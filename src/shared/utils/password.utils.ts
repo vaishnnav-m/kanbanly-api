@@ -1,5 +1,5 @@
 import { injectable } from "tsyringe";
-import { IPasswordUtils } from "../../interfaces/IPasswordUtils";
+import { IPasswordUtils } from "../../interfaces/common/IPasswordUtils";
 import bcrypt from "bcrypt";
 
 @injectable()

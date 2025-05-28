@@ -1,19 +1,19 @@
 import { Request, Response } from "express";
-import { IUserController } from "../interfaces/IUserController";
+import { IUserController } from "../interfaces/controller-interfaces/IUserController";
 import { inject, injectable } from "tsyringe";
-import { IUserService } from "../interfaces/IUserService";
+import { IUserService } from "../interfaces/service-interface/IUserService";
 import { HTTP_STATUS } from "../shared/constants/http.status";
-import { ApiResponse } from "../interfaces/IApiResponse";
+import { ApiResponse } from "../interfaces/common/IApiResponse";
 import { IUser } from "../interfaces/IUser";
 import { SUCCESS_MESSAGES } from "../shared/constants/messages";
 
 @injectable()
 export class UserController implements IUserController {
-  constructor(@inject("IUserService") private userService: IUserService) {}
+  constructor(@inject("IUserService") private _userService: IUserService) {}
 
   async registerUser(req: Request, res: Response): Promise<void> {
     try {
-      await this.userService.register(req.body);
+      await this._userService.register(req.body);
 
       const response: ApiResponse<IUser> = {
         success: true,
