@@ -15,7 +15,7 @@ export class AuthRoutes extends BaseRoute {
 
   initializeRoutes(): void {
     this._router.post(
-      "/register",
+      "/signup",
       this._userController.registerUser.bind(this._userController)
     );
     this._router.post(

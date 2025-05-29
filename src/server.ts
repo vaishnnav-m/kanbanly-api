@@ -1,8 +1,10 @@
 import express, { Application } from "express";
+import cors from "cors";
 import { config } from "./config";
 import { AuthRoutes } from "./routes/auth/auth.routes";
 import { container } from "tsyringe";
 import { DependencyInjection } from "./di";
+import { corsOptions } from "./middlewares/cors.middleware";
 
 export default class Server {
   private _app: Application;
@@ -21,6 +23,7 @@ export default class Server {
   }
 
   private configureMiddlewares(): void {
+    this._app.use(cors(corsOptions));
     this._app.use(express.json());
   }
 
