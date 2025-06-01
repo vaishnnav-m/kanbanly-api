@@ -16,7 +16,12 @@ export const config = {
     EMAIL_PASS: process.env.EMAIL_PASS,
   },
 
-  cors:{
-    ALLOWED_ORIGIN:process.env.CORS_ALLOWED_ORIGIN
-  }
+  cors: {
+    ALLOWED_ORIGIN: process.env.CORS_ALLOWED_ORIGIN,
+  },
+
+  jwt: {
+    ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET || "ACCESS_SECRET",
+    REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET || "REFRESH_SECRET",
+  },
 };
