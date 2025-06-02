@@ -12,4 +12,7 @@ export class OtpRepository implements IOtpRepository {
   async findByEmail(email: string): Promise<IOtp | null> {
     return await otpModel.findOne({ email });
   }
+  async delete(id: string): Promise<void> {
+    await otpModel.findByIdAndDelete(id);
+  }
 }

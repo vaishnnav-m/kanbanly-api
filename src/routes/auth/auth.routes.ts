@@ -23,6 +23,10 @@ export class AuthRoutes extends BaseRoute {
       this._otpController.sendOtp.bind(this._otpController)
     );
     this._router.post(
+      "/verify-otp",
+      this._otpController.verifyOtp.bind(this._otpController)
+    );
+    this._router.post(
       "/login",
       this._authController.login.bind(this._authController)
     );

@@ -12,4 +12,8 @@ export class UserRepository implements IUserRepository {
   async findByEmail(email: string): Promise<IUser | null> {
     return await userModel.findOne({ email });
   }
+
+  async updateIsVerified(email: string, status: boolean): Promise<void> {
+    await userModel.findOneAndUpdate({ email }, { isEmailVerified: status });
+  }
 }

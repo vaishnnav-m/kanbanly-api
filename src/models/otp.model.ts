@@ -10,6 +10,7 @@ const otpSchema = new Schema<IOtp>(
     expiresAt: {
       type: Date,
       required: true,
+      expires: 0,
     },
     email: {
       type: String,
