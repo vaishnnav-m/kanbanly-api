@@ -4,6 +4,8 @@ import { IAuthService } from "../interfaces/service-interface/IAuthService";
 import { IUserRepository } from "../interfaces/repository-interfaces/IUserRepository";
 import { IPasswordUtils } from "../interfaces/common/IPasswordUtils";
 import { IUser } from "../interfaces/IUser";
+import AppError from "../shared/utils/AppError";
+import { HTTP_STATUS } from "../shared/constants/http.status";
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -16,7 +18,7 @@ export class AuthService implements IAuthService {
     const emailExists = await this._userRepository.findByEmail(email);
 
     if (emailExists) {
-      throw new Error("User already exists");
+      throw new AppError("User already exists", HTTP_STATUS.CONFLICT);
     }
 
     const hashedPassword = await this._passwordBcrypt.hash(password);
@@ -34,12 +36,10 @@ export class AuthService implements IAuthService {
   async login(user: userDto): Promise<IUser> {
     const { email, password } = user;
     const emailExists = await this._userRepository.findByEmail(email);
-    console.log(">>>>>", email);
 
     if (!emailExists) {
-      throw new Error("Invalid Email or Password");
+      throw new AppError("Invalid Email or Password", HTTP_STATUS.BAD_REQUEST);
     }
-
 
     const isPasswordMatch = await this._passwordBcrypt.compare(
       password,
@@ -47,7 +47,7 @@ export class AuthService implements IAuthService {
     );
 
     if (!isPasswordMatch) {
-      throw new Error("Invalid Email or Password");
+      throw new AppError("Invalid Email or Password", HTTP_STATUS.BAD_REQUEST);
     }
 
     return emailExists;

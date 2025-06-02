@@ -9,6 +9,7 @@ import { SUCCESS_MESSAGES } from "../shared/constants/messages";
 import { ITokenService } from "../interfaces/service-interface/ITokenService";
 import { setAuthCookies } from "../shared/utils/cookieHelper.utils";
 import { userDto } from "../interfaces/dtos/createUser.dto";
+import AppError from "../shared/utils/AppError";
 
 @injectable()
 export class AuthController implements IAuthController {
@@ -45,6 +46,15 @@ export class AuthController implements IAuthController {
       res.status(HTTP_STATUS.CREATED).json(response);
     } catch (error) {
       console.log(error);
+      
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          success: false,
+          message: error.message,
+        });
+        return;
+      }
+
       res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: error ? error : "Internal Server Error",
@@ -91,8 +101,17 @@ export class AuthController implements IAuthController {
       };
 
       res.status(HTTP_STATUS.OK).json(response);
-    } catch (error:any) {
+    } catch (error) {
       console.log(error);
+
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          success: false,
+          message: error.message,
+        });
+        return;
+      }
+
       res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: error ? error : "Internal Server Error",
