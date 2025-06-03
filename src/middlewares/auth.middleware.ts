@@ -10,9 +10,7 @@ export const authenticateToken = (
   res: Response,
   next: NextFunction
 ) => {
-  const authHeader = req.headers["authorization"];
-
-  const token = authHeader && authHeader.split(" ")[1];
+  const token = req.cookies.accessToken;
 
   if (!token) {
     return res.status(HTTP_STATUS.UNAUTHORIZED).json({
@@ -20,6 +18,7 @@ export const authenticateToken = (
       message: ERROR_MESSAGES.AUTH_NO_TOKEN_PROVIDED,
     });
   }
+
   try {
     const tokenService = container.resolve<ITokenService>("TokenService");
     const decoded = tokenService.verifyAccessToken(token);
