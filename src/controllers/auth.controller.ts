@@ -23,13 +23,13 @@ export class AuthController implements IAuthController {
       const user: IUser = await this._authService.register(req.body);
 
       const accessToken = this._tokenService.generateAccessToken({
-        userId: user.id,
+        email: user.email,
         isVerified: user.isEmailVerified,
         role: user.isAdmin ? "Admin" : "User",
       });
 
       const refreshToken = this._tokenService.generateRefreshToken({
-        userId: user.id,
+        email: user.email,
         isVerified: user.isEmailVerified,
         role: user.isAdmin ? "Admin" : "User",
       });
@@ -75,13 +75,13 @@ export class AuthController implements IAuthController {
       }
 
       const accessToken = this._tokenService.generateAccessToken({
-        userId: user.id,
+        email: user.email,
         isVerified: user.isEmailVerified,
         role: user.isAdmin ? "Admin" : "User",
       });
 
       const refreshToken = this._tokenService.generateRefreshToken({
-        userId: user.id,
+        email: user.email,
         isVerified: user.isEmailVerified,
         role: user.isAdmin ? "Admin" : "User",
       });
