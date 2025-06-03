@@ -1,10 +1,10 @@
 import { inject, injectable } from "tsyringe";
-import { IOtpController } from "../interfaces/controller-interfaces/IOtpControllder";
+import { IOtpController } from "../types/controller-interfaces/IOtpControllder";
 import { Request, Response } from "express";
-import { IOtpService } from "../interfaces/service-interface/IOtpService";
-import { ApiResponse } from "../interfaces/common/IApiResponse";
-import { IOtp } from "../interfaces/IOtp";
-import { SUCCESS_MESSAGES } from "../shared/constants/messages";
+import { IOtpService } from "../types/service-interface/IOtpService";
+import { ApiResponse } from "../types/common/IApiResponse";
+import { IOtp } from "../types/IOtp";
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../shared/constants/messages";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import AppError from "../shared/utils/AppError";
 
@@ -35,7 +35,7 @@ export class OtpController implements IOtpController {
 
       res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: error ? error : "Internal Server Error",
+        message: error ? error : ERROR_MESSAGES.UNEXPECTED_SERVER_ERROR,
       });
     }
   }
@@ -63,7 +63,7 @@ export class OtpController implements IOtpController {
 
       res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: error ? error : "Internal Server Error",
+        message: error ? error : ERROR_MESSAGES.UNEXPECTED_SERVER_ERROR,
       });
     }
   }

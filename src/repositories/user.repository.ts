@@ -1,6 +1,6 @@
 import { injectable } from "tsyringe";
-import { IUser } from "../interfaces/IUser";
-import { IUserRepository } from "../interfaces/repository-interfaces/IUserRepository";
+import { IUser } from "../types/IUser";
+import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
 import { userModel } from "../models/user.model";
 
 @injectable()

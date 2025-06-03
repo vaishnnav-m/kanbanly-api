@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
-import { IAuthController } from "../../interfaces/controller-interfaces/IAuthController";
+import { IAuthController } from "../../types/controller-interfaces/IAuthController";
 import { BaseRoute } from "../base.routes";
-import { IOtpController } from "../../interfaces/controller-interfaces/IOtpControllder";
+import { IOtpController } from "../../types/controller-interfaces/IOtpControllder";
 
 @injectable()
 export class AuthRoutes extends BaseRoute {

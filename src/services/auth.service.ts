@@ -1,9 +1,9 @@
 import { inject, injectable } from "tsyringe";
-import { userDto } from "../interfaces/dtos/createUser.dto";
-import { IAuthService } from "../interfaces/service-interface/IAuthService";
-import { IUserRepository } from "../interfaces/repository-interfaces/IUserRepository";
-import { IPasswordUtils } from "../interfaces/common/IPasswordUtils";
-import { IUser } from "../interfaces/IUser";
+import { userDto } from "../types/dtos/createUser.dto";
+import { IAuthService } from "../types/service-interface/IAuthService";
+import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
+import { IPasswordUtils } from "../types/common/IPasswordUtils";
+import { IUser } from "../types/IUser";
 import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 

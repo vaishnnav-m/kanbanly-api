@@ -17,4 +17,7 @@ export const ERROR_MESSAGES = {
   RESOURCE_NOT_FOUND: 'The requested resource was not found.',
   UNAUTHORIZED_ACCESS: 'Unauthorized access.',
   FORBIDDEN_ACCESS: 'Forbidden access.',
+  AUTH_NO_TOKEN_PROVIDED: "Access Denied: No authentication token provided.",
+  AUTH_INVALID_TOKEN: "Access Denied: Invalid or expired authentication token.",
+  AUTH_TOKEN_ERROR: "Authentication error: Could not process token.",
 };

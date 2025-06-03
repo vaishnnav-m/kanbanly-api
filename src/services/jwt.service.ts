@@ -2,7 +2,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import {
   ITokenPayload,
   ITokenService,
-} from "../interfaces/service-interface/ITokenService";
+} from "../types/service-interface/ITokenService";
 import { config } from "../config";
 import { injectable } from "tsyringe";
 
@@ -21,10 +21,31 @@ export class TokenService implements ITokenService {
   generateRefreshToken(payload: ITokenPayload): string {
     return jwt.sign(payload, this._refreshSecret, { expiresIn: "7d" });
   }
-  verifyAccessToken(token: string): JwtPayload | string {
-    return jwt.verify(token, this._accessSecret);
+  verifyAccessToken(token: string): ITokenPayload | null {
+    try {
+      const decoded = jwt.verify(token, this._accessSecret);
+
+      if (!decoded || typeof decoded === "string") {
+        return null;
+      }
+
+      return decoded as ITokenPayload;
+    } catch (error) {
+      return null;
+    }
   }
-  verifyRefereshToken(token: string): JwtPayload | string {
-    return jwt.verify(token, this._refreshSecret);
+
+  verifyRefereshToken(token: string): ITokenPayload | null {
+    try {
+      const decoded = jwt.verify(token, this._refreshSecret);
+
+      if (!decoded || typeof decoded === "string") {
+        return null;
+      }
+
+      return decoded as ITokenPayload;
+    } catch (error) {
+      return null;
+    }
   }
 }

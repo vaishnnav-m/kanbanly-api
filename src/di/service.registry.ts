@@ -1,9 +1,9 @@
 import { container } from "tsyringe";
-import { IAuthService } from "../interfaces/service-interface/IAuthService";
+import { IAuthService } from "../types/service-interface/IAuthService";
 import { AuthService } from "../services/auth.service";
-import { IOtpService } from "../interfaces/service-interface/IOtpService";
+import { IOtpService } from "../types/service-interface/IOtpService";
 import { OtpService } from "../services/otp.service";
-import { ITokenService } from "../interfaces/service-interface/ITokenService";
+import { ITokenService } from "../types/service-interface/ITokenService";
 import { TokenService } from "../services/jwt.service";
 
 export class ServiceRegistry {

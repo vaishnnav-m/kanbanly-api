@@ -1,7 +1,7 @@
 import { container } from "tsyringe";
-import { IUserRepository } from "../interfaces/repository-interfaces/IUserRepository";
+import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
 import { UserRepository } from "../repositories/user.repository";
-import { IOtpRepository } from "../interfaces/repository-interfaces/IOtpRepository";
+import { IOtpRepository } from "../types/repository-interfaces/IOtpRepository";
 import { OtpRepository } from "../repositories/otp.repository";
 
 export class RepositoryRegistry {

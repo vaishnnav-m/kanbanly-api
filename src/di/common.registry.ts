@@ -1,9 +1,9 @@
 import { container } from "tsyringe";
-import { IPasswordUtils } from "../interfaces/common/IPasswordUtils";
+import { IPasswordUtils } from "../types/common/IPasswordUtils";
 import { PasswordUtils } from "../shared/utils/password.utils";
-import { IOtpUtils } from "../interfaces/common/IOtpUtils";
+import { IOtpUtils } from "../types/common/IOtpUtils";
 import { OtpUtils } from "../shared/utils/otp.utils";
-import { IEmailUtils } from "../interfaces/common/IEmailUtils";
+import { IEmailUtils } from "../types/common/IEmailUtils";
 import { EmailUtils } from "../shared/utils/emailTransporter.utils";
 
 export class CommonRegistry {

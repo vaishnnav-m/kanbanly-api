@@ -1,12 +1,12 @@
 import { inject, injectable } from "tsyringe";
-import { IOtpService } from "../interfaces/service-interface/IOtpService";
-import { IOtpRepository } from "../interfaces/repository-interfaces/IOtpRepository";
-import { IOtpUtils } from "../interfaces/common/IOtpUtils";
-import { IEmailUtils } from "../interfaces/common/IEmailUtils";
-import { IPasswordUtils } from "../interfaces/common/IPasswordUtils";
+import { IOtpService } from "../types/service-interface/IOtpService";
+import { IOtpRepository } from "../types/repository-interfaces/IOtpRepository";
+import { IOtpUtils } from "../types/common/IOtpUtils";
+import { IEmailUtils } from "../types/common/IEmailUtils";
+import { IPasswordUtils } from "../types/common/IPasswordUtils";
 import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
-import { IUserRepository } from "../interfaces/repository-interfaces/IUserRepository";
+import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
 
 @injectable()
 export class OtpService implements IOtpService {

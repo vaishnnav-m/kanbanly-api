@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import { injectable } from "tsyringe";
-import { IEmailUtils } from "../../interfaces/common/IEmailUtils";
+import { IEmailUtils } from "../../types/common/IEmailUtils";
 import { config } from "../../config";
 import { ACCOUNT_VERIFICATION } from "../templates/email.templates";
 

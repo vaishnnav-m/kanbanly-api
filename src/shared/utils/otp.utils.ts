@@ -1,5 +1,5 @@
 import { injectable } from "tsyringe";
-import { IOtpUtils } from "../../interfaces/common/IOtpUtils";
+import { IOtpUtils } from "../../types/common/IOtpUtils";
 import { randomBytes } from "crypto";
 
 @injectable()

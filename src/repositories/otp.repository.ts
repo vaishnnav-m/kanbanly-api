@@ -1,8 +1,8 @@
 import { injectable } from "tsyringe";
-import { IOtpRepository } from "../interfaces/repository-interfaces/IOtpRepository";
-import { IOtp } from "../interfaces/IOtp";
+import { IOtpRepository } from "../types/repository-interfaces/IOtpRepository";
+import { IOtp } from "../types/IOtp";
 import { otpModel } from "../models/otp.model";
-import { OtpDto } from "../interfaces/dtos/createOtp.dto";
+import { OtpDto } from "../types/dtos/createOtp.dto";
 
 @injectable()
 export class OtpRepository implements IOtpRepository {

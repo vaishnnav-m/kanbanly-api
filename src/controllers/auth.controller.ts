@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import { IAuthController } from "../interfaces/controller-interfaces/IAuthController";
+import { IAuthController } from "../types/controller-interfaces/IAuthController";
 import { inject, injectable } from "tsyringe";
-import { IAuthService } from "../interfaces/service-interface/IAuthService";
+import { IAuthService } from "../types/service-interface/IAuthService";
 import { HTTP_STATUS } from "../shared/constants/http.status";
-import { ApiResponse } from "../interfaces/common/IApiResponse";
-import { IUser } from "../interfaces/IUser";
-import { SUCCESS_MESSAGES } from "../shared/constants/messages";
-import { ITokenService } from "../interfaces/service-interface/ITokenService";
+import { ApiResponse } from "../types/common/IApiResponse";
+import { IUser } from "../types/IUser";
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../shared/constants/messages";
+import { ITokenService } from "../types/service-interface/ITokenService";
 import { setAuthCookies } from "../shared/utils/cookieHelper.utils";
-import { userDto } from "../interfaces/dtos/createUser.dto";
+import { userDto } from "../types/dtos/createUser.dto";
 import AppError from "../shared/utils/AppError";
 
 @injectable()
@@ -46,7 +46,7 @@ export class AuthController implements IAuthController {
       res.status(HTTP_STATUS.CREATED).json(response);
     } catch (error) {
       console.log(error);
-      
+
       if (error instanceof AppError) {
         res.status(error.statusCode).json({
           success: false,
@@ -57,7 +57,7 @@ export class AuthController implements IAuthController {
 
       res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: error ? error : "Internal Server Error",
+        message: error ? error : ERROR_MESSAGES.UNEXPECTED_SERVER_ERROR,
       });
     }
   }
@@ -114,7 +114,7 @@ export class AuthController implements IAuthController {
 
       res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: error ? error : "Internal Server Error",
+        message: error ? error : ERROR_MESSAGES.UNEXPECTED_SERVER_ERROR,
       });
     }
   }

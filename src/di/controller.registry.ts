@@ -1,7 +1,7 @@
 import { container } from "tsyringe";
-import { IAuthController } from "../interfaces/controller-interfaces/IAuthController";
+import { IAuthController } from "../types/controller-interfaces/IAuthController";
 import { AuthController } from "../controllers/auth.controller";
-import { IOtpController } from "../interfaces/controller-interfaces/IOtpControllder";
+import { IOtpController } from "../types/controller-interfaces/IOtpControllder";
 import { OtpController } from "../controllers/otp.controller";
 
 export class ControllerRegistry {
