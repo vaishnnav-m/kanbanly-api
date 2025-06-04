@@ -8,7 +8,6 @@ import { IUser } from "../types/IUser";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../shared/constants/messages";
 import { ITokenService } from "../types/service-interface/ITokenService";
 import { setAuthCookies } from "../shared/utils/cookieHelper.utils";
-import { userDto } from "../types/dtos/createUser.dto";
 import AppError from "../shared/utils/AppError";
 
 @injectable()
@@ -38,9 +37,15 @@ export class AuthController implements IAuthController {
       setAuthCookies(res, "userRefreshToken", refreshToken);
       setAuthCookies(res, "isVerified", user.isEmailVerified.toString());
 
-      const response: ApiResponse<IUser> = {
+      const response: ApiResponse<Partial<IUser>> = {
         success: true,
         message: SUCCESS_MESSAGES.REGISTRATION_SUCCESSFUL,
+        data: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          isEmailVerified: user.isEmailVerified,
+        },
       };
 
       res.status(HTTP_STATUS.CREATED).json(response);
@@ -90,13 +95,14 @@ export class AuthController implements IAuthController {
       setAuthCookies(res, "userRefreshToken", refreshToken);
       setAuthCookies(res, "isVerified", user.isEmailVerified.toString());
 
-      const response: ApiResponse<Omit<userDto, "password">> = {
+      const response: ApiResponse<Partial<IUser>> = {
         success: true,
         message: SUCCESS_MESSAGES.LOGIN_SUCCESSFUL,
         data: {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
+          isEmailVerified: user.isEmailVerified,
         },
       };
 

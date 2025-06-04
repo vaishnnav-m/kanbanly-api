@@ -9,30 +9,33 @@ export const authenticateToken = (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
-  const token = req.cookies.accessToken;
+): void => {
+  const token = req.cookies.userAccessToken;
 
   if (!token) {
-    return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+    res.status(HTTP_STATUS.UNAUTHORIZED).json({
       success: false,
       message: ERROR_MESSAGES.AUTH_NO_TOKEN_PROVIDED,
     });
+    return;
   }
 
   try {
-    const tokenService = container.resolve<ITokenService>("TokenService");
+    const tokenService = container.resolve<ITokenService>("ITokenService");
     const decoded = tokenService.verifyAccessToken(token);
 
     if (!decoded) {
-      return res.status(HTTP_STATUS.FORBIDDEN).json({
+      res.status(HTTP_STATUS.FORBIDDEN).json({
         success: false,
         message: ERROR_MESSAGES.AUTH_INVALID_TOKEN,
       });
+      return;
     }
 
     req.user = decoded;
     next();
   } catch (error) {
+    console.error(error);
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: ERROR_MESSAGES.UNEXPECTED_SERVER_ERROR,

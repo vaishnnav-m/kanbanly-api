@@ -14,7 +14,15 @@ export class OtpController implements IOtpController {
 
   async sendOtp(req: Request, res: Response): Promise<void> {
     try {
-      const { email } = req.body;
+      if (!req.user) {
+        res.status(HTTP_STATUS.UNAUTHORIZED).json({
+          success: false,
+          message: ERROR_MESSAGES.AUTH_INVALID_TOKEN,
+        });
+        return;
+      }
+
+      const { email } = req.user;
       await this._otpService.sendOtp(email);
 
       const response: ApiResponse<IOtp> = {
@@ -42,7 +50,15 @@ export class OtpController implements IOtpController {
 
   async verifyOtp(req: Request, res: Response): Promise<void> {
     try {
-      const { email, otp }: { email: string; otp: string } = req.body;
+      if (!req.user) {
+        res.status(HTTP_STATUS.UNAUTHORIZED).json({
+          success: false,
+          message: ERROR_MESSAGES.AUTH_INVALID_TOKEN,
+        });
+        return;
+      }
+      const { email } = req.user;
+      const { otp }: { email: string; otp: string } = req.body;
       await this._otpService.verifyOtpService(email, otp);
 
       const response: ApiResponse<IOtp> = {
