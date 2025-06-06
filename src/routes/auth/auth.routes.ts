@@ -3,12 +3,14 @@ import { IAuthController } from "../../types/controller-interfaces/IAuthControll
 import { BaseRoute } from "../base.routes";
 import { IOtpController } from "../../types/controller-interfaces/IOtpControllder";
 import { authenticateToken } from "../../middlewares/auth.middleware";
+import { IVerificationController } from "../../types/controller-interfaces/IVerificationController";
 
 @injectable()
 export class AuthRoutes extends BaseRoute {
   constructor(
     @inject("IAuthController") private _authController: IAuthController,
-    @inject("IOtpController") private _otpController: IOtpController
+    @inject("IVerificationController")
+    private _verificationController: IVerificationController
   ) {
     super();
     this.initializeRoutes();
@@ -19,16 +21,6 @@ export class AuthRoutes extends BaseRoute {
       "/signup",
       this._authController.registerUser.bind(this._authController)
     );
-    this._router.get(
-      "/send-otp",
-      authenticateToken,
-      this._otpController.sendOtp.bind(this._otpController)
-    );
-    this._router.post(
-      "/verify-otp",
-      authenticateToken,
-      this._otpController.verifyOtp.bind(this._otpController)
-    );
     this._router.post(
       "/login",
       this._authController.login.bind(this._authController)
@@ -37,6 +29,12 @@ export class AuthRoutes extends BaseRoute {
       "/logout",
       authenticateToken,
       this._authController.logout.bind(this._authController)
+    );
+    this._router.get(
+      "/verify-email",
+      this._verificationController.verifyEmail.bind(
+        this._verificationController
+      )
     );
   }
 }

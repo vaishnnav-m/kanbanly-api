@@ -23,22 +23,6 @@ export class AuthController implements IAuthController {
   async registerUser(req: Request, res: Response): Promise<void> {
     const user: IUser = await this._authService.register(req.body);
 
-    const accessToken = this._tokenService.generateAccessToken({
-      email: user.email,
-      isVerified: user.isEmailVerified,
-      role: user.isAdmin ? "Admin" : "User",
-    });
-
-    const refreshToken = this._tokenService.generateRefreshToken({
-      email: user.email,
-      isVerified: user.isEmailVerified,
-      role: user.isAdmin ? "Admin" : "User",
-    });
-
-    setAuthCookies(res, "userAccessToken", accessToken);
-    setAuthCookies(res, "userRefreshToken", refreshToken);
-    setAuthCookies(res, "isVerified", user.isEmailVerified.toString());
-
     const response: ApiResponse<Partial<IUser>> = {
       success: true,
       message: SUCCESS_MESSAGES.REGISTRATION_SUCCESSFUL,

@@ -20,4 +20,5 @@ export const ERROR_MESSAGES = {
   AUTH_NO_TOKEN_PROVIDED: "Access Denied: No authentication token provided.",
   AUTH_INVALID_TOKEN: "Access Denied: Invalid or expired authentication token.",
   AUTH_TOKEN_ERROR: "Authentication error: Could not process token.",
+  USER_NOT_EXIST_OR_ALREADY_VERIFIED: 'User not exists or already verified.',
 };

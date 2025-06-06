@@ -16,12 +16,12 @@ export class EmailUtils implements IEmailUtils {
       },
     });
   }
-  async sendEmail(to: string, subject: string, otp: string): Promise<void> {
+  async sendEmail(to: string, subject: string, link: string): Promise<void> {
     const mailOptions = {
       from: "Kanbanly",
       to,
       subject,
-      html: ACCOUNT_VERIFICATION(otp),
+      html: ACCOUNT_VERIFICATION(link),
     };
 
     await this._transporter.sendMail(mailOptions);

@@ -3,6 +3,8 @@ import { IAuthController } from "../types/controller-interfaces/IAuthController"
 import { AuthController } from "../controllers/auth.controller";
 import { IOtpController } from "../types/controller-interfaces/IOtpControllder";
 import { OtpController } from "../controllers/otp.controller";
+import { IVerificationController } from "../types/controller-interfaces/IVerificationController";
+import { VerificationController } from "../controllers/verification.controller";
 
 export class ControllerRegistry {
   static registerController(): void {
@@ -11,6 +13,9 @@ export class ControllerRegistry {
     });
     container.register<IOtpController>("IOtpController", {
       useClass: OtpController,
+    });
+    container.register<IVerificationController>("IVerificationController", {
+      useClass: VerificationController,
     });
   }
 }

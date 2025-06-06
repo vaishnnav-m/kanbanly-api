@@ -17,11 +17,12 @@ export const config = {
   },
 
   cors: {
-    ALLOWED_ORIGIN: process.env.CORS_ALLOWED_ORIGIN,
+    ALLOWED_ORIGIN: process.env.CORS_ALLOWED_ORIGIN || "http://localhost:3000",
   },
 
   jwt: {
     ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET || "ACCESS_SECRET",
     REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET || "REFRESH_SECRET",
+    VERIFICATION_TOKEN_SECRET:process.env.VERIFICATION_TOKEN_SECRET || "VERIFICATION_TOKEN_SECRET"
   },
 };

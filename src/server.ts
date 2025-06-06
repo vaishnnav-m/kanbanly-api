@@ -7,6 +7,8 @@ import { DependencyInjection } from "./di";
 import { corsOptions } from "./middlewares/cors.middleware";
 import cookieParser from "cookie-parser";
 import { ErrorMiddleware } from "./middlewares/error.middleware";
+import { IVerificationService } from "./types/service-interface/IVerificationService";
+import { authEvents } from "./services/auth.service";
 
 export default class Server {
   private _app: Application;
@@ -20,6 +22,7 @@ export default class Server {
 
   private initialize() {
     DependencyInjection.registerAll();
+    this.setupEventListeners();
     this.configureMiddlewares();
     this.configureRoutes();
     this.configureErrorMiddlewares();
@@ -35,6 +38,29 @@ export default class Server {
     const errorMiddlewareInstance = container.resolve(ErrorMiddleware);
     this._app.use(
       errorMiddlewareInstance.handleError.bind(errorMiddlewareInstance)
+    );
+  }
+
+  private setupEventListeners() {
+    const verificationService = container.resolve<IVerificationService>(
+      "IVerificationService"
+    );
+
+    authEvents.on(
+      "userRegistered",
+      async ({ userEmail }: { userEmail: string }) => {
+        try {
+          await verificationService.sendVerificationEmail(userEmail);
+          console.log(
+            `[Event Listener] Verification email sent to ${userEmail} after registration.`
+          );
+        } catch (error) {
+          console.error(
+            `[Event Listener] Failed to send verification email for ${userEmail}:`,
+            error
+          );
+        }
+      }
     );
   }
 

@@ -1,14 +1,23 @@
-export const ACCOUNT_VERIFICATION = ( otp: string) => `
-    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-      <h1 style="color: #5cb85c;">Account Verification</h1>
-      <p>Thank you for registering with Kanbanly. Please use the following One-Time Password (OTP) to verify your account:</p>
-      <p style="font-size: 24px; font-weight: bold; text-align: center; color: #0056b3; margin: 30px 0; padding: 10px 0; border: 2px dashed #0056b3; border-radius: 5px;">${otp}</p>
-      <p>Enter this OTP in the application to complete your registration.</p>
-      <p>If you did not register, please ignore this email.</p>
-      <p style="margin-top: 20px;">Best regards,</p>
-      <p><strong>The Kanbanly Team</strong></p>
+export const ACCOUNT_VERIFICATION = (verificationLink: string) => `
+  <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+    <h1 style="color: #5cb85c;">Account Verification</h1>
+    <p>Thank you for registering with Kanbanly. Please click the button below to verify your account:</p>
+    
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="${verificationLink}" style="background-color: #5cb85c; color: white; padding: 12px 24px; text-decoration: none; font-size: 16px; border-radius: 5px; display: inline-block;">
+        Verify My Account
+      </a>
     </div>
-  `;
+
+    <p>If the button above does not work, you can also copy and paste the following link into your browser:</p>
+    <p style="word-break: break-all;"><a href="${verificationLink}">${verificationLink}</a></p>
+
+    <p>If you did not register, please ignore this email.</p>
+    <p style="margin-top: 20px;">Best regards,</p>
+    <p><strong>The Kanbanly Team</strong></p>
+  </div>
+`;
+
 
 export const WELCOME = (name: string) => `
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">

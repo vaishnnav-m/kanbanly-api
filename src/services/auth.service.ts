@@ -6,6 +6,9 @@ import { IBcryptUtils } from "../types/common/IBcryptUtils";
 import { IUser } from "../types/IUser";
 import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
+import { EventEmitter } from "events";
+
+export const authEvents = new EventEmitter();
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -30,6 +33,8 @@ export class AuthService implements IAuthService {
       password: hashedPassword,
     });
 
+    authEvents.emit("userRegistered", { userEmail: email });
+
     return newUser;
   }
 
@@ -48,6 +53,13 @@ export class AuthService implements IAuthService {
 
     if (!isPasswordMatch) {
       throw new AppError("Invalid Email or Password", HTTP_STATUS.BAD_REQUEST);
+    }
+
+    if (!emailExists.isEmailVerified) {
+      throw new AppError(
+        "Please verify your email to login",
+        HTTP_STATUS.FORBIDDEN
+      );
     }
 
     return emailExists;
