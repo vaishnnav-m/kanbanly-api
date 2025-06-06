@@ -16,7 +16,7 @@ export class TokenService implements ITokenService {
   }
 
   generateAccessToken(payload: ITokenPayload): string {
-    return jwt.sign(payload, this._accessSecret, { expiresIn: "5m" });
+    return jwt.sign(payload, this._accessSecret, { expiresIn: "25m" });
   }
   generateRefreshToken(payload: ITokenPayload): string {
     return jwt.sign(payload, this._refreshSecret, { expiresIn: "7d" });

@@ -9,3 +9,12 @@ export const setAuthCookies = (res: Response, key: string, value: string) => {
     sameSite: isProduction ? "none" : "lax",
   });
 };
+
+export const clearAuthCookies = (res: Response, key: string) => {
+  res.clearCookie(key, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    maxAge: 0,
+  });
+};

@@ -2,7 +2,7 @@ import { inject, injectable } from "tsyringe";
 import { userDto } from "../types/dtos/createUser.dto";
 import { IAuthService } from "../types/service-interface/IAuthService";
 import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
-import { IPasswordUtils } from "../types/common/IPasswordUtils";
+import { IBcryptUtils } from "../types/common/IBcryptUtils";
 import { IUser } from "../types/IUser";
 import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
@@ -11,7 +11,7 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 export class AuthService implements IAuthService {
   constructor(
     @inject("IUserRepository") private _userRepository: IUserRepository,
-    @inject("IPasswordUtils") private _passwordBcrypt: IPasswordUtils
+    @inject("IBcryptUtils") private _passwordBcrypt: IBcryptUtils
   ) {}
   async register(user: userDto): Promise<IUser> {
     const { firstName, lastName, email, phone, password } = user;

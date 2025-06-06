@@ -6,6 +6,7 @@ import { container } from "tsyringe";
 import { DependencyInjection } from "./di";
 import { corsOptions } from "./middlewares/cors.middleware";
 import cookieParser from "cookie-parser";
+import { ErrorMiddleware } from "./middlewares/error.middleware";
 
 export default class Server {
   private _app: Application;
@@ -21,12 +22,20 @@ export default class Server {
     DependencyInjection.registerAll();
     this.configureMiddlewares();
     this.configureRoutes();
+    this.configureErrorMiddlewares();
   }
 
   private configureMiddlewares(): void {
     this._app.use(cors(corsOptions));
     this._app.use(express.json());
     this._app.use(cookieParser());
+  }
+
+  private configureErrorMiddlewares() {
+    const errorMiddlewareInstance = container.resolve(ErrorMiddleware);
+    this._app.use(
+      errorMiddlewareInstance.handleError.bind(errorMiddlewareInstance)
+    );
   }
 
   private configureRoutes(): void {

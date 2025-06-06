@@ -13,74 +13,38 @@ export class OtpController implements IOtpController {
   constructor(@inject("IOtpService") private _otpService: IOtpService) {}
 
   async sendOtp(req: Request, res: Response): Promise<void> {
-    try {
-      if (!req.user) {
-        res.status(HTTP_STATUS.UNAUTHORIZED).json({
-          success: false,
-          message: ERROR_MESSAGES.AUTH_INVALID_TOKEN,
-        });
-        return;
-      }
-
-      const { email } = req.user;
-      await this._otpService.sendOtp(email);
-
-      const response: ApiResponse<IOtp> = {
-        success: true,
-        message: SUCCESS_MESSAGES.OTP_SEND,
-      };
-      res.status(HTTP_STATUS.OK).json(response);
-    } catch (error) {
-      console.log(error);
-
-      if (error instanceof AppError) {
-        res.status(error.statusCode).json({
-          success: false,
-          message: error.message,
-        });
-        return;
-      }
-
-      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: error ? error : ERROR_MESSAGES.UNEXPECTED_SERVER_ERROR,
-      });
+    if (!req.user) {
+      throw new AppError(
+        ERROR_MESSAGES.AUTH_INVALID_TOKEN,
+        HTTP_STATUS.UNAUTHORIZED
+      );
     }
+
+    const { email } = req.user;
+    await this._otpService.sendOtp(email);
+
+    const response: ApiResponse<IOtp> = {
+      success: true,
+      message: SUCCESS_MESSAGES.OTP_SEND,
+    };
+    res.status(HTTP_STATUS.OK).json(response);
   }
 
   async verifyOtp(req: Request, res: Response): Promise<void> {
-    try {
-      if (!req.user) {
-        res.status(HTTP_STATUS.UNAUTHORIZED).json({
-          success: false,
-          message: ERROR_MESSAGES.AUTH_INVALID_TOKEN,
-        });
-        return;
-      }
-      const { email } = req.user;
-      const { otp }: { email: string; otp: string } = req.body;
-      await this._otpService.verifyOtpService(email, otp);
-
-      const response: ApiResponse<IOtp> = {
-        success: true,
-        message: SUCCESS_MESSAGES.OTP_VERIFIED,
-      };
-      res.status(HTTP_STATUS.OK).json(response);
-    } catch (error) {
-      console.log(error);
-
-      if (error instanceof AppError) {
-        res.status(error.statusCode).json({
-          success: false,
-          message: error.message,
-        });
-        return;
-      }
-
-      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: error ? error : ERROR_MESSAGES.UNEXPECTED_SERVER_ERROR,
-      });
+    if (!req.user) {
+      throw new AppError(
+        ERROR_MESSAGES.AUTH_INVALID_TOKEN,
+        HTTP_STATUS.UNAUTHORIZED
+      );
     }
+    const { email } = req.user;
+    const { otp }: { email: string; otp: string } = req.body;
+    await this._otpService.verifyOtpService(email, otp);
+
+    const response: ApiResponse<IOtp> = {
+      success: true,
+      message: SUCCESS_MESSAGES.OTP_VERIFIED,
+    };
+    res.status(HTTP_STATUS.OK).json(response);
   }
 }

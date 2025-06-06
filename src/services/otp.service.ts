@@ -3,7 +3,7 @@ import { IOtpService } from "../types/service-interface/IOtpService";
 import { IOtpRepository } from "../types/repository-interfaces/IOtpRepository";
 import { IOtpUtils } from "../types/common/IOtpUtils";
 import { IEmailUtils } from "../types/common/IEmailUtils";
-import { IPasswordUtils } from "../types/common/IPasswordUtils";
+import { IBcryptUtils } from "../types/common/IBcryptUtils";
 import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
@@ -14,7 +14,7 @@ export class OtpService implements IOtpService {
     @inject("IOtpRepository") private _otpRepository: IOtpRepository,
     @inject("IOtpUtils") private _otpUtil: IOtpUtils,
     @inject("IEmailUtils") private _emailUtil: IEmailUtils,
-    @inject("IPasswordUtils") private _passwordUtil: IPasswordUtils,
+    @inject("IBcryptUtils") private _bcryptUtil: IBcryptUtils,
     @inject("IUserRepository") private _userRepository: IUserRepository
   ) {}
   async sendOtp(email: string): Promise<void> {
@@ -26,7 +26,7 @@ export class OtpService implements IOtpService {
       );
     }
     const otp = this._otpUtil.generateOtp(6);
-    const hashedOtp = await this._passwordUtil.hash(otp);
+    const hashedOtp = await this._bcryptUtil.hash(otp);
 
     const otpData = {
       email,
@@ -45,7 +45,7 @@ export class OtpService implements IOtpService {
     }
     if (
       new Date() > otpData.expiresAt ||
-      !(await this._passwordUtil.compare(otp, otpData.otp))
+      !(await this._bcryptUtil.compare(otp, otpData.otp))
     ) {
       throw new AppError("Invalid or Expired Otp", HTTP_STATUS.BAD_REQUEST);
     }

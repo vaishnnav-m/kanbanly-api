@@ -33,5 +33,10 @@ export class AuthRoutes extends BaseRoute {
       "/login",
       this._authController.login.bind(this._authController)
     );
+    this._router.get(
+      "/logout",
+      authenticateToken,
+      this._authController.logout.bind(this._authController)
+    );
   }
 }

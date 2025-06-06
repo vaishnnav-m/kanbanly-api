@@ -3,7 +3,7 @@ export const SUCCESS_MESSAGES = {
   LOGIN_SUCCESSFUL: 'User logged in successfully.',
   DATA_RETRIEVED: 'Data retrieved successfully.',
   USER_UPDATED: 'User updated successfully.',
-  USER_DELETED: 'User deleted successfully.',
+  USER_LOGOUT: 'User logout successfully.',
   OTP_SEND:"Otp send successfully",
   OTP_VERIFIED:"Otp verification was successfull"
 };

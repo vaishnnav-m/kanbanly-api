@@ -10,5 +10,5 @@ export interface ITokenService {
   generateAccessToken(payload: ITokenPayload): string;
   verifyAccessToken(token: string): ITokenPayload | null;
   generateRefreshToken(payload: ITokenPayload): string;
-  verifyRefereshToken(token: string): JwtPayload | null;
+  verifyRefereshToken(token: string): ITokenPayload | null;
 }
