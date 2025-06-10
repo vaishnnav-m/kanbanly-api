@@ -4,9 +4,9 @@ import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { inject, injectable } from "tsyringe";
 import { IVerificationService } from "../types/service-interface/IVerificationService";
-import { config } from "../config";
 import { ITokenService } from "../types/service-interface/ITokenService";
 import { setAuthCookies } from "../shared/utils/cookieHelper.utils";
+import { SUCCESS_MESSAGES } from "../shared/constants/messages";
 
 @injectable()
 export class VerificationController implements IVerificationController {
@@ -42,8 +42,23 @@ export class VerificationController implements IVerificationController {
     setAuthCookies(res, "userRefreshToken", refreshToken);
     setAuthCookies(res, "isVerified", user.isEmailVerified.toString());
 
-    res.redirect(`${config.cors.ALLOWED_ORIGIN}/workspaces`);
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.EMAIL_VERIFIED,
+    });
   }
 
-  async resendEmail(req: Request, res: Response): Promise<void> {}
+  async resendEmail(req: Request, res: Response): Promise<void> {
+    const email = req.query.email as string;
+    if (!email) {
+      throw new AppError("Email is not provided", HTTP_STATUS.BAD_REQUEST);
+    }
+
+    await this._verificationService.sendVerificationEmail(email);
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.EMAIL_SEND,
+    });
+  }
 }

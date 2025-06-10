@@ -39,6 +39,7 @@ export class VerificationService implements IVerificationService {
       verificationLink
     );
   }
+
   async processVerification(token: string): Promise<IUser> {
     const userEmail = this._tokenService.verifyEmailToken(token);
     if (!userEmail) {

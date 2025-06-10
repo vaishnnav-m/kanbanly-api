@@ -4,8 +4,8 @@ export const SUCCESS_MESSAGES = {
   DATA_RETRIEVED: 'Data retrieved successfully.',
   USER_UPDATED: 'User updated successfully.',
   USER_LOGOUT: 'User logout successfully.',
-  OTP_SEND:"Otp send successfully",
-  OTP_VERIFIED:"Otp verification was successfull"
+  EMAIL_SEND:"Email send successfully",
+  EMAIL_VERIFIED:"Email verification was successfull"
 };
 
 export const ERROR_MESSAGES = {

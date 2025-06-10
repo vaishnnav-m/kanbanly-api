@@ -1,7 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { IAuthController } from "../../types/controller-interfaces/IAuthController";
 import { BaseRoute } from "../base.routes";
-import { IOtpController } from "../../types/controller-interfaces/IOtpControllder";
 import { authenticateToken } from "../../middlewares/auth.middleware";
 import { IVerificationController } from "../../types/controller-interfaces/IVerificationController";
 
@@ -33,6 +32,12 @@ export class AuthRoutes extends BaseRoute {
     this._router.get(
       "/verify-email",
       this._verificationController.verifyEmail.bind(
+        this._verificationController
+      )
+    );
+    this.router.get(
+      "/resend-email",
+      this._verificationController.resendEmail.bind(
         this._verificationController
       )
     );

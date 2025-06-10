@@ -43,7 +43,7 @@ export class OtpController implements IOtpController {
 
     const response: ApiResponse<IOtp> = {
       success: true,
-      message: SUCCESS_MESSAGES.OTP_VERIFIED,
+      message: SUCCESS_MESSAGES.EMAIL_VERIFIED,
     };
     res.status(HTTP_STATUS.OK).json(response);
   }
