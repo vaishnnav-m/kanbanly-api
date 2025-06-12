@@ -30,7 +30,6 @@ export class AuthController implements IAuthController {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        isEmailVerified: user.isEmailVerified,
       },
     };
 
@@ -42,19 +41,21 @@ export class AuthController implements IAuthController {
 
     const accessToken = this._tokenService.generateAccessToken({
       email: user.email,
-      isVerified: user.isEmailVerified,
       role: user.isAdmin ? "Admin" : "User",
     });
 
     const refreshToken = this._tokenService.generateRefreshToken({
       email: user.email,
-      isVerified: user.isEmailVerified,
       role: user.isAdmin ? "Admin" : "User",
     });
 
-    setAuthCookies(res, "userAccessToken", accessToken);
-    setAuthCookies(res, "userRefreshToken", refreshToken);
-    setAuthCookies(res, "isVerified", user.isEmailVerified.toString());
+    setAuthCookies(res, "userAccessToken", accessToken, 5 * 60 * 1000);
+    setAuthCookies(
+      res,
+      "userRefreshToken",
+      refreshToken,
+      7 * 24 * 60 * 60 * 1000
+    );
 
     const response: ApiResponse<Partial<IUser>> = {
       success: true,
@@ -63,17 +64,47 @@ export class AuthController implements IAuthController {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        isEmailVerified: user.isEmailVerified,
       },
     };
 
     res.status(HTTP_STATUS.OK).json(response);
   }
 
+  async refreshAccessToken(req: Request, res: Response): Promise<void> {
+    const refreshToken = req.cookies?.userRefreshToken;
+    if (!refreshToken) {
+      throw new AppError(
+        ERROR_MESSAGES.AUTH_NO_TOKEN_PROVIDED,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    const decoded = this._tokenService.verifyRefereshToken(refreshToken);
+    if (!decoded) {
+      throw new AppError(
+        ERROR_MESSAGES.AUTH_INVALID_TOKEN,
+        HTTP_STATUS.FORBIDDEN
+      );
+    }
+
+    const accessToken = this._tokenService.generateAccessToken({
+      email: decoded.email,
+      role: decoded.isAdmin ? "Admin" : "User",
+    });
+
+    clearAuthCookies(res, "userAccessToken");
+    setAuthCookies(res, "userAccessToken", accessToken, 5 * 60 * 1000);
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: "Token generation successful",
+    });
+  }
+
   async logout(req: Request, res: Response) {
     clearAuthCookies(res, "userAccessToken");
     clearAuthCookies(res, "userRefreshToken");
-    clearAuthCookies(res, "isVerified");
+
     res.status(HTTP_STATUS.OK).json({
       success: true,
       message: SUCCESS_MESSAGES.USER_LOGOUT,

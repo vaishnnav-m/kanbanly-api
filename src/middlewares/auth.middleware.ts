@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express"; 
+import { NextFunction, Request, Response } from "express";
 import "../types/express.d";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
@@ -13,7 +13,7 @@ export const authenticateToken = (
   const token = req.cookies.userAccessToken;
 
   if (!token) {
-    res.status(HTTP_STATUS.UNAUTHORIZED).json({
+    res.status(HTTP_STATUS.FORBIDDEN).json({
       success: false,
       message: ERROR_MESSAGES.AUTH_NO_TOKEN_PROVIDED,
     });

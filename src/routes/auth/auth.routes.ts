@@ -41,5 +41,9 @@ export class AuthRoutes extends BaseRoute {
         this._verificationController
       )
     );
+    this.router.get(
+      "/refresh",
+      this._authController.refreshAccessToken.bind(this._authController)
+    );
   }
 }

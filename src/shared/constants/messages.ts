@@ -5,7 +5,8 @@ export const SUCCESS_MESSAGES = {
   USER_UPDATED: 'User updated successfully.',
   USER_LOGOUT: 'User logout successfully.',
   EMAIL_SEND:"Email send successfully",
-  EMAIL_VERIFIED:"Email verification was successfull"
+  EMAIL_VERIFIED:"Email verification was successfull",
+  
 };
 
 export const ERROR_MESSAGES = {
