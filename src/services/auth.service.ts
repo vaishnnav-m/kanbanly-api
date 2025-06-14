@@ -7,6 +7,10 @@ import { IUser } from "../types/IUser";
 import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { EventEmitter } from "events";
+import { OAuth2Client } from "google-auth-library";
+import { ERROR_MESSAGES } from "../shared/constants/messages";
+import { config } from "../config";
+import { IGoogleService } from "../types/service-interface/IGoogleService";
 
 export const authEvents = new EventEmitter();
 
@@ -14,8 +18,10 @@ export const authEvents = new EventEmitter();
 export class AuthService implements IAuthService {
   constructor(
     @inject("IUserRepository") private _userRepository: IUserRepository,
-    @inject("IBcryptUtils") private _passwordBcrypt: IBcryptUtils
+    @inject("IBcryptUtils") private _passwordBcrypt: IBcryptUtils,
+    @inject("IGoogleService") private _googleService: IGoogleService
   ) {}
+
   async register(user: userDto): Promise<IUser> {
     const { firstName, lastName, email, phone, password } = user;
     const emailExists = await this._userRepository.findByEmail(email);
@@ -63,5 +69,31 @@ export class AuthService implements IAuthService {
     }
 
     return emailExists;
+  }
+
+  async googleAuthentication(token: string): Promise<IUser> {
+    const payload = await this._googleService.getUserInfoFromAccessToken(token);
+
+    const { googleId, email, firstName = "", lastName = "" } = payload;
+
+    let user = await this._userRepository.findByEmail(email);
+
+    if (!user) {
+      user = await this._userRepository.create({
+        firstName,
+        lastName,
+        email,
+        googleId,
+        isEmailVerified: true,
+      });
+    } else if (!user.googleId) {
+      await this._userRepository.update(user.id, { googleId });
+    }
+
+    if (!user?.isActive) {
+      throw new AppError(ERROR_MESSAGES.USER_BLOCKED, HTTP_STATUS.FORBIDDEN);
+    }
+
+    return user;
   }
 }

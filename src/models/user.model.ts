@@ -15,12 +15,16 @@ const userSchema = new Schema<IUser>(
       required: true,
       unique: true,
     },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
     phone: {
       type: String,
     },
     password: {
       type: String,
-      required: true,
     },
     profile: {
       type: String,

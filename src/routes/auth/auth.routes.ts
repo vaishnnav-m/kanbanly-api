@@ -20,30 +20,40 @@ export class AuthRoutes extends BaseRoute {
       "/signup",
       this._authController.registerUser.bind(this._authController)
     );
+
     this._router.post(
       "/login",
       this._authController.login.bind(this._authController)
     );
-    this._router.get(
-      "/logout",
-      authenticateToken,
-      this._authController.logout.bind(this._authController)
+
+    this.router.post(
+      "/google/callback",
+      this._authController.googleAuthCallback.bind(this._authController)
     );
+
     this._router.get(
       "/verify-email",
       this._verificationController.verifyEmail.bind(
         this._verificationController
       )
     );
+
     this.router.get(
       "/resend-email",
       this._verificationController.resendEmail.bind(
         this._verificationController
       )
     );
+
     this.router.get(
       "/refresh",
       this._authController.refreshAccessToken.bind(this._authController)
+    );
+
+    this._router.get(
+      "/logout",
+      authenticateToken,
+      this._authController.logout.bind(this._authController)
     );
   }
 }

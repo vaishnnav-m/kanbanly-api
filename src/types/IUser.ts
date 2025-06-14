@@ -4,6 +4,7 @@ export interface IUser extends Document {
   firstName: string;
   lastName?: string;
   email: string;
+  googleId: string;
   phone?: string;
   password: string;
   profile?: string;
@@ -13,4 +14,3 @@ export interface IUser extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
-

@@ -70,6 +70,49 @@ export class AuthController implements IAuthController {
     res.status(HTTP_STATUS.OK).json(response);
   }
 
+  async googleAuthCallback(req: Request, res: Response): Promise<void> {
+    const { token } = req.body;
+
+    if (!token) {
+      throw new AppError(
+        "Autherization code is missing",
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const user = await this._authService.googleAuthentication(token);
+
+    const accessToken = this._tokenService.generateAccessToken({
+      email: user.email,
+      role: user.isAdmin ? "Admin" : "User",
+    });
+
+    const refreshToken = this._tokenService.generateRefreshToken({
+      email: user.email,
+      role: user.isAdmin ? "Admin" : "User",
+    });
+
+    setAuthCookies(res, "userAccessToken", accessToken, 5 * 60 * 1000);
+    setAuthCookies(
+      res,
+      "userRefreshToken",
+      refreshToken,
+      7 * 24 * 60 * 60 * 1000
+    );
+
+    const response: ApiResponse<Partial<IUser>> = {
+      success: true,
+      message: SUCCESS_MESSAGES.LOGIN_SUCCESSFUL,
+      data: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      },
+    };
+
+    res.status(HTTP_STATUS.OK).json(response);
+  }
+
   async refreshAccessToken(req: Request, res: Response): Promise<void> {
     const refreshToken = req.cookies?.userRefreshToken;
     if (!refreshToken) {

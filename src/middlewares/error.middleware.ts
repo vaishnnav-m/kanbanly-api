@@ -23,6 +23,7 @@ export class ErrorMiddleware {
       message = err.message || ERROR_MESSAGES.UNEXPECTED_SERVER_ERROR;
     }
     console.error(`[${statusCode}] ${message}`);
+    console.error(err);
     res.status(statusCode).json({
       success: false,
       message,

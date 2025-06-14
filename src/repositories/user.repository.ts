@@ -13,10 +13,17 @@ export class UserRepository implements IUserRepository {
     return await userModel.findOne({ email });
   }
 
-  async updateIsVerified(email: string, status: boolean): Promise<IUser | null> {
+  async updateIsVerified(
+    email: string,
+    status: boolean
+  ): Promise<IUser | null> {
     return await userModel.findOneAndUpdate(
       { email },
       { isEmailVerified: status }
     );
+  }
+
+  async update(userId: string, updateData: Partial<IUser>): Promise<IUser | null> {
+    return await userModel.findByIdAndUpdate(userId, updateData);
   }
 }

@@ -5,6 +5,8 @@ import { ITokenService } from "../types/service-interface/ITokenService";
 import { TokenService } from "../services/jwt.service";
 import { IVerificationService } from "../types/service-interface/IVerificationService";
 import { VerificationService } from "../services/verification.service";
+import { IGoogleService } from "../types/service-interface/IGoogleService";
+import { GoogleService } from "../services/google.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -16,6 +18,9 @@ export class ServiceRegistry {
     });
     container.register<ITokenService>("ITokenService", {
       useClass: TokenService,
+    });
+    container.register<IGoogleService>("IGoogleService", {
+      useClass: GoogleService,
     });
   }
 }
