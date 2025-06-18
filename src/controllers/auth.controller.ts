@@ -4,7 +4,7 @@ import { inject, injectable } from "tsyringe";
 import { IAuthService } from "../types/service-interface/IAuthService";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { ApiResponse } from "../types/common/IApiResponse";
-import { IUser } from "../types/IUser";
+import { IUser } from "../types/entities/IUser";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../shared/constants/messages";
 import { ITokenService } from "../types/service-interface/ITokenService";
 import {

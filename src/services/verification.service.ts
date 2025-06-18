@@ -7,7 +7,7 @@ import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { config } from "../config";
-import { IUser } from "../types/IUser";
+import { IUser } from "../types/entities/IUser";
 
 @injectable()
 export class VerificationService implements IVerificationService {

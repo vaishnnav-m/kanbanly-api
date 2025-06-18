@@ -1,5 +1,5 @@
 import { userDto } from "../dtos/createUser.dto";
-import { IUser } from "../IUser";
+import { IUser } from "../entities/IUser";
 
 export interface IAuthService {
   register(user: userDto): Promise<IUser>;

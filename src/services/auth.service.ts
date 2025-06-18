@@ -3,13 +3,11 @@ import { userDto } from "../types/dtos/createUser.dto";
 import { IAuthService } from "../types/service-interface/IAuthService";
 import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
 import { IBcryptUtils } from "../types/common/IBcryptUtils";
-import { IUser } from "../types/IUser";
+import { IUser } from "../types/entities/IUser";
 import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { EventEmitter } from "events";
-import { OAuth2Client } from "google-auth-library";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
-import { config } from "../config";
 import { IGoogleService } from "../types/service-interface/IGoogleService";
 
 export const authEvents = new EventEmitter();

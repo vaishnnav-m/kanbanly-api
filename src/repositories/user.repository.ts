@@ -1,29 +1,29 @@
 import { injectable } from "tsyringe";
-import { IUser } from "../types/IUser";
+import { IUser } from "../types/entities/IUser";
 import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
 import { userModel } from "../models/user.model";
+import { BaseRepository } from "./base.repository";
 
 @injectable()
-export class UserRepository implements IUserRepository {
-  async create(user: Partial<IUser>): Promise<IUser> {
-    return await userModel.create(user);
+export class UserRepository
+  extends BaseRepository<IUser>
+  implements IUserRepository
+{
+  constructor() {
+    super(userModel);
   }
 
   async findByEmail(email: string): Promise<IUser | null> {
-    return await userModel.findOne({ email });
+    return await this.model.findOne({ email });
   }
 
   async updateIsVerified(
     email: string,
     status: boolean
   ): Promise<IUser | null> {
-    return await userModel.findOneAndUpdate(
+    return await this.model.findOneAndUpdate(
       { email },
       { isEmailVerified: status }
     );
-  }
-
-  async update(userId: string, updateData: Partial<IUser>): Promise<IUser | null> {
-    return await userModel.findByIdAndUpdate(userId, updateData);
   }
 }

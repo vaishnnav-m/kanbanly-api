@@ -13,7 +13,9 @@ export class GoogleService implements IGoogleService {
   constructor() {
     this._client = new OAuth2Client(config.googleAuth.CLIENT_ID);
   }
+
   async getUserInfoFromAccessToken(accessToken: string): Promise<IGoogleUser> {
+    
     const tokenInfo = await this._client.getTokenInfo(accessToken);
     const profile = await axios.get(config.googleAuth.USERINFO_ENDPOINT, {
       headers: { Authorization: `Bearer ${accessToken}` },
