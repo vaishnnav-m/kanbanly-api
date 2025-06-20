@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { userDto } from "../types/dtos/createUser.dto";
+import { responseDataDto, userDto } from "../types/dtos/createUser.dto";
 import { IAuthService } from "../types/service-interface/IAuthService";
 import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
 import { IBcryptUtils } from "../types/common/IBcryptUtils";
@@ -9,6 +9,7 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 import { EventEmitter } from "events";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { IGoogleService } from "../types/service-interface/IGoogleService";
+import { ITokenService } from "../types/service-interface/ITokenService";
 
 export const authEvents = new EventEmitter();
 
@@ -17,7 +18,8 @@ export class AuthService implements IAuthService {
   constructor(
     @inject("IUserRepository") private _userRepository: IUserRepository,
     @inject("IBcryptUtils") private _passwordBcrypt: IBcryptUtils,
-    @inject("IGoogleService") private _googleService: IGoogleService
+    @inject("IGoogleService") private _googleService: IGoogleService,
+    @inject("ITokenService") private _tokenService: ITokenService
   ) {}
 
   async register(user: userDto): Promise<IUser> {
@@ -46,8 +48,11 @@ export class AuthService implements IAuthService {
     const { email, password } = user;
     const emailExists = await this._userRepository.findByEmail(email);
 
-    if (!emailExists) {
-      throw new AppError("Invalid Email or Password", HTTP_STATUS.BAD_REQUEST);
+    if (!emailExists || !emailExists?.password) {
+      throw new AppError(
+        ERROR_MESSAGES.INVALID_CREDENTIALS,
+        HTTP_STATUS.BAD_REQUEST
+      );
     }
 
     const isPasswordMatch = await this._passwordBcrypt.compare(
@@ -56,7 +61,10 @@ export class AuthService implements IAuthService {
     );
 
     if (!isPasswordMatch) {
-      throw new AppError("Invalid Email or Password", HTTP_STATUS.BAD_REQUEST);
+      throw new AppError(
+        ERROR_MESSAGES.INVALID_CREDENTIALS,
+        HTTP_STATUS.BAD_REQUEST
+      );
     }
 
     if (!emailExists.isEmailVerified) {
@@ -93,5 +101,53 @@ export class AuthService implements IAuthService {
     }
 
     return user;
+  }
+
+  async adminLogin(
+    user: Omit<userDto, "firstName">
+  ): Promise<responseDataDto<IUser>> {
+    const { email, password } = user;
+    const userData = await this._userRepository.findByEmail(email);
+
+    if (!userData || !userData?.password) {
+      throw new AppError(
+        ERROR_MESSAGES.INVALID_CREDENTIALS,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const isPasswordMatch = await this._passwordBcrypt.compare(
+      password,
+      userData.password
+    );
+
+    if (!isPasswordMatch) {
+      throw new AppError(
+        ERROR_MESSAGES.INVALID_CREDENTIALS,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    if (!userData.isAdmin) {
+      throw new AppError("you are not an admin", HTTP_STATUS.FORBIDDEN);
+    }
+
+    const accessToken = this._tokenService.generateAccessToken({
+      email: userData.email,
+      role: userData.isAdmin ? "Admin" : "User",
+    });
+
+    const refreshToken = this._tokenService.generateRefreshToken({
+      email: userData.email,
+      role: userData.isAdmin ? "Admin" : "User",
+    });
+
+    const response = {
+      accessToken,
+      refreshToken,
+      user: userData,
+    };
+
+    return response;
   }
 }

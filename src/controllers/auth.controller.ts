@@ -12,6 +12,7 @@ import {
   setAuthCookies,
 } from "../shared/utils/cookieHelper.utils";
 import AppError from "../shared/utils/AppError";
+import { userDto } from "../types/dtos/createUser.dto";
 
 @injectable()
 export class AuthController implements IAuthController {
@@ -37,7 +38,8 @@ export class AuthController implements IAuthController {
   }
 
   async login(req: Request, res: Response): Promise<void> {
-    const user: IUser = await this._authService.login(req.body);
+    const { email, password } = req.body as userDto;
+    const user: IUser = await this._authService.login({ email, password });
 
     const accessToken = this._tokenService.generateAccessToken({
       email: user.email,
@@ -152,5 +154,38 @@ export class AuthController implements IAuthController {
       success: true,
       message: SUCCESS_MESSAGES.USER_LOGOUT,
     });
+  }
+
+  async adminLogin(req: Request, res: Response): Promise<void> {
+    const { email, password } = req.body as userDto;
+    const responseData = await this._authService.adminLogin({
+      email,
+      password,
+    });
+
+    setAuthCookies(
+      res,
+      "adminAccessToken",
+      responseData.accessToken,
+      5 * 60 * 1000
+    );
+    setAuthCookies(
+      res,
+      "adminRefreshToken",
+      responseData.refreshToken,
+      7 * 24 * 60 * 60 * 1000
+    );
+
+    const response: ApiResponse<Partial<IUser>> = {
+      success: true,
+      message: SUCCESS_MESSAGES.LOGIN_SUCCESSFUL,
+      data: {
+        firstName: responseData.user.firstName,
+        lastName: responseData.user.lastName,
+        email: responseData.user.email,
+      },
+    };
+
+    res.status(HTTP_STATUS.OK).json(response);
   }
 }

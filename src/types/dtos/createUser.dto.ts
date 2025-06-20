@@ -5,3 +5,9 @@ export interface userDto {
   phone?: string;
   password: string;
 }
+
+export interface responseDataDto<T> {
+  accessToken: string;
+  refreshToken: string;
+  user: T;
+}
