@@ -39,23 +39,18 @@ export class AuthController implements IAuthController {
 
   async login(req: Request, res: Response): Promise<void> {
     const { email, password } = req.body as userDto;
-    const user: IUser = await this._authService.login({ email, password });
+    const responseData = await this._authService.login({ email, password });
 
-    const accessToken = this._tokenService.generateAccessToken({
-      email: user.email,
-      role: user.isAdmin ? "Admin" : "User",
-    });
-
-    const refreshToken = this._tokenService.generateRefreshToken({
-      email: user.email,
-      role: user.isAdmin ? "Admin" : "User",
-    });
-
-    setAuthCookies(res, "userAccessToken", accessToken, 5 * 60 * 1000);
+    setAuthCookies(
+      res,
+      "userAccessToken",
+      responseData.accessToken,
+      5 * 60 * 1000
+    );
     setAuthCookies(
       res,
       "userRefreshToken",
-      refreshToken,
+      responseData.refreshToken,
       7 * 24 * 60 * 60 * 1000
     );
 
@@ -63,9 +58,9 @@ export class AuthController implements IAuthController {
       success: true,
       message: SUCCESS_MESSAGES.LOGIN_SUCCESSFUL,
       data: {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
+        firstName: responseData.user.firstName,
+        lastName: responseData.user.lastName,
+        email: responseData.user.email,
       },
     };
 
@@ -85,11 +80,13 @@ export class AuthController implements IAuthController {
     const user = await this._authService.googleAuthentication(token);
 
     const accessToken = this._tokenService.generateAccessToken({
+      userid: user._id as string,
       email: user.email,
       role: user.isAdmin ? "Admin" : "User",
     });
 
     const refreshToken = this._tokenService.generateRefreshToken({
+      userid: user._id as string,
       email: user.email,
       role: user.isAdmin ? "Admin" : "User",
     });
@@ -133,6 +130,7 @@ export class AuthController implements IAuthController {
     }
 
     const accessToken = this._tokenService.generateAccessToken({
+      userid: decoded.userid,
       email: decoded.email,
       role: decoded.isAdmin ? "Admin" : "User",
     });

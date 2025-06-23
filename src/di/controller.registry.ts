@@ -5,6 +5,8 @@ import { IVerificationController } from "../types/controller-interfaces/IVerific
 import { VerificationController } from "../controllers/verification.controller";
 import { IAdminController } from "../types/controller-interfaces/IAdminController";
 import { AdminController } from "../controllers/admin.controller";
+import { IWorkspaceController } from "../types/controller-interfaces/IWorkspaceController";
+import { WorkspaceController } from "../controllers/workspace.controller";
 
 export class ControllerRegistry {
   static registerController(): void {
@@ -16,6 +18,9 @@ export class ControllerRegistry {
     });
     container.register<IAdminController>("IAdminController", {
       useClass: AdminController,
+    });
+    container.register<IWorkspaceController>("IWorkspaceController", {
+      useClass: WorkspaceController,
     });
   }
 }

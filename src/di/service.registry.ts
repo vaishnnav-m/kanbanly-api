@@ -9,6 +9,8 @@ import { IGoogleService } from "../types/service-interface/IGoogleService";
 import { GoogleService } from "../services/google.service";
 import { IAdminService } from "../types/service-interface/IAdminService";
 import { AdminService } from "../services/admin.service";
+import { IWorkspaceService } from "../types/service-interface/IWorkspaceService";
+import { WorkspaceService } from "../services/workspace.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -26,6 +28,9 @@ export class ServiceRegistry {
     });
     container.register<IAdminService>("IAdminService", {
       useClass: AdminService,
+    });
+    container.register<IWorkspaceService>("IWorkspaceService", {
+      useClass: WorkspaceService,
     });
   }
 }

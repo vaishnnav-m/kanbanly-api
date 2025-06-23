@@ -44,11 +44,11 @@ export class AuthService implements IAuthService {
     return newUser;
   }
 
-  async login(user: userDto): Promise<IUser> {
+  async login(user: userDto): Promise<responseDataDto<IUser>> {
     const { email, password } = user;
-    const emailExists = await this._userRepository.findByEmail(email);
+    const userData = await this._userRepository.findByEmail(email);
 
-    if (!emailExists || !emailExists?.password) {
+    if (!userData || !userData?.password) {
       throw new AppError(
         ERROR_MESSAGES.INVALID_CREDENTIALS,
         HTTP_STATUS.BAD_REQUEST
@@ -57,7 +57,7 @@ export class AuthService implements IAuthService {
 
     const isPasswordMatch = await this._passwordBcrypt.compare(
       password,
-      emailExists.password
+      userData.password
     );
 
     if (!isPasswordMatch) {
@@ -67,14 +67,26 @@ export class AuthService implements IAuthService {
       );
     }
 
-    if (!emailExists.isEmailVerified) {
+    if (!userData.isEmailVerified) {
       throw new AppError(
         "Please verify your email to login",
         HTTP_STATUS.FORBIDDEN
       );
     }
 
-    return emailExists;
+    const accessToken = this._tokenService.generateAccessToken({
+      userid: userData._id as string,
+      email: userData.email,
+      role: userData.isAdmin ? "Admin" : "User",
+    });
+
+    const refreshToken = this._tokenService.generateRefreshToken({
+      userid: userData._id as string,
+      email: userData.email,
+      role: userData.isAdmin ? "Admin" : "User",
+    });
+
+    return { accessToken, refreshToken, user: userData };
   }
 
   async googleAuthentication(token: string): Promise<IUser> {
@@ -133,11 +145,13 @@ export class AuthService implements IAuthService {
     }
 
     const accessToken = this._tokenService.generateAccessToken({
+      userid:userData._id as string,
       email: userData.email,
       role: userData.isAdmin ? "Admin" : "User",
     });
 
     const refreshToken = this._tokenService.generateRefreshToken({
+      userid:userData._id as string,
       email: userData.email,
       role: userData.isAdmin ? "Admin" : "User",
     });

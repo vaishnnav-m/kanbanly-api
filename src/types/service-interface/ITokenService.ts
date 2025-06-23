@@ -1,9 +1,9 @@
 import { JwtPayload } from "jsonwebtoken";
 
 export interface ITokenPayload extends JwtPayload {
+  userid: string;
   email: string;
   role?: string;
-  isVerified?: boolean;
 }
 
 export interface ITokenService {

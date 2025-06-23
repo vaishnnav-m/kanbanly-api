@@ -2,11 +2,23 @@ import { model, Schema, Types } from "mongoose";
 import { IWorkspace } from "../types/entities/IWrokspace";
 
 const workspaceSchema = new Schema<IWorkspace>({
-  name: {
+  workspaceId: {
     type: String,
     unique: true,
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  slug: {
+    type: String,
+    required: true,
   },
   description: {
+    type: String,
+  },
+  logo: {
     type: String,
   },
   createdBy: {
