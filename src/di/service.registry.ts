@@ -7,6 +7,8 @@ import { IVerificationService } from "../types/service-interface/IVerificationSe
 import { VerificationService } from "../services/verification.service";
 import { IGoogleService } from "../types/service-interface/IGoogleService";
 import { GoogleService } from "../services/google.service";
+import { IAdminService } from "../types/service-interface/IAdminService";
+import { AdminService } from "../services/admin.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -21,6 +23,9 @@ export class ServiceRegistry {
     });
     container.register<IGoogleService>("IGoogleService", {
       useClass: GoogleService,
+    });
+    container.register<IAdminService>("IAdminService", {
+      useClass: AdminService,
     });
   }
 }

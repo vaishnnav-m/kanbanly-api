@@ -12,6 +12,13 @@ export class BaseRepository<T> implements IBaseRepository<T> {
     return this.model.findById(id);
   }
 
+  async find(
+    query: any,
+    options: { skip?: number; limit?: number; sort?: any }
+  ): Promise<T[]> {
+    return this.model.find(query, options);
+  }
+
   async create(data: Partial<T>): Promise<T> {
     return this.model.create(data);
   }

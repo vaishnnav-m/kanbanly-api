@@ -10,7 +10,7 @@ export const authenticateToken = (
   res: Response,
   next: NextFunction
 ): void => {
-  const token = req.cookies.userAccessToken;
+  const token = req.cookies.userAccessToken || req.cookies.adminAccessToken;
 
   if (!token) {
     res.status(HTTP_STATUS.FORBIDDEN).json({

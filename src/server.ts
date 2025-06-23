@@ -9,6 +9,7 @@ import cookieParser from "cookie-parser";
 import { ErrorMiddleware } from "./middlewares/error.middleware";
 import { IVerificationService } from "./types/service-interface/IVerificationService";
 import { authEvents } from "./services/auth.service";
+import { AdminRoutes } from "./routes/admin/admin.routes";
 
 export default class Server {
   private _app: Application;
@@ -66,6 +67,7 @@ export default class Server {
 
   private configureRoutes(): void {
     this._app.use("/api/v1/auth", container.resolve(AuthRoutes).router);
+    this._app.use("/api/v1/admin", container.resolve(AdminRoutes).router);
   }
 
   public start(): void {
