@@ -3,6 +3,8 @@ import { IWorkspaceController } from "../types/controller-interfaces/IWorkspaceC
 import { inject, injectable } from "tsyringe";
 import { IWorkspaceService } from "../types/service-interface/IWorkspaceService";
 import { HTTP_STATUS } from "../shared/constants/http.status";
+import { IWorkspace } from "../types/entities/IWrokspace";
+import AppError from "../shared/utils/AppError";
 
 @injectable()
 export class WorkspaceController implements IWorkspaceController {
@@ -24,5 +26,26 @@ export class WorkspaceController implements IWorkspaceController {
       success: true,
       message: "Workspace creation was successfull",
     });
+  }
+
+  async getAllWorkspaces(req: Request, res: Response): Promise<void> {
+    const { user } = req;
+
+    if (!user) {
+      throw new AppError("Token is not valid", HTTP_STATUS.BAD_REQUEST);
+    }
+
+    const workspaces: IWorkspace[] | null =
+      await this._workspaceService.getAllWorkspaces(user?.userid);
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: "Successfully fetched all workspaces",
+      data: workspaces,
+    });
+  }
+
+  async addUserWorkspace(req: Request, res: Response): Promise<void> {
+    const {} = req.body;
   }
 }

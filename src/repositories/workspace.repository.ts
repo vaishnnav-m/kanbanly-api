@@ -12,4 +12,17 @@ export class WorkspaceRepository
   constructor() {
     super(workspaceModel);
   }
+
+  async pushMember(
+    workspaceId: string,
+    member: { user: string; role: string }
+  ): Promise<IWorkspace | null> {
+    return this.model.findByIdAndUpdate(
+      workspaceId,
+      {
+        $push: { members: member },
+      },
+      { new: true }
+    );
+  }
 }

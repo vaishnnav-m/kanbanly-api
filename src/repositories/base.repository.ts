@@ -24,6 +24,6 @@ export class BaseRepository<T> implements IBaseRepository<T> {
   }
 
   async update(id: string, data: any): Promise<T | null> {
-    return this.model.findByIdAndUpdate(id, data);
+    return this.model.findByIdAndUpdate(id, data, { new: true });
   }
 }

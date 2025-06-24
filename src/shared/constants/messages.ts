@@ -4,6 +4,7 @@ export const SUCCESS_MESSAGES = {
   DATA_RETRIEVED: "Data retrieved successfully.",
   USER_UPDATED: "User updated successfully.",
   USER_LOGOUT: "User logout successfully.",
+  ADMIN_LOGOUT: "Admin logout successfully.",
   EMAIL_SEND: "Email send successfully",
   EMAIL_VERIFIED: "Email verification was successfull",
 };

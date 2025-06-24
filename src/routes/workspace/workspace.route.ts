@@ -19,5 +19,11 @@ export class WorkspaceRoutes extends BaseRoute {
       authenticateToken,
       this._workspaceController.createWorkspace.bind(this._workspaceController)
     );
+
+    this._router.get(
+      "/",
+      authenticateToken,
+      this._workspaceController.getAllWorkspaces.bind(this._workspaceController)
+    );
   }
 }

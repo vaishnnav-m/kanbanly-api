@@ -7,5 +7,10 @@ export interface IWorkspace extends Document {
   description?: string;
   logo?: string;
   createdBy: string | ObjectId;
-  members: [string];
+  members: [
+    {
+      user: string;
+      role: "owner" | "projectManager" | "member";
+    }
+  ];
 }

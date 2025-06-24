@@ -82,13 +82,13 @@ export class AuthController implements IAuthController {
     const accessToken = this._tokenService.generateAccessToken({
       userid: user._id as string,
       email: user.email,
-      role: user.isAdmin ? "Admin" : "User",
+      role: "user",
     });
 
     const refreshToken = this._tokenService.generateRefreshToken({
       userid: user._id as string,
       email: user.email,
-      role: user.isAdmin ? "Admin" : "User",
+      role: "user",
     });
 
     setAuthCookies(res, "userAccessToken", accessToken, 5 * 60 * 1000);
@@ -132,7 +132,7 @@ export class AuthController implements IAuthController {
     const accessToken = this._tokenService.generateAccessToken({
       userid: decoded.userid,
       email: decoded.email,
-      role: decoded.isAdmin ? "Admin" : "User",
+      role: decoded.role,
     });
 
     clearAuthCookies(res, "userAccessToken");
@@ -185,5 +185,15 @@ export class AuthController implements IAuthController {
     };
 
     res.status(HTTP_STATUS.OK).json(response);
+  }
+
+  async adminLgout(req: Request, res: Response) {
+    clearAuthCookies(res, "adminAccessToken");
+    clearAuthCookies(res, "adminRefreshToken");
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.ADMIN_LOGOUT,
+    });
   }
 }

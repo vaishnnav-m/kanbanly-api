@@ -11,7 +11,6 @@ import { IVerificationService } from "./types/service-interface/IVerificationSer
 import { authEvents } from "./services/auth.service";
 import { AdminRoutes } from "./routes/admin/admin.routes";
 import { WorkspaceRoutes } from "./routes/workspace/workspace.route";
-import expressListEndpoints from "express-list-endpoints";
 
 export default class Server {
   private _app: Application;
@@ -71,7 +70,6 @@ export default class Server {
     this._app.use("/api/v1/auth", container.resolve(AuthRoutes).router);
     this._app.use("/api/v1/admin", container.resolve(AdminRoutes).router);
     this._app.use("/api/v1/workspace",container.resolve(WorkspaceRoutes).router);
-    console.log(expressListEndpoints(this._app));
   }
 
   public start(): void {

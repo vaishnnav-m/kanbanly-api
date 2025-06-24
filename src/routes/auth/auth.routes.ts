@@ -60,5 +60,11 @@ export class AuthRoutes extends BaseRoute {
       "/admin/login",
       this._authController.adminLogin.bind(this._authController)
     );
+
+    this.router.get(
+      "/admin/logout",
+      authenticateToken,
+      this._authController.adminLgout.bind(this._authController)
+    );
   }
 }

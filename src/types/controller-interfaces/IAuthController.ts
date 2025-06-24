@@ -7,4 +7,5 @@ export interface IAuthController {
   refreshAccessToken(req: Request, res: Response): Promise<void>;
   logout(req: Request, res: Response): Promise<void>;
   adminLogin(req: Request, res: Response): Promise<void>;
+  adminLgout(req: Request, res: Response): Promise<void>;
 }

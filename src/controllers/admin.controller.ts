@@ -3,6 +3,7 @@ import { IAdminController } from "../types/controller-interfaces/IAdminControlle
 import { Request, Response } from "express";
 import { IAdminService } from "../types/service-interface/IAdminService";
 import { HTTP_STATUS } from "../shared/constants/http.status";
+import AppError from "../shared/utils/AppError";
 
 @injectable()
 export class AdminController implements IAdminController {
@@ -13,6 +14,21 @@ export class AdminController implements IAdminController {
     res.status(HTTP_STATUS.OK).json({
       message: "Users fetched successfully",
       data: users,
+    });
+  }
+
+  async updateUserStatus(req: Request, res: Response): Promise<void> {
+    const userId = req.params.id;
+    if (!userId) {
+      throw new AppError("User id is not provided", HTTP_STATUS.BAD_REQUEST);
+    }
+
+    const newUser = await this._adminService.updateUserStatus(userId);
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: "successfully updated the user",
+      data: newUser,
     });
   }
 }

@@ -77,13 +77,13 @@ export class AuthService implements IAuthService {
     const accessToken = this._tokenService.generateAccessToken({
       userid: userData._id as string,
       email: userData.email,
-      role: userData.isAdmin ? "Admin" : "User",
+      role: "user",
     });
 
     const refreshToken = this._tokenService.generateRefreshToken({
       userid: userData._id as string,
       email: userData.email,
-      role: userData.isAdmin ? "Admin" : "User",
+      role: "user",
     });
 
     return { accessToken, refreshToken, user: userData };
@@ -145,15 +145,15 @@ export class AuthService implements IAuthService {
     }
 
     const accessToken = this._tokenService.generateAccessToken({
-      userid:userData._id as string,
+      userid: userData._id as string,
       email: userData.email,
-      role: userData.isAdmin ? "Admin" : "User",
+      role: "admin",
     });
 
     const refreshToken = this._tokenService.generateRefreshToken({
-      userid:userData._id as string,
+      userid: userData._id as string,
       email: userData.email,
-      role: userData.isAdmin ? "Admin" : "User",
+      role: "admin",
     });
 
     const response = {
