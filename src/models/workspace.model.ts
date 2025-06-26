@@ -18,32 +18,38 @@ const memberSchema = new Schema(
   { _id: false }
 );
 
-const workspaceSchema = new Schema<IWorkspace>({
-  workspaceId: {
-    type: String,
-    unique: true,
-    required: true,
+const workspaceSchema = new Schema<IWorkspace>(
+  {
+    workspaceId: {
+      type: String,
+      unique: true,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+    },
+    logo: {
+      type: String,
+    },
+    createdBy: {
+      type: Types.ObjectId,
+      ref: "user",
+      required: true,
+    },
+    members: {
+      type: [memberSchema],
+      default: [],
+    },
   },
-  name: {
-    type: String,
-    required: true,
-  },
-  slug: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-  },
-  logo: {
-    type: String,
-  },
-  createdBy: {
-    type: Types.ObjectId,
-    ref: "user",
-    required: true,
-  },
-  members: [memberSchema],
-});
+  { timestamps: true }
+);
 
 export const workspaceModel = model<IWorkspace>("workspace", workspaceSchema);

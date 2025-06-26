@@ -6,4 +6,5 @@ export interface IWorkspaceRepository extends IBaseRepository<IWorkspace> {
     workspaceId: string,
     member: { user: string; role: string }
   ): Promise<IWorkspace | null>;
+
 }

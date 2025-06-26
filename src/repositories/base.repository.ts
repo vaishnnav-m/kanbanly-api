@@ -4,7 +4,7 @@ import { IBaseRepository } from "../types/repository-interfaces/IBaseRepositroy"
 export class BaseRepository<T> implements IBaseRepository<T> {
   constructor(protected model: Model<T>) {}
 
-  async findOne(query: any): Promise<T | null> {
+  async findOne(query: Partial<T>): Promise<T | null> {
     return this.model.findOne(query);
   }
 
@@ -13,10 +13,10 @@ export class BaseRepository<T> implements IBaseRepository<T> {
   }
 
   async find(
-    query: any,
+    query: Partial<T>,
     options: { skip?: number; limit?: number; sort?: any }
   ): Promise<T[]> {
-    return this.model.find(query, options);
+    return this.model.find(query, options).sort({ createdAt: 1 });
   }
 
   async create(data: Partial<T>): Promise<T> {

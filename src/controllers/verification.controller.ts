@@ -27,16 +27,18 @@ export class VerificationController implements IVerificationController {
     const user = await this._verificationService.processVerification(token);
 
     const accessToken = this._tokenService.generateAccessToken({
+      userid: user._id as string,
       email: user.email,
       role: user.isAdmin ? "Admin" : "User",
     });
 
     const refreshToken = this._tokenService.generateRefreshToken({
+      userid: user._id as string,
       email: user.email,
       role: user.isAdmin ? "Admin" : "User",
     });
 
-    setAuthCookies(res, "userAccessToken", accessToken, 5 * 60 * 1000);
+    setAuthCookies(res, "userAccessToken", accessToken, 60 * 60 * 1000);
     setAuthCookies(
       res,
       "userRefreshToken",
@@ -47,6 +49,14 @@ export class VerificationController implements IVerificationController {
     res.status(HTTP_STATUS.OK).json({
       success: true,
       message: SUCCESS_MESSAGES.EMAIL_VERIFIED,
+      data: {
+        user: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+        },
+        role:user.isAdmin ? "admin":'user'
+      },
     });
   }
 

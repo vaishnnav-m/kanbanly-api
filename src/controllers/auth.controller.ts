@@ -45,7 +45,7 @@ export class AuthController implements IAuthController {
       res,
       "userAccessToken",
       responseData.accessToken,
-      5 * 60 * 1000
+      60 * 60 * 1000
     );
     setAuthCookies(
       res,
@@ -136,7 +136,7 @@ export class AuthController implements IAuthController {
     });
 
     clearAuthCookies(res, "userAccessToken");
-    setAuthCookies(res, "userAccessToken", accessToken, 5 * 60 * 1000);
+    setAuthCookies(res, "userAccessToken", accessToken, 60 * 60 * 1000);
 
     res.status(HTTP_STATUS.OK).json({
       success: true,
@@ -165,7 +165,7 @@ export class AuthController implements IAuthController {
       res,
       "adminAccessToken",
       responseData.accessToken,
-      5 * 60 * 1000
+      60 * 60 * 1000
     );
     setAuthCookies(
       res,

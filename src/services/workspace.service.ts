@@ -20,10 +20,20 @@ export class WorkspaceService implements IWorkspaceService {
   async createWorkspace(
     workspaceData: CreateWorkspaceDto
   ): Promise<IWorkspace | null> {
+    const slugName = this.slugify(workspaceData.name);
+    const isExists = await this._workspaceRepo.find({ slug: slugName });
+
+    if (isExists) {
+      throw new AppError(
+        "The workspace already exists",
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
     const workspace: Partial<IWorkspace> = {
       workspaceId: uuidv4(),
       name: workspaceData.name,
-      slug: this.slugify(workspaceData.name),
+      slug: slugName,
       description: workspaceData.description,
       logo: workspaceData.logo,
       createdBy: workspaceData.createdBy,
@@ -38,7 +48,7 @@ export class WorkspaceService implements IWorkspaceService {
     const workspaces: IWorkspace[] = await this._workspaceRepo.find({
       createdBy: userid,
     });
-
+    console.log(workspaces);
     return workspaces;
   }
 
@@ -63,6 +73,6 @@ export class WorkspaceService implements IWorkspaceService {
       throw new AppError("member already exists", HTTP_STATUS.BAD_REQUEST);
     }
 
-    return await this._workspaceRepo.pushMember(workspaceId,user)
+    return await this._workspaceRepo.pushMember(workspaceId, user);
   }
 }

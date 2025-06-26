@@ -1,7 +1,7 @@
 export interface IBaseRepository<T> {
-  findOne(query: any): Promise<T | null>;
+  findOne(query: Partial<T>): Promise<T | null>;
   find(
-    query?: any,
+    query?: Partial<T>,
     options?: { skip?: number; limit?: number; sort?: any }
   ): Promise<T[]>;
   findById(id: string): Promise<T | null>;
