@@ -1,3 +1,5 @@
+import { ObjectId } from "mongoose";
+
 export interface IBaseRepository<T> {
   findOne(query: Partial<T>): Promise<T | null>;
   find(
@@ -6,5 +8,5 @@ export interface IBaseRepository<T> {
   ): Promise<T[]>;
   findById(id: string): Promise<T | null>;
   create(data: Partial<T>): Promise<T>;
-  update(id: string, data: any): Promise<T | null>;
+  update(query: any, data: any): Promise<T | null>;
 }

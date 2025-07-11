@@ -1,12 +1,13 @@
 import { inject, injectable } from "tsyringe";
-import { responseDataDto, userDto } from "../types/dtos/createUser.dto";
+import { v4 as uuidv4 } from "uuid";
+import { EventEmitter } from "events";
+import { responseDataDto, userDto } from "../types/dtos/auth/createUser.dto";
 import { IAuthService } from "../types/service-interface/IAuthService";
 import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
 import { IBcryptUtils } from "../types/common/IBcryptUtils";
 import { IUser } from "../types/entities/IUser";
 import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
-import { EventEmitter } from "events";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { IGoogleService } from "../types/service-interface/IGoogleService";
 import { ITokenService } from "../types/service-interface/ITokenService";
@@ -32,6 +33,7 @@ export class AuthService implements IAuthService {
 
     const hashedPassword = await this._passwordBcrypt.hash(password);
     const newUser = await this._userRepository.create({
+      userId: uuidv4(),
       firstName,
       lastName,
       email,
@@ -75,13 +77,13 @@ export class AuthService implements IAuthService {
     }
 
     const accessToken = this._tokenService.generateAccessToken({
-      userid: userData._id as string,
+      userid: userData.userId as string,
       email: userData.email,
       role: "user",
     });
 
     const refreshToken = this._tokenService.generateRefreshToken({
-      userid: userData._id as string,
+      userid: userData.userId as string,
       email: userData.email,
       role: "user",
     });
@@ -98,6 +100,7 @@ export class AuthService implements IAuthService {
 
     if (!user) {
       user = await this._userRepository.create({
+        userId: uuidv4(),
         firstName,
         lastName,
         email,
@@ -105,7 +108,7 @@ export class AuthService implements IAuthService {
         isEmailVerified: true,
       });
     } else if (!user.googleId) {
-      await this._userRepository.update(user.id, { googleId });
+      await this._userRepository.update({ userId: user.userId }, { googleId });
     }
 
     if (!user?.isActive) {
@@ -145,13 +148,13 @@ export class AuthService implements IAuthService {
     }
 
     const accessToken = this._tokenService.generateAccessToken({
-      userid: userData._id as string,
+      userid: userData.userId,
       email: userData.email,
       role: "admin",
     });
 
     const refreshToken = this._tokenService.generateRefreshToken({
-      userid: userData._id as string,
+      userid: userData.userId,
       email: userData.email,
       role: "admin",
     });

@@ -3,6 +3,11 @@ import { IUser } from "../types/entities/IUser";
 
 const userSchema = new Schema<IUser>(
   {
+    userId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     firstName: {
       type: String,
       required: true,

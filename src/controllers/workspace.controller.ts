@@ -11,15 +11,19 @@ export class WorkspaceController implements IWorkspaceController {
   constructor(
     @inject("IWorkspaceService") private _workspaceService: IWorkspaceService
   ) {}
-  async createWorkspace(req: Request, res: Response): Promise<void> {
+  async createWorkspace(req: Request, res: Response) {
     const { user } = req;
     const { name, description, logo } = req.body;
+
+    if (!user || !user.userid) {
+      throw new AppError("Unautherized access", HTTP_STATUS.UNAUTHORIZED);
+    }
 
     await this._workspaceService.createWorkspace({
       name,
       description,
       logo,
-      createdBy: user?.userid,
+      createdBy: user.userid,
     });
 
     res.status(HTTP_STATUS.OK).json({
@@ -28,7 +32,7 @@ export class WorkspaceController implements IWorkspaceController {
     });
   }
 
-  async getAllWorkspaces(req: Request, res: Response): Promise<void> {
+  async getAllWorkspaces(req: Request, res: Response) {
     const { user } = req;
 
     if (!user) {
@@ -43,9 +47,5 @@ export class WorkspaceController implements IWorkspaceController {
       message: "Successfully fetched all workspaces",
       data: workspaces,
     });
-  }
-
-  async addUserWorkspace(req: Request, res: Response): Promise<void> {
-    const {} = req.body;
   }
 }

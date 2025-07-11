@@ -11,6 +11,8 @@ import { IAdminService } from "../types/service-interface/IAdminService";
 import { AdminService } from "../services/admin.service";
 import { IWorkspaceService } from "../types/service-interface/IWorkspaceService";
 import { WorkspaceService } from "../services/workspace.service";
+import { IWorkspaceMemberService } from "../types/service-interface/IWorkspaceMemberService";
+import { WorkspaceMemberService } from "../services/workspace-member.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -31,6 +33,9 @@ export class ServiceRegistry {
     });
     container.register<IWorkspaceService>("IWorkspaceService", {
       useClass: WorkspaceService,
+    });
+    container.register<IWorkspaceMemberService>("IWorkspaceMemberService", {
+      useClass: WorkspaceMemberService,
     });
   }
 }

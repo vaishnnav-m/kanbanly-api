@@ -16,7 +16,7 @@ export class VerificationController implements IVerificationController {
     @inject("ITokenService") private _tokenService: ITokenService
   ) {}
 
-  async verifyEmail(req: Request, res: Response): Promise<void> {
+  async verifyEmail(req: Request, res: Response) {
     const token = req.query.token as string;
     if (!token) {
       throw new AppError(
@@ -27,13 +27,13 @@ export class VerificationController implements IVerificationController {
     const user = await this._verificationService.processVerification(token);
 
     const accessToken = this._tokenService.generateAccessToken({
-      userid: user._id as string,
+      userid: user.userId as string,
       email: user.email,
       role: user.isAdmin ? "Admin" : "User",
     });
 
     const refreshToken = this._tokenService.generateRefreshToken({
-      userid: user._id as string,
+      userid: user.userId as string,
       email: user.email,
       role: user.isAdmin ? "Admin" : "User",
     });
@@ -60,7 +60,7 @@ export class VerificationController implements IVerificationController {
     });
   }
 
-  async resendEmail(req: Request, res: Response): Promise<void> {
+  async resendEmail(req: Request, res: Response) {
     const email = req.query.email as string;
     if (!email) {
       throw new AppError("Email is not provided", HTTP_STATUS.BAD_REQUEST);

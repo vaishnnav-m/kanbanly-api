@@ -38,14 +38,14 @@ export class AuthRoutes extends BaseRoute {
       )
     );
 
-    this.router.get(
+    this._router.get(
       "/resend-email",
       this._verificationController.resendEmail.bind(
         this._verificationController
       )
     );
 
-    this.router.get(
+    this._router.get(
       "/refresh",
       this._authController.refreshAccessToken.bind(this._authController)
     );
@@ -56,12 +56,12 @@ export class AuthRoutes extends BaseRoute {
       this._authController.logout.bind(this._authController)
     );
 
-    this.router.post(
+    this._router.post(
       "/admin/login",
       this._authController.adminLogin.bind(this._authController)
     );
 
-    this.router.get(
+    this._router.get(
       "/admin/logout",
       authenticateToken,
       this._authController.adminLgout.bind(this._authController)

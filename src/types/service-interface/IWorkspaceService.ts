@@ -1,4 +1,4 @@
-import { CreateWorkspaceDto } from "../dtos/workspace.dto";
+import { CreateWorkspaceDto } from "../dtos/workspaces/workspace.dto";
 import { IWorkspace } from "../entities/IWrokspace";
 
 export interface IWorkspaceService {
@@ -7,12 +7,4 @@ export interface IWorkspaceService {
   ): Promise<IWorkspace | null>;
 
   getAllWorkspaces(userid: string): Promise<IWorkspace[] | null>;
-
-  addUserWorkspaces(
-    user: {
-      user: string;
-      role: string;
-    },
-    workspaceId: string
-  ): Promise<IWorkspace | null>;
 }

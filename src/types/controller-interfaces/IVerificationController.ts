@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
+import { controllerMethod } from "../common/ControllerMethod";
 
 export interface IVerificationController {
-  verifyEmail(req: Request, res: Response): Promise<void>;
-  resendEmail(req: Request, res: Response): Promise<void>;
+  verifyEmail: controllerMethod;
+  resendEmail: controllerMethod;
 }

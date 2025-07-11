@@ -9,7 +9,7 @@ import AppError from "../shared/utils/AppError";
 export class AdminController implements IAdminController {
   constructor(@inject("IAdminService") private _adminService: IAdminService) {}
 
-  async getAllUsers(req: Request, res: Response): Promise<void> {
+  async getAllUsers(req: Request, res: Response) {
     const users = await this._adminService.getAllUsers();
     res.status(HTTP_STATUS.OK).json({
       message: "Users fetched successfully",
@@ -17,7 +17,7 @@ export class AdminController implements IAdminController {
     });
   }
 
-  async updateUserStatus(req: Request, res: Response): Promise<void> {
+  async updateUserStatus(req: Request, res: Response) {
     const userId = req.params.id;
     if (!userId) {
       throw new AppError("User id is not provided", HTTP_STATUS.BAD_REQUEST);

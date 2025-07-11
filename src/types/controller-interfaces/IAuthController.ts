@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
+import { controllerMethod } from "../common/ControllerMethod";
 
 export interface IAuthController {
-  registerUser(req: Request, res: Response): Promise<void>;
-  login(req: Request, res: Response): Promise<void>;
-  googleAuthCallback(req: Request, res: Response): Promise<void>;
-  refreshAccessToken(req: Request, res: Response): Promise<void>;
-  logout(req: Request, res: Response): Promise<void>;
-  adminLogin(req: Request, res: Response): Promise<void>;
-  adminLgout(req: Request, res: Response): Promise<void>;
+  registerUser: controllerMethod;
+  login: controllerMethod;
+  googleAuthCallback: controllerMethod;
+  refreshAccessToken: controllerMethod;
+  logout: controllerMethod;
+  adminLogin: controllerMethod;
+  adminLgout: controllerMethod;
 }

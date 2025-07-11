@@ -14,16 +14,32 @@ export class BaseRepository<T> implements IBaseRepository<T> {
 
   async find(
     query: Partial<T>,
-    options: { skip?: number; limit?: number; sort?: any }
+    options: { skip?: number; limit?: number; sort?: any } = {}
   ): Promise<T[]> {
-    return this.model.find(query, options).sort({ createdAt: 1 });
+    let q = this.model.find(query);
+
+    if (options.skip) {
+      q.skip(options.skip);
+    }
+
+    if (options.limit) {
+      q.limit(options.limit);
+    }
+
+    if (options.sort) {
+      q.sort(options.sort);
+    } else {
+      q.sort({ createdAt: -1 });
+    }
+
+    return q.exec();
   }
 
   async create(data: Partial<T>): Promise<T> {
     return this.model.create(data);
   }
 
-  async update(id: string, data: any): Promise<T | null> {
-    return this.model.findByIdAndUpdate(id, data, { new: true });
+  async update(query: any, data: any): Promise<T | null> {
+    return this.model.findOneAndUpdate(query, data);
   }
 }

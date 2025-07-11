@@ -1,7 +1,6 @@
-import { Request, Response } from "express";
+import { controllerMethod } from "../common/ControllerMethod";
 
 export interface IWorkspaceController {
-  createWorkspace(req: Request, res: Response): Promise<void>;
-  getAllWorkspaces(req: Request, res: Response): Promise<void>;
-  addUserWorkspace(req: Request, res: Response): Promise<void>;
+  createWorkspace: controllerMethod;
+  getAllWorkspaces: controllerMethod;
 }

@@ -1,23 +1,5 @@
 import { model, Schema, Types } from "mongoose";
 import { IWorkspace } from "../types/entities/IWrokspace";
-
-const memberSchema = new Schema(
-  {
-    user: {
-      type: Types.ObjectId,
-      ref: "user",
-      required: true,
-    },
-    role: {
-      type: String,
-      enum: ["owner", "projectManager", "member"],
-      default: "member",
-      required: true,
-    },
-  },
-  { _id: false }
-);
-
 const workspaceSchema = new Schema<IWorkspace>(
   {
     workspaceId: {
@@ -40,12 +22,17 @@ const workspaceSchema = new Schema<IWorkspace>(
       type: String,
     },
     createdBy: {
-      type: Types.ObjectId,
+      type: String,
       ref: "user",
       required: true,
     },
     members: {
-      type: [memberSchema],
+      type: [
+        {
+          type: Types.ObjectId,
+          ref: "workspaceMember",
+        },
+      ],
       default: [],
     },
   },

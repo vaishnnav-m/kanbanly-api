@@ -11,6 +11,7 @@ import { IVerificationService } from "./types/service-interface/IVerificationSer
 import { authEvents } from "./services/auth.service";
 import { AdminRoutes } from "./routes/admin/admin.routes";
 import { WorkspaceRoutes } from "./routes/workspace/workspace.route";
+import { WorkspaceMemberRoutes } from "./routes/workspace/workspace-member.route";
 
 export default class Server {
   private _app: Application;
@@ -69,7 +70,14 @@ export default class Server {
   private configureRoutes(): void {
     this._app.use("/api/v1/auth", container.resolve(AuthRoutes).router);
     this._app.use("/api/v1/admin", container.resolve(AdminRoutes).router);
-    this._app.use("/api/v1/workspace",container.resolve(WorkspaceRoutes).router);
+    this._app.use(
+      "/api/v1/workspace",
+      container.resolve(WorkspaceRoutes).router
+    );
+    this._app.use(
+      "/api/v1/workspace-member",
+      container.resolve(WorkspaceMemberRoutes).router
+    );
   }
 
   public start(): void {
