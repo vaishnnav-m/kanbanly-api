@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
+import { controllerMethod } from "../common/ControllerMethod";
 
 export interface IAdminController {
-  getAllUsers(req: Request, res: Response): Promise<void>;
-  updateUserStatus(req: Request, res: Response): Promise<void>;
+  getAllUsers: controllerMethod;
+  updateUserStatus: controllerMethod;
 }

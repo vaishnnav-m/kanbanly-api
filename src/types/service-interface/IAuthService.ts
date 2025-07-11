@@ -1,4 +1,4 @@
-import { responseDataDto, userDto } from "../dtos/createUser.dto";
+import { responseDataDto, userDto } from "../dtos/auth/createUser.dto";
 import { IUser } from "../entities/IUser";
 
 export interface IAuthService {

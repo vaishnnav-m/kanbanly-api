@@ -1,16 +1,11 @@
-import { Document, ObjectId } from "mongoose";
+import { ObjectId } from "mongoose";
 
-export interface IWorkspace extends Document {
+export interface IWorkspace {
   workspaceId: string;
   name: string;
   slug: string;
   description?: string;
   logo?: string;
   createdBy: string | ObjectId;
-  members: [
-    {
-      user: string;
-      role: "owner" | "projectManager" | "member";
-    }
-  ];
+  members: [ObjectId];
 }

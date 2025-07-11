@@ -12,7 +12,7 @@ import {
   setAuthCookies,
 } from "../shared/utils/cookieHelper.utils";
 import AppError from "../shared/utils/AppError";
-import { userDto } from "../types/dtos/createUser.dto";
+import { userDto } from "../types/dtos/auth/createUser.dto";
 
 @injectable()
 export class AuthController implements IAuthController {
@@ -21,7 +21,7 @@ export class AuthController implements IAuthController {
     @inject("ITokenService") private _tokenService: ITokenService
   ) {}
 
-  async registerUser(req: Request, res: Response): Promise<void> {
+  async registerUser(req: Request, res: Response) {
     const user: IUser = await this._authService.register(req.body);
 
     const response: ApiResponse<Partial<IUser>> = {
@@ -37,7 +37,7 @@ export class AuthController implements IAuthController {
     res.status(HTTP_STATUS.CREATED).json(response);
   }
 
-  async login(req: Request, res: Response): Promise<void> {
+  async login(req: Request, res: Response) {
     const { email, password } = req.body as userDto;
     const responseData = await this._authService.login({ email, password });
 
@@ -67,7 +67,7 @@ export class AuthController implements IAuthController {
     res.status(HTTP_STATUS.OK).json(response);
   }
 
-  async googleAuthCallback(req: Request, res: Response): Promise<void> {
+  async googleAuthCallback(req: Request, res: Response) {
     const { token } = req.body;
 
     if (!token) {
@@ -80,13 +80,13 @@ export class AuthController implements IAuthController {
     const user = await this._authService.googleAuthentication(token);
 
     const accessToken = this._tokenService.generateAccessToken({
-      userid: user._id as string,
+      userid: user.userId,
       email: user.email,
       role: "user",
     });
 
     const refreshToken = this._tokenService.generateRefreshToken({
-      userid: user._id as string,
+      userid: user.userId,
       email: user.email,
       role: "user",
     });
@@ -112,7 +112,7 @@ export class AuthController implements IAuthController {
     res.status(HTTP_STATUS.OK).json(response);
   }
 
-  async refreshAccessToken(req: Request, res: Response): Promise<void> {
+  async refreshAccessToken(req: Request, res: Response) {
     const refreshToken = req.cookies?.userRefreshToken;
     if (!refreshToken) {
       throw new AppError(
@@ -154,7 +154,7 @@ export class AuthController implements IAuthController {
     });
   }
 
-  async adminLogin(req: Request, res: Response): Promise<void> {
+  async adminLogin(req: Request, res: Response) {
     const { email, password } = req.body as userDto;
     const responseData = await this._authService.adminLogin({
       email,
