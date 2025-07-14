@@ -5,6 +5,8 @@ import { IWorkspaceRepository } from "../types/repository-interfaces/IWorkspaceR
 import { WorkspaceRepository } from "../repositories/workspace.repository";
 import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWorkspaceMember";
 import { WorkspaceMemberRepository } from "../repositories/workspace-member.repository";
+import { IInvitationRepository } from "../types/repository-interfaces/IInvitationRepository";
+import { InvitationRepository } from "../repositories/invitation.repository";
 
 export class RepositoryRegistry {
   static registerRepositories(): void {
@@ -17,8 +19,11 @@ export class RepositoryRegistry {
     container.register<IWorkspaceMemberRepository>(
       "IWorkspaceMemberRepository",
       {
-        useClass: WorkspaceMemberRepository,  
+        useClass: WorkspaceMemberRepository,
       }
     );
+    container.register<IInvitationRepository>("IInvitationRepository", {
+      useClass: InvitationRepository,
+    });
   }
 }

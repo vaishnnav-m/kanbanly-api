@@ -22,7 +22,8 @@
     "nodemailer": "^7.0.3",
     "reflect-metadata": "^0.2.2",
     "tsyringe": "^4.10.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "zod": "^4.0.5"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

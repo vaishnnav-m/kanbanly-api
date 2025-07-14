@@ -12,4 +12,8 @@ export class WorkspaceRepository
   constructor() {
     super(workspaceModel);
   }
+
+  async findByWorkspaceID(workspaceId: string): Promise<IWorkspace | null> {
+    return this.model.findOne({ workspaceId });
+  }
 }

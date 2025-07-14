@@ -8,10 +8,6 @@ export class BaseRepository<T> implements IBaseRepository<T> {
     return this.model.findOne(query);
   }
 
-  async findById(id: string): Promise<T | null> {
-    return this.model.findById(id);
-  }
-
   async find(
     query: Partial<T>,
     options: { skip?: number; limit?: number; sort?: any } = {}

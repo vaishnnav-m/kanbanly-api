@@ -13,6 +13,8 @@ import { IWorkspaceService } from "../types/service-interface/IWorkspaceService"
 import { WorkspaceService } from "../services/workspace.service";
 import { IWorkspaceMemberService } from "../types/service-interface/IWorkspaceMemberService";
 import { WorkspaceMemberService } from "../services/workspace-member.service";
+import { IEmailService } from "../types/service-interface/IEmailService";
+import { EmailService } from "../services/email.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -36,6 +38,9 @@ export class ServiceRegistry {
     });
     container.register<IWorkspaceMemberService>("IWorkspaceMemberService", {
       useClass: WorkspaceMemberService,
+    });
+    container.register<IEmailService>("IEmailService", {
+      useClass: EmailService,
     });
   }
 }
