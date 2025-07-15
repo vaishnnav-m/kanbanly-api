@@ -31,16 +31,9 @@ export class WorkspaceRoutes extends BaseRoute {
       this._workspaceController.getAllWorkspaces.bind(this._workspaceController)
     );
     this._router.post(
-      "/:workspaceId/add-member",
+      "/:workspaceId/invitations",
       authenticateToken,
       this._invitationController.createInvitation.bind(
-        this._invitationController
-      )
-    );
-    this._router.get(
-      "/:token/accept-invite",
-      authenticateToken,
-      this._invitationController.acceptInvitation.bind(
         this._invitationController
       )
     );
