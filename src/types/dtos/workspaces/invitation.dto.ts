@@ -5,9 +5,18 @@ export const CreateInvitationSchema = z.object({
   workspaceId: z.string(),
   invitedEmail: z.email(),
   role: z.enum(workspaceRoles),
-  invitedUserId: z.string(),
 });
 
 type BaseInvitationDto = z.infer<typeof CreateInvitationSchema>;
 
-export type CreateInvitationDto = BaseInvitationDto & { invitedBy: string };
+export interface CreateInvitationDto {
+  workspaceId: string;
+  invitedEmail: string;
+  role: workspaceRoles;
+  invitedBy: string;
+}
+
+export type CreateInvitationBodyDto = Omit<
+  CreateInvitationDto,
+  "invitedBy" | "workspaceId"
+>;

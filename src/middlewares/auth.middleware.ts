@@ -4,13 +4,14 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { container } from "tsyringe";
 import { ITokenService } from "../types/service-interface/ITokenService";
+import { success } from "zod";
 
 export const authenticateToken = (
   req: Request,
   res: Response,
   next: NextFunction
 ): void => {
-  const token = req.cookies.userAccessToken;
+  const token = req.cookies.accessToken;
 
   if (!token) {
     res.status(HTTP_STATUS.FORBIDDEN).json({
@@ -48,7 +49,7 @@ export const adminTokenCheck = (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.cookies.adminAccessToken;
+  const token = req.cookies.accessToken;
 
   if (!token) {
     res.status(HTTP_STATUS.FORBIDDEN).json({
@@ -68,6 +69,12 @@ export const adminTokenCheck = (
         message: ERROR_MESSAGES.AUTH_INVALID_TOKEN,
       });
       return;
+    }
+    if (decoded.role !== "admin") {
+      res.status(HTTP_STATUS.UNAUTHORIZED).json({
+        success: false,
+        message: ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+      });
     }
 
     req.user = decoded;

@@ -13,9 +13,10 @@ export const zodValidate =
         message: issue.message,
       }));
 
-      return res
+      res
         .status(HTTP_STATUS.BAD_REQUEST)
         .json({ success: false, message: errors });
+      return;
     }
 
     req.body = result.data;

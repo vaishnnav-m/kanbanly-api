@@ -40,9 +40,11 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     await this._workspaceMemberRepo.create(data);
   }
 
-
   async isMember(workspaceId: string, userId: string): Promise<boolean> {
-      const member = await this._workspaceMemberRepo.findOne({ workspaceId, userId });
-      return !!member;
+    const member = await this._workspaceMemberRepo.findOne({
+      workspaceId,
+      userId,
+    });
+    return !!member;
   }
 }
