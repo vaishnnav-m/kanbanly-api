@@ -3,8 +3,6 @@ import { authenticateToken } from "../../middlewares/auth.middleware";
 import { IWorkspaceController } from "../../types/controller-interfaces/IWorkspaceController";
 import { BaseRoute } from "../base.routes";
 import { IInvitationController } from "../../types/controller-interfaces/IInvitationController";
-import { zodValidate } from "../../middlewares/validate.middleware";
-import { CreateInvitationSchema } from "../../types/dtos/workspaces/invitation.dto";
 
 @injectable()
 export class WorkspaceRoutes extends BaseRoute {
@@ -37,5 +35,6 @@ export class WorkspaceRoutes extends BaseRoute {
         this._invitationController
       )
     );
+    
   }
 }

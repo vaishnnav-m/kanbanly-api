@@ -4,7 +4,6 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { container } from "tsyringe";
 import { ITokenService } from "../types/service-interface/ITokenService";
-import { success } from "zod";
 
 export const authenticateToken = (
   req: Request,

@@ -10,11 +10,12 @@ export class InvitationRoutes extends BaseRoute {
     private _invitationController: IInvitationController
   ) {
     super();
+    this.initializeRoutes();
   }
 
   protected initializeRoutes(): void {
     this._router.post(
-      "/:token/accept",
+      "/workspace/:token/accept",
       authenticateToken,
       this._invitationController.acceptInvitation.bind(
         this._invitationController
