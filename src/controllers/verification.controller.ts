@@ -38,10 +38,10 @@ export class VerificationController implements IVerificationController {
       role: user.isAdmin ? "Admin" : "User",
     });
 
-    setAuthCookies(res, "userAccessToken", accessToken, 60 * 60 * 1000);
+    setAuthCookies(res, "accessToken", accessToken, 60 * 60 * 1000);
     setAuthCookies(
       res,
-      "userRefreshToken",
+      "refreshToken",
       refreshToken,
       7 * 24 * 60 * 60 * 1000
     );

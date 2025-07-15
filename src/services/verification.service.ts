@@ -1,6 +1,5 @@
 import { inject, injectable } from "tsyringe";
 import { IVerificationService } from "../types/service-interface/IVerificationService";
-import { IEmailUtils } from "../types/common/IEmailUtils";
 import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
 import { ITokenService } from "../types/service-interface/ITokenService";
 import AppError from "../shared/utils/AppError";
@@ -8,12 +7,13 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { config } from "../config";
 import { IUser } from "../types/entities/IUser";
+import { IEmailService } from "../types/service-interface/IEmailService";
 
 @injectable()
 export class VerificationService implements IVerificationService {
   private _frontendUrl: string;
   constructor(
-    @inject("IEmailUtils") private _emailUtil: IEmailUtils,
+    @inject("IEmailService") private _emailService: IEmailService,
     @inject("ITokenService") private _tokenService: ITokenService,
     @inject("IUserRepository") private _userRepository: IUserRepository
   ) {
@@ -33,7 +33,7 @@ export class VerificationService implements IVerificationService {
 
     const verificationLink = `${this._frontendUrl}/verify-email?token=${token}`;
 
-    this._emailUtil.sendEmail(
+    this._emailService.sendVerificationEmail(
       toEmail,
       "Verify Your Email Address",
       verificationLink

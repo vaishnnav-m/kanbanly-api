@@ -43,13 +43,13 @@ export class AuthController implements IAuthController {
 
     setAuthCookies(
       res,
-      "userAccessToken",
+      "accessToken",
       responseData.accessToken,
       60 * 60 * 1000
     );
     setAuthCookies(
       res,
-      "userRefreshToken",
+      "refreshToken",
       responseData.refreshToken,
       7 * 24 * 60 * 60 * 1000
     );
@@ -91,10 +91,10 @@ export class AuthController implements IAuthController {
       role: "user",
     });
 
-    setAuthCookies(res, "userAccessToken", accessToken, 5 * 60 * 1000);
+    setAuthCookies(res, "accessToken", accessToken, 5 * 60 * 1000);
     setAuthCookies(
       res,
-      "userRefreshToken",
+      "refreshToken",
       refreshToken,
       7 * 24 * 60 * 60 * 1000
     );
@@ -113,7 +113,7 @@ export class AuthController implements IAuthController {
   }
 
   async refreshAccessToken(req: Request, res: Response) {
-    const refreshToken = req.cookies?.userRefreshToken;
+    const refreshToken = req.cookies?.refreshToken;
     if (!refreshToken) {
       throw new AppError(
         ERROR_MESSAGES.AUTH_NO_TOKEN_PROVIDED,
@@ -135,8 +135,8 @@ export class AuthController implements IAuthController {
       role: decoded.role,
     });
 
-    clearAuthCookies(res, "userAccessToken");
-    setAuthCookies(res, "userAccessToken", accessToken, 60 * 60 * 1000);
+    clearAuthCookies(res, "accessToken");
+    setAuthCookies(res, "accessToken", accessToken, 60 * 60 * 1000);
 
     res.status(HTTP_STATUS.OK).json({
       success: true,
@@ -145,8 +145,8 @@ export class AuthController implements IAuthController {
   }
 
   async logout(req: Request, res: Response) {
-    clearAuthCookies(res, "userAccessToken");
-    clearAuthCookies(res, "userRefreshToken");
+    clearAuthCookies(res, "accessToken");
+    clearAuthCookies(res, "refreshToken");
 
     res.status(HTTP_STATUS.OK).json({
       success: true,
@@ -163,13 +163,13 @@ export class AuthController implements IAuthController {
 
     setAuthCookies(
       res,
-      "adminAccessToken",
+      "accessToken",
       responseData.accessToken,
       60 * 60 * 1000
     );
     setAuthCookies(
       res,
-      "adminRefreshToken",
+      "refreshToken",
       responseData.refreshToken,
       7 * 24 * 60 * 60 * 1000
     );
@@ -188,8 +188,8 @@ export class AuthController implements IAuthController {
   }
 
   async adminLgout(req: Request, res: Response) {
-    clearAuthCookies(res, "adminAccessToken");
-    clearAuthCookies(res, "adminRefreshToken");
+    clearAuthCookies(res, "accessToken");
+    clearAuthCookies(res, "refreshToken");
 
     res.status(HTTP_STATUS.OK).json({
       success: true,

@@ -54,9 +54,6 @@ export default class Server {
       async ({ userEmail }: { userEmail: string }) => {
         try {
           await verificationService.sendVerificationEmail(userEmail);
-          console.log(
-            `[Event Listener] Verification email sent to ${userEmail} after registration.`
-          );
         } catch (error) {
           console.error(
             `[Event Listener] Failed to send verification email for ${userEmail}:`,
