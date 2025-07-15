@@ -3,6 +3,7 @@ import { AuthRoutes } from "../routes/auth/auth.routes";
 import { WorkspaceRoutes } from "../routes/workspace/workspace.route";
 import { AdminRoutes } from "../routes/admin/admin.routes";
 import { WorkspaceMemberRoutes } from "../routes/workspace/workspace-member.route";
+import { InvitationRoutes } from "../routes/invitations/invitation.route";
 
 export class RoutesRegistry {
   static registerRoutes(): void {
@@ -17,6 +18,9 @@ export class RoutesRegistry {
     });
     container.register(WorkspaceMemberRoutes, {
       useClass: WorkspaceMemberRoutes,
+    });
+    container.register(InvitationRoutes, {
+      useClass: InvitationRoutes,
     });
   }
 }
