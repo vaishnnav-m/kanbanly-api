@@ -114,7 +114,29 @@ export class AuthService implements IAuthService {
     );
   }
 
-  
+  async resetPassword(token: string, password: string): Promise<void> {
+    const userId = await this._cache.get(`forgotToken:${token}`);
+    if (!userId) {
+      throw new AppError(
+        "Invalid or expired password reset link",
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const hashedPassword = await this._passwordBcrypt.hash(password);
+    const updated = await this._userRepository.update(
+      { userId },
+      { password: hashedPassword }
+    );
+
+    if (!updated) {
+      throw new AppError(
+        "Failed to update password. Please try again.",
+        HTTP_STATUS.INTERNAL_SERVER_ERROR
+      );
+    }
+    await this._cache.del(`forgotToken:${token}`);
+  }
 
   async googleAuthentication(token: string): Promise<IUser> {
     const payload = await this._googleService.getUserInfoFromAccessToken(token);

@@ -69,11 +69,32 @@ export class AuthController implements IAuthController {
 
   async forgotPassword(req: Request, res: Response) {
     const { email } = req.body as { email: string };
+    if (!email) {
+      throw new AppError("Email is not provided", HTTP_STATUS.BAD_REQUEST);
+    }
+
     await this._authService.sendForgotPassword(email);
 
     res
       .status(HTTP_STATUS.OK)
       .json({ success: true, message: SUCCESS_MESSAGES.FORGOT_EMAIL_SEND });
+  }
+
+  async resetPassword(req: Request, res: Response) {
+    const { password, token } = req.body as { password: string; token: string };
+
+    if (!token) {
+      throw new AppError("Token is not provided", HTTP_STATUS.BAD_REQUEST);
+    }
+    if (!password) {
+      throw new AppError("Password is not provided", HTTP_STATUS.BAD_REQUEST);
+    }
+
+    await this._authService.resetPassword(token, password);
+
+    res
+      .status(HTTP_STATUS.OK)
+      .json({ success: true, message: "Password Reseted Successfully" });
   }
 
   async googleAuthCallback(req: Request, res: Response) {

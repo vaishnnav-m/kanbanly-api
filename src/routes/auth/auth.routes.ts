@@ -50,6 +50,11 @@ export class AuthRoutes extends BaseRoute {
       this._authController.forgotPassword.bind(this._authController)
     );
 
+    this._router.patch(
+      "/reset-password",
+      this._authController.resetPassword.bind(this._authController)
+    );
+
     this._router.get(
       "/refresh",
       this._authController.refreshAccessToken.bind(this._authController)
