@@ -10,10 +10,14 @@ export class AdminController implements IAdminController {
   constructor(@inject("IAdminService") private _adminService: IAdminService) {}
 
   async getAllUsers(req: Request, res: Response) {
-    const users = await this._adminService.getAllUsers();
+    const pageParam = req.query.page;
+    const page =
+      parseInt(typeof pageParam === "string" ? pageParam : "1", 10) || 1;
+
+    const usersData = await this._adminService.getAllUsers(page);
     res.status(HTTP_STATUS.OK).json({
       message: "Users fetched successfully",
-      data: users,
+      data: usersData,
     });
   }
 

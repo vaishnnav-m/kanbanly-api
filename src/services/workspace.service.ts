@@ -8,6 +8,8 @@ import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { IWorkspaceMemberService } from "../types/service-interface/IWorkspaceMemberService";
 import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
+import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWorkspaceMember";
+import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 
 @injectable()
 export class WorkspaceService implements IWorkspaceService {
@@ -15,7 +17,9 @@ export class WorkspaceService implements IWorkspaceService {
     @inject("IWorkspaceRepository")
     private _workspaceRepo: IWorkspaceRepository,
     @inject("IWorkspaceMemberService")
-    private _workspaceMemberService: IWorkspaceMemberService
+    private _workspaceMemberService: IWorkspaceMemberService,
+    @inject("IWorkspaceMemberRepository")
+    private _workspaceMemberRepo: IWorkspaceMemberRepository
   ) {}
 
   private slugify(name: string) {
@@ -26,7 +30,7 @@ export class WorkspaceService implements IWorkspaceService {
     workspaceData: CreateWorkspaceDto
   ): Promise<IWorkspace | null> {
     const slugName = this.slugify(workspaceData.name);
-    
+
     const isExists = await this._workspaceRepo.findOne({
       createdBy: workspaceData.createdBy,
       slug: slugName,
@@ -59,10 +63,16 @@ export class WorkspaceService implements IWorkspaceService {
     return newWorkspace;
   }
 
-  async getAllWorkspaces(userid: string): Promise<IWorkspace[] | null> {
-    const workspaces: IWorkspace[] = await this._workspaceRepo.find({
-      createdBy: userid,
-    });
+  async getAllWorkspaces(userId: string): Promise<IWorkspace[] | null> {
+    const memberWorkspaces: IWorkspaceMember[] =
+      await this._workspaceMemberRepo.find({ userId });
+
+    const memberWorkspaceIds = memberWorkspaces.map((workspace) =>
+      workspace.workspaceId.toString()
+    );
+
+    const workspaces: IWorkspace[] =
+      await this._workspaceRepo.findAllWorkspaces(memberWorkspaceIds, userId);
     return workspaces;
   }
 }

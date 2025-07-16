@@ -6,6 +6,7 @@ import { invitationStatus } from "../types/enums/invitation-status.enum";
 const invitationSchema = new Schema<IInvitation>({
   workspaceId: {
     type: String,
+    ref: "workspace",
     required: true,
   },
   invitationToken: {

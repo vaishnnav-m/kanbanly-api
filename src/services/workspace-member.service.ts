@@ -8,6 +8,7 @@ import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWork
 import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { IWorkspaceRepository } from "../types/repository-interfaces/IWorkspaceRepository";
+import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 
 @injectable()
 export class WorkspaceMemberService implements IWorkspaceMemberService {
@@ -47,4 +48,8 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     });
     return !!member;
   }
+
+  // async getMembers(workspaceId: string,userId:string): Promise<IWorkspaceMember[]> {
+      
+  // }
 }
