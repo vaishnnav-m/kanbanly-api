@@ -67,6 +67,15 @@ export class AuthController implements IAuthController {
     res.status(HTTP_STATUS.OK).json(response);
   }
 
+  async forgotPassword(req: Request, res: Response) {
+    const { email } = req.body as { email: string };
+    await this._authService.sendForgotPassword(email);
+
+    res
+      .status(HTTP_STATUS.OK)
+      .json({ success: true, message: SUCCESS_MESSAGES.FORGOT_EMAIL_SEND });
+  }
+
   async googleAuthCallback(req: Request, res: Response) {
     const { token } = req.body;
 
@@ -92,12 +101,7 @@ export class AuthController implements IAuthController {
     });
 
     setAuthCookies(res, "accessToken", accessToken, 5 * 60 * 1000);
-    setAuthCookies(
-      res,
-      "refreshToken",
-      refreshToken,
-      7 * 24 * 60 * 60 * 1000
-    );
+    setAuthCookies(res, "refreshToken", refreshToken, 7 * 24 * 60 * 60 * 1000);
 
     const response: ApiResponse<Partial<IUser>> = {
       success: true,

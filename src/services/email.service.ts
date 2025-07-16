@@ -4,6 +4,7 @@ import { IEmailService } from "../types/service-interface/IEmailService";
 import { config } from "../config";
 import {
   ACCOUNT_VERIFICATION,
+  PASSWORD_RESET,
   WORKSPACE_INVITATION,
 } from "../shared/templates/email.templates";
 
@@ -30,6 +31,22 @@ export class EmailService implements IEmailService {
       to,
       subject,
       html: ACCOUNT_VERIFICATION(link),
+    };
+
+    await this._transporter.sendMail(mailOptions);
+  }
+
+  async sendForgotEmail(
+    to: string,
+    subject: string,
+    link: string,
+    name: string
+  ): Promise<void> {
+    const mailOptions = {
+      from: "Kanbanly",
+      to,
+      subject,
+      html: PASSWORD_RESET(name, link),
     };
 
     await this._transporter.sendMail(mailOptions);

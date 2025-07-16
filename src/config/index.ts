@@ -33,4 +33,11 @@ export const config = {
     CLIENT_REDIRECT_URI: process.env.REDIRECT_URI,
     USERINFO_ENDPOINT: process.env.GOOGLE_USERINFO_ENDPOINT || "",
   },
+
+  redis: {
+    USER: process.env.REDIS_USER || 'default',
+    PASS: process.env.REDIS_PASS || '',
+    HOST: process.env.REDIS_HOST,
+    PORT: process.env.REDIS_PORT,
+  },
 };

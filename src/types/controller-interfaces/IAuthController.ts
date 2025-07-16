@@ -3,6 +3,7 @@ import { controllerMethod } from "../common/ControllerMethod";
 export interface IAuthController {
   registerUser: controllerMethod;
   login: controllerMethod;
+  forgotPassword: controllerMethod;
   googleAuthCallback: controllerMethod;
   refreshAccessToken: controllerMethod;
   logout: controllerMethod;

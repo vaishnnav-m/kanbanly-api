@@ -6,6 +6,8 @@ export const SUCCESS_MESSAGES = {
   USER_LOGOUT: "User logout successfully.",
   ADMIN_LOGOUT: "Admin logout successfully.",
   EMAIL_SEND: "Email send successfully",
+  FORGOT_EMAIL_SEND:
+    "If an account with that email address exists, a password reset link has been sent to your inbox. Please check your spam folder if you don't see it.",
   EMAIL_VERIFIED: "Email verification was successfull",
 };
 
