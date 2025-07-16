@@ -11,6 +11,9 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { IGoogleService } from "../types/service-interface/IGoogleService";
 import { ITokenService } from "../types/service-interface/ITokenService";
+import { IEmailService } from "../types/service-interface/IEmailService";
+import { ICacheService } from "../types/service-interface/ICacheService";
+import { config } from "../config";
 
 export const authEvents = new EventEmitter();
 
@@ -20,7 +23,9 @@ export class AuthService implements IAuthService {
     @inject("IUserRepository") private _userRepository: IUserRepository,
     @inject("IBcryptUtils") private _passwordBcrypt: IBcryptUtils,
     @inject("IGoogleService") private _googleService: IGoogleService,
-    @inject("ITokenService") private _tokenService: ITokenService
+    @inject("ITokenService") private _tokenService: ITokenService,
+    @inject("IEmailService") private _emailService: IEmailService,
+    @inject("ICacheService") private _cache: ICacheService
   ) {}
 
   async register(user: userDto): Promise<IUser> {
@@ -89,6 +94,48 @@ export class AuthService implements IAuthService {
     });
 
     return { accessToken, refreshToken, user: userData };
+  }
+
+  async sendForgotPassword(email: string): Promise<void> {
+    const user = await this._userRepository.findByEmail(email);
+    if (!user) {
+      return;
+    }
+    const token = uuidv4();
+    this._cache.set(`forgotToken:${token}`, user.userId, 3600);
+
+    const link = `${config.cors.ALLOWED_ORIGIN}/reset-password?token=${token}`;
+
+    await this._emailService.sendForgotEmail(
+      user.email,
+      "Reset Your Password",
+      link,
+      user.firstName
+    );
+  }
+
+  async resetPassword(token: string, password: string): Promise<void> {
+    const userId = await this._cache.get(`forgotToken:${token}`);
+    if (!userId) {
+      throw new AppError(
+        "Invalid or expired password reset link",
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const hashedPassword = await this._passwordBcrypt.hash(password);
+    const updated = await this._userRepository.update(
+      { userId },
+      { password: hashedPassword }
+    );
+
+    if (!updated) {
+      throw new AppError(
+        "Failed to update password. Please try again.",
+        HTTP_STATUS.INTERNAL_SERVER_ERROR
+      );
+    }
+    await this._cache.del(`forgotToken:${token}`);
   }
 
   async googleAuthentication(token: string): Promise<IUser> {

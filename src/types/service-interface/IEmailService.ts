@@ -2,7 +2,14 @@ export interface IEmailService {
   sendVerificationEmail(
     to: string,
     subject: string,
-    body: string
+    link: string
+  ): Promise<void>;
+
+  sendForgotEmail(
+    to: string,
+    subject: string,
+    link: string,
+    name: string
   ): Promise<void>;
 
   sendInvitationEmail(

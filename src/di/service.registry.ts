@@ -17,6 +17,8 @@ import { IEmailService } from "../types/service-interface/IEmailService";
 import { EmailService } from "../services/email.service";
 import { IInvitationService } from "../types/service-interface/IInvitationService";
 import { InvitationService } from "../services/invitaion.service";
+import { ICacheService } from "../types/service-interface/ICacheService";
+import { CacheService } from "../services/cache.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -46,6 +48,9 @@ export class ServiceRegistry {
     });
     container.register<IInvitationService>("IInvitationService", {
       useClass: InvitationService,
+    });
+    container.register<ICacheService>("ICacheService", {
+      useClass: CacheService,
     });
   }
 }
