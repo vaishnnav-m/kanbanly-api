@@ -16,4 +16,13 @@ export class WorkspaceRepository
   async findByWorkspaceID(workspaceId: string): Promise<IWorkspace | null> {
     return this.model.findOne({ workspaceId });
   }
+
+  async findAllWorkspaces(
+    workspaceIds: string[],
+    userId: string
+  ): Promise<IWorkspace[]> {
+    return this.model.find({
+      $or: [{ createdBy: userId }, { workspaceId: { $in: workspaceIds } }],
+    });
+  }
 }

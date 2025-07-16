@@ -8,4 +8,8 @@ export interface IBaseRepository<T> {
   ): Promise<T[]>;
   create(data: Partial<T>): Promise<T>;
   update(query: any, data: any): Promise<T | null>;
+  findWithPagination(
+    query: Partial<T>,
+    options: { skip?: number; limit?: number; sort?: any }
+  ): Promise<{ data: T[]; totalPages: number }>;
 }

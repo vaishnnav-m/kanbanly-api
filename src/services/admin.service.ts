@@ -12,14 +12,24 @@ export class AdminService implements IAdminService {
     @inject("IUserRepository") private _userRepository: IUserRepository
   ) {}
 
-  async getAllUsers(): Promise<UserAdminTableDto[]> {
-    const users = await this._userRepository.find({ isAdmin: false });
+  async getAllUsers(page: number): Promise<UserAdminTableDto> {
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const { data: users, totalPages } =
+      await this._userRepository.findWithPagination(
+        {
+          isAdmin: false,
+        },
+        { limit, skip }
+      );
+
     const modifiedUsers = users.map(
       ({ userId, firstName, lastName, email, isActive }) => {
         return { userId, firstName, lastName, email, isActive };
       }
     );
-    return modifiedUsers;
+    return { users: modifiedUsers, totalPages };
   }
 
   async updateUserStatus(userId: string): Promise<IUser | null> {
