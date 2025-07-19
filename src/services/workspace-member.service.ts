@@ -1,6 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import {
   WorkspaceMemberDto,
+  WorkspaceMemberListDto,
   workspaceRoles,
 } from "../types/dtos/workspaces/workspace-member.dto";
 import { IWorkspaceMemberService } from "../types/service-interface/IWorkspaceMemberService";
@@ -8,7 +9,8 @@ import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWork
 import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { IWorkspaceRepository } from "../types/repository-interfaces/IWorkspaceRepository";
-import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
+import { PaginatedResponseDto } from "../types/dtos/paginated.dto";
+import { ERROR_MESSAGES } from "../shared/constants/messages";
 
 @injectable()
 export class WorkspaceMemberService implements IWorkspaceMemberService {
@@ -49,7 +51,39 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     return !!member;
   }
 
-  // async getMembers(workspaceId: string,userId:string): Promise<IWorkspaceMember[]> {
-      
-  // }
+  async getMembers(
+    workspaceId: string,
+    userId: string,
+    page: number
+  ): Promise<PaginatedResponseDto<WorkspaceMemberListDto[]>> {
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const isOwner = await this._workspaceRepo.isOwner(workspaceId, userId);
+    if (!isOwner) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    const rawMembers = await this._workspaceMemberRepo.getMembers(
+      workspaceId,
+      skip,
+      limit
+    );
+
+    const members = rawMembers.data.map((member) => {
+      return {
+        name: member.user.firstName,
+        email: member.user.email,
+        role: member.role,
+        _id: member.user.userId,
+      };
+    });
+
+    const totalPages = Math.ceil(rawMembers.count / limit);
+
+    return { data: members, totalPages, total: rawMembers.count };
+  }
 }

@@ -1,7 +1,7 @@
 export const SUCCESS_MESSAGES = {
   REGISTRATION_SUCCESSFUL: "User registered successfully.",
   LOGIN_SUCCESSFUL: "User logged in successfully.",
-  DATA_RETRIEVED: "Data retrieved successfully.",
+  DATA_FETCHED: "Data fetched successfully.",
   USER_UPDATED: "User updated successfully.",
   USER_LOGOUT: "User logout successfully.",
   ADMIN_LOGOUT: "Admin logout successfully.",

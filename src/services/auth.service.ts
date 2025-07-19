@@ -159,7 +159,7 @@ export class AuthService implements IAuthService {
     }
 
     if (!user?.isActive) {
-      throw new AppError(ERROR_MESSAGES.USER_BLOCKED, HTTP_STATUS.FORBIDDEN);
+      throw new AppError(ERROR_MESSAGES.USER_BLOCKED, HTTP_STATUS.UNAUTHORIZED);
     }
 
     return user;

@@ -4,7 +4,7 @@ import { IUserRepository } from "../types/repository-interfaces/IUserRepository"
 import { IUser } from "../types/entities/IUser";
 import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
-import { UserAdminTableDto } from "../types/dtos/users/user-admin-table.dto";
+import { UserAdminTableDto } from "../types/dtos/admin/user-admin-table.dto";
 
 @injectable()
 export class AdminService implements IAdminService {

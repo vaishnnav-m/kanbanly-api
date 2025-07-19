@@ -3,6 +3,7 @@ import { authenticateToken } from "../../middlewares/auth.middleware";
 import { IWorkspaceController } from "../../types/controller-interfaces/IWorkspaceController";
 import { BaseRoute } from "../base.routes";
 import { IInvitationController } from "../../types/controller-interfaces/IInvitationController";
+import { IWorkspaceMemberController } from "../../types/controller-interfaces/IWorkspaceMemberController";
 
 @injectable()
 export class WorkspaceRoutes extends BaseRoute {
@@ -10,7 +11,9 @@ export class WorkspaceRoutes extends BaseRoute {
     @inject("IWorkspaceController")
     private _workspaceController: IWorkspaceController,
     @inject("IInvitationController")
-    private _invitationController: IInvitationController
+    private _invitationController: IInvitationController,
+    @inject("IWorkspaceMemberController")
+    private _workspaceMemberController: IWorkspaceMemberController
   ) {
     super();
     this.initializeRoutes();
@@ -35,6 +38,12 @@ export class WorkspaceRoutes extends BaseRoute {
         this._invitationController
       )
     );
-    
+    this._router.get(
+      "/:workspaceId/members",
+      authenticateToken,
+      this._workspaceMemberController.getMembers.bind(
+        this._workspaceMemberController
+      )
+    );
   }
 }
