@@ -7,4 +7,5 @@ export interface IWorkspaceRepository extends IBaseRepository<IWorkspace> {
     workspaceIds: string[],
     userId: string
   ): Promise<IWorkspace[]>;
+  isOwner(workspaceId: string, userId: string): Promise<boolean>;
 }

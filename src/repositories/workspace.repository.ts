@@ -25,4 +25,11 @@ export class WorkspaceRepository
       $or: [{ createdBy: userId }, { workspaceId: { $in: workspaceIds } }],
     });
   }
+
+  async isOwner(workspaceId: string, userId: string): Promise<boolean> {
+    const onwner = await this.model
+      .findOne({ workspaceId })
+      .select("createdBy");
+    return userId === onwner?.createdBy;
+  }
 }

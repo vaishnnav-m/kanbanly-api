@@ -1,4 +1,4 @@
-import { UserAdminTableDto } from "../dtos/users/user-admin-table.dto";
+import { UserAdminTableDto } from "../dtos/admin/user-admin-table.dto";
 import { IUser } from "../entities/IUser";
 
 export interface IAdminService {
