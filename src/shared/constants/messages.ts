@@ -9,6 +9,7 @@ export const SUCCESS_MESSAGES = {
   FORGOT_EMAIL_SEND:
     "If an account with that email address exists, a password reset link has been sent to your inbox. Please check your spam folder if you don't see it.",
   EMAIL_VERIFIED: "Email verification was successfull",
+  PROJECT_CREATED: "Project Created Successfully",
 };
 
 export const ERROR_MESSAGES = {
@@ -26,4 +27,6 @@ export const ERROR_MESSAGES = {
   USER_NOT_EXIST_OR_ALREADY_VERIFIED: "User not exists or already verified.",
   USER_BLOCKED:
     "Oops! It looks like your access has been restricted. Please reach out to our support team for assistance.",
+  PROJECT_ALREADY_EXISTS: "Project with this name already exists",
+  WORKSPACE_NOT_FOUND: "The workspace is not exists",
 };

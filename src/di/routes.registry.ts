@@ -1,9 +1,8 @@
 import { container } from "tsyringe";
 import { AuthRoutes } from "../routes/auth/auth.routes";
-import { WorkspaceRoutes } from "../routes/workspace/workspace.route";
+import { WorkspaceRoutes } from "../routes/workspaces/workspace.routes";
 import { AdminRoutes } from "../routes/admin/admin.routes";
-import { WorkspaceMemberRoutes } from "../routes/workspace/workspace-member.route";
-import { InvitationRoutes } from "../routes/invitations/invitation.route";
+import { InvitationRoutes } from "../routes/invitations/invitation.routes";
 
 export class RoutesRegistry {
   static registerRoutes(): void {
@@ -16,11 +15,9 @@ export class RoutesRegistry {
     container.register(WorkspaceRoutes, {
       useClass: WorkspaceRoutes,
     });
-    container.register(WorkspaceMemberRoutes, {
-      useClass: WorkspaceMemberRoutes,
-    });
     container.register(InvitationRoutes, {
       useClass: InvitationRoutes,
     });
+    // container.register(ProjectRoutes)
   }
 }

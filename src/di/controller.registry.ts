@@ -11,6 +11,8 @@ import { IWorkspaceMemberController } from "../types/controller-interfaces/IWork
 import { WorkspaceMemberController } from "../controllers/workspace-member.controller";
 import { IInvitationController } from "../types/controller-interfaces/IInvitationController";
 import { InvitationController } from "../controllers/invitation.controller";
+import { IProjectController } from "../types/controller-interfaces/IProjectController";
+import { ProjectController } from "../controllers/project.controller";
 
 export class ControllerRegistry {
   static registerController(): void {
@@ -34,6 +36,9 @@ export class ControllerRegistry {
     );
     container.register<IInvitationController>("IInvitationController", {
       useClass: InvitationController,
+    });
+    container.register<IProjectController>("IProjectController", {
+      useClass: ProjectController,
     });
   }
 }

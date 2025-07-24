@@ -45,7 +45,7 @@ export class WorkspaceMemberRepository
       },
       {
         $facet: {
-          data: [{ $limit: limit }, { $skip: skip }],
+          data: [{ $skip: skip }, { $limit: limit }],
           totalCount: [{ $count: "count" }],
         },
       },

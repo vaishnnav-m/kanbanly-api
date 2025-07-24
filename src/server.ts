@@ -7,11 +7,10 @@ import { DependencyInjection } from "./di";
 import { corsOptions } from "./middlewares/cors.middleware";
 import cookieParser from "cookie-parser";
 import { ErrorMiddleware } from "./middlewares/error.middleware";
-import { IVerificationService } from "./types/service-interface/IVerificationService";
-import { authEvents } from "./services/auth.service";
 import { AdminRoutes } from "./routes/admin/admin.routes";
-import { WorkspaceRoutes } from "./routes/workspace/workspace.route";
-import { InvitationRoutes } from "./routes/invitations/invitation.route";
+import { WorkspaceRoutes } from "./routes/workspaces/workspace.routes";
+import { InvitationRoutes } from "./routes/invitations/invitation.routes";
+import { registerUserEventListner } from "./events/listeners/auth.listener";
 
 export default class Server {
   private _app: Application;
@@ -25,7 +24,7 @@ export default class Server {
 
   private initialize() {
     DependencyInjection.registerAll();
-    this.setupEventListeners();
+    registerUserEventListner()
     this.configureMiddlewares();
     this.configureRoutes();
     this.configureErrorMiddlewares();
@@ -41,26 +40,6 @@ export default class Server {
     const errorMiddlewareInstance = container.resolve(ErrorMiddleware);
     this._app.use(
       errorMiddlewareInstance.handleError.bind(errorMiddlewareInstance)
-    );
-  }
-
-  private setupEventListeners() {
-    const verificationService = container.resolve<IVerificationService>(
-      "IVerificationService"
-    );
-
-    authEvents.on(
-      "userRegistered",
-      async ({ userEmail }: { userEmail: string }) => {
-        try {
-          await verificationService.sendVerificationEmail(userEmail);
-        } catch (error) {
-          console.error(
-            `[Event Listener] Failed to send verification email for ${userEmail}:`,
-            error
-          );
-        }
-      }
     );
   }
 
