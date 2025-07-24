@@ -4,6 +4,7 @@ import { IWorkspaceController } from "../../types/controller-interfaces/IWorkspa
 import { BaseRoute } from "../base.routes";
 import { IInvitationController } from "../../types/controller-interfaces/IInvitationController";
 import { IWorkspaceMemberController } from "../../types/controller-interfaces/IWorkspaceMemberController";
+import { ProjectRoutes } from "./projects/project.routes";
 
 @injectable()
 export class WorkspaceRoutes extends BaseRoute {
@@ -13,7 +14,8 @@ export class WorkspaceRoutes extends BaseRoute {
     @inject("IInvitationController")
     private _invitationController: IInvitationController,
     @inject("IWorkspaceMemberController")
-    private _workspaceMemberController: IWorkspaceMemberController
+    private _workspaceMemberController: IWorkspaceMemberController,
+    @inject(ProjectRoutes) private _projectRoutes: ProjectRoutes
   ) {
     super();
     this.initializeRoutes();
@@ -44,6 +46,11 @@ export class WorkspaceRoutes extends BaseRoute {
       this._workspaceMemberController.getMembers.bind(
         this._workspaceMemberController
       )
+    );
+    this._router.use(
+      "/:workspaceId/projects",
+      authenticateToken,
+      this._projectRoutes.router
     );
   }
 }

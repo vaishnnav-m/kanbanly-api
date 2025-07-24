@@ -19,6 +19,8 @@ import { IInvitationService } from "../types/service-interface/IInvitationServic
 import { InvitationService } from "../services/invitaion.service";
 import { ICacheService } from "../types/service-interface/ICacheService";
 import { CacheService } from "../services/cache.service";
+import { IProjectService } from "../types/service-interface/IProjectService";
+import { ProjectService } from "../services/project.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -51,6 +53,9 @@ export class ServiceRegistry {
     });
     container.register<ICacheService>("ICacheService", {
       useClass: CacheService,
+    });
+    container.register<IProjectService>("IProjectService", {
+      useClass: ProjectService,
     });
   }
 }

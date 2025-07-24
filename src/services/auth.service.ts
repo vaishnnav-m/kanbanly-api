@@ -1,6 +1,5 @@
 import { inject, injectable } from "tsyringe";
 import { v4 as uuidv4 } from "uuid";
-import { EventEmitter } from "events";
 import { responseDataDto, userDto } from "../types/dtos/auth/createUser.dto";
 import { IAuthService } from "../types/service-interface/IAuthService";
 import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
@@ -14,8 +13,7 @@ import { ITokenService } from "../types/service-interface/ITokenService";
 import { IEmailService } from "../types/service-interface/IEmailService";
 import { ICacheService } from "../types/service-interface/ICacheService";
 import { config } from "../config";
-
-export const authEvents = new EventEmitter();
+import { AuthEvent, authEvents } from "../events/auth.events";
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -46,7 +44,7 @@ export class AuthService implements IAuthService {
       password: hashedPassword,
     });
 
-    authEvents.emit("userRegistered", { userEmail: email });
+    authEvents.emit(AuthEvent.UserRegistered, { userEmail: email });
 
     return newUser;
   }
