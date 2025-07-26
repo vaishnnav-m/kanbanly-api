@@ -29,4 +29,5 @@ export const ERROR_MESSAGES = {
     "Oops! It looks like your access has been restricted. Please reach out to our support team for assistance.",
   PROJECT_ALREADY_EXISTS: "Project with this name already exists",
   WORKSPACE_NOT_FOUND: "The workspace is not exists",
+  NOT_OWNER:"You are not the owner of this workspace"
 };
