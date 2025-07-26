@@ -16,5 +16,9 @@ export class ProjectRoutes extends BaseRoute {
       "/",
       this._projectController.createProject.bind(this._projectController)
     );
+    this._router.get(
+      "/",
+      this._projectController.getAllProjects.bind(this._projectController)
+    );
   }
 }

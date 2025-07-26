@@ -3,5 +3,9 @@ export interface CreateProjectDto {
   description: string;
   workspaceId: string;
   createdBy: string;
-  
+}
+
+export interface ProjectListDto {
+  name: string;
+  description: string;
 }

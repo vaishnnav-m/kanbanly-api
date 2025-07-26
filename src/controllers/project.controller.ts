@@ -16,7 +16,6 @@ export class ProjectController implements IProjectController {
     const { name, description } = req.body;
     const workspaceId = req.params.workspaceId;
     const userId = req.user?.userid;
-    console.log("workspaceId",workspaceId,"\n params",req.params)
 
     if (!userId) {
       throw new AppError(
@@ -35,5 +34,30 @@ export class ProjectController implements IProjectController {
     res
       .status(HTTP_STATUS.OK)
       .json({ success: true, message: SUCCESS_MESSAGES.PROJECT_CREATED });
+  }
+
+  async getAllProjects(req: Request, res: Response): Promise<void> {
+    const workspaceId = req.params.workspaceId;
+    const userId = req.user?.userid;
+
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    const projects = await this._projectService.getAllProjects(
+      workspaceId,
+      userId
+    );
+
+    res
+      .status(HTTP_STATUS.OK)
+      .json({
+        success: true,
+        message: SUCCESS_MESSAGES.PROJECT_CREATED,
+        data: projects,
+      });
   }
 }
