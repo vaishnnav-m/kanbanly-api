@@ -21,6 +21,8 @@ import { ICacheService } from "../types/service-interface/ICacheService";
 import { CacheService } from "../services/cache.service";
 import { IProjectService } from "../types/service-interface/IProjectService";
 import { ProjectService } from "../services/project.service";
+import { ITaskService } from "../types/service-interface/ITaskService";
+import { TaskService } from "../services/task.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -56,6 +58,9 @@ export class ServiceRegistry {
     });
     container.register<IProjectService>("IProjectService", {
       useClass: ProjectService,
+    });
+    container.register<ITaskService>("ITaskService", {
+      useClass: TaskService,
     });
   }
 }

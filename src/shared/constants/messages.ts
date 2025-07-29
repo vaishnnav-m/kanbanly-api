@@ -2,6 +2,7 @@ export const SUCCESS_MESSAGES = {
   REGISTRATION_SUCCESSFUL: "User registered successfully.",
   LOGIN_SUCCESSFUL: "User logged in successfully.",
   DATA_FETCHED: "Data fetched successfully.",
+  DATA_CREATED: "Data Created Successfully",
   USER_UPDATED: "User updated successfully.",
   USER_LOGOUT: "User logout successfully.",
   ADMIN_LOGOUT: "Admin logout successfully.",
@@ -13,6 +14,7 @@ export const SUCCESS_MESSAGES = {
 };
 
 export const ERROR_MESSAGES = {
+  // GENERAL
   UNEXPECTED_SERVER_ERROR: "An unexpected server error occurred.",
   INPUT_VALIDATION_FAILED: "Input validation failed. Please check your data.",
   EMAIL_ALREADY_EXISTS: "A user with this email already exists.",
@@ -24,10 +26,23 @@ export const ERROR_MESSAGES = {
   AUTH_NO_TOKEN_PROVIDED: "Access Denied: No authentication token provided.",
   AUTH_INVALID_TOKEN: "Access Denied: Invalid or expired authentication token.",
   AUTH_TOKEN_ERROR: "Authentication error: Could not process token.",
+
+  // USER
   USER_NOT_EXIST_OR_ALREADY_VERIFIED: "User not exists or already verified.",
   USER_BLOCKED:
     "Oops! It looks like your access has been restricted. Please reach out to our support team for assistance.",
-  PROJECT_ALREADY_EXISTS: "Project with this name already exists",
+
+  // WORKSPACE
   WORKSPACE_NOT_FOUND: "The workspace is not exists",
-  NOT_OWNER:"You are not the owner of this workspace"
+
+  // WORKSPACE MEMBER
+  NOT_OWNER: "You are not the owner of this workspace",
+  NOT_MEMBER: "User is not a member of this workspace",
+  ACTION_DENIED:
+    "Action denied: your role does not have the required permissions.",
+
+  // PROJECT
+  PROJECT_ALREADY_EXISTS: "Project with this name already exists",
+  INVALID_PROJECT_ID:
+    "Invalid project or project doesn't belong to the specified workspace",
 };

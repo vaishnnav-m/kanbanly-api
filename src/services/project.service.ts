@@ -1,4 +1,5 @@
 import { inject, injectable } from "tsyringe";
+import { v4 as uuidv4 } from "uuid";
 import { IProjectService } from "../types/service-interface/IProjectService";
 import { IProjectRepository } from "../types/repository-interfaces/IProjectRepository";
 import {
@@ -60,6 +61,7 @@ export class ProjectService implements IProjectService {
 
     // creating the project
     await this._projectRepo.create({
+      projectId: uuidv4(),
       ...data,
       normalizedName,
     });
@@ -88,7 +90,11 @@ export class ProjectService implements IProjectService {
 
     const projectsData = await this._projectRepo.find(query);
     const projects = projectsData.map((project) => {
-      return { name: project.name, description: project.description };
+      return {
+        projectId: project.projectId,
+        name: project.name,
+        description: project.description,
+      };
     });
 
     return projects;

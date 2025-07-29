@@ -1,4 +1,5 @@
 export interface IProject {
+  projectId: string;
   name: string;
   description: string;
   normalizedName: string;

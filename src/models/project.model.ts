@@ -3,6 +3,11 @@ import { IProject } from "../types/entities/IProject";
 
 const projectSchema = new Schema<IProject>(
   {
+    projectId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     name: {
       type: String,
       required: true,
