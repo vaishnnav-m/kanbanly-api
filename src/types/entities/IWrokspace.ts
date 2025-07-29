@@ -8,4 +8,5 @@ export interface IWorkspace {
   logo?: string;
   createdBy: string | ObjectId;
   members: [ObjectId];
+  createdAt: Date;
 }

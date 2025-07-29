@@ -48,4 +48,26 @@ export class WorkspaceController implements IWorkspaceController {
       data: workspaces,
     });
   }
+
+  async getOneWorkspace(req: Request, res: Response) {
+    const userId = req.user?.userid;
+    const workspaceId = req.params.workspaceId;
+    if (!userId) {
+      throw new AppError("Token is not valid", HTTP_STATUS.BAD_REQUEST);
+    }
+
+    if (!workspaceId)
+      throw new AppError("workspaceId is required", HTTP_STATUS.BAD_REQUEST);
+
+    const workspace = await this._workspaceService.getOneWorkspace({
+      workspaceId,
+      userId,
+    });
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: "Successfully fetched the workspace details",
+      data: workspace,
+    });
+  }
 }

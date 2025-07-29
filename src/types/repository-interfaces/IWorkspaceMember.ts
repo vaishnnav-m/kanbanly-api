@@ -9,4 +9,5 @@ export interface IWorkspaceMemberRepository
     skip: number,
     limit: number
   ): Promise<WorkspaceMemberRepoDto>;
+  getCount(workspaceId: string): Promise<number>;
 }

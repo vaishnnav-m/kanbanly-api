@@ -55,4 +55,8 @@ export class WorkspaceMemberRepository
     console.log(data);
     return { data, count };
   }
+
+  async getCount(workspaceId: string): Promise<number> {
+    return await this.model.countDocuments({ workspaceId });
+  }
 }
