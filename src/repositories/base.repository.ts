@@ -12,7 +12,7 @@ export class BaseRepository<T> implements IBaseRepository<T> {
     query: Partial<T>,
     options: { skip?: number; limit?: number; sort?: any } = {}
   ): Promise<T[]> {
-    let q = this.model.find(query);
+    let q = this.model.find(query, { _id: 0, __v: 0 });
 
     if (options.skip) {
       q.skip(options.skip);

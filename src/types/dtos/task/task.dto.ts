@@ -1,3 +1,5 @@
+import { ITask } from "../../entities/ITask";
+
 export enum TaskStatus {
   Todo = "todo",
   InProgress = "inprogress",
@@ -19,4 +21,4 @@ export interface CreateTaskDto {
   assignedTo: string;
   createdBy: string;
   dueDate: Date;
-}
+} 

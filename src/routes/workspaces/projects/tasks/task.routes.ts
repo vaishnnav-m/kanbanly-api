@@ -15,5 +15,9 @@ export class TaskRoutes extends BaseRoute {
       "/",
       this._taskController.createTask.bind(this._taskController)
     );
+    this._router.get(
+      "/",
+      this._taskController.getAllTasks.bind(this._taskController)
+    );
   }
 }

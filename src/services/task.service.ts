@@ -47,7 +47,7 @@ export class TaskService implements ITaskService {
         HTTP_STATUS.BAD_REQUEST
       );
     }
-    
+
     if (data.assignedTo) {
       const assignee = await this._workspaceMemberRepo.findOne({
         userId: data.assignedTo,
@@ -72,5 +72,45 @@ export class TaskService implements ITaskService {
     };
 
     await this._taskRepo.create(task);
+  }
+
+  async getAllTask(
+    workspaceId: string,
+    projectId: string,
+    userId: string
+  ): Promise<ITask[]> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      userId,
+      workspaceId,
+    });
+
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
+    }
+
+    const project = await this._projectRepo.findOne({
+      projectId,
+    });
+
+    if (!project || project.workspaceId !== workspaceId) {
+      throw new AppError(
+        ERROR_MESSAGES.INVALID_PROJECT_ID,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const isManager =
+      workspaceMember.role === workspaceRoles.owner ||
+      workspaceMember.role === workspaceRoles.projectManager;
+
+    const tasks = isManager
+      ? await this._taskRepo.find({ workspaceId, projectId })
+      : await this._taskRepo.find({
+          workspaceId,
+          projectId,
+          assignedTo: userId,
+        });
+
+    return tasks;
   }
 }
