@@ -13,6 +13,8 @@ import { IInvitationController } from "../types/controller-interfaces/IInvitatio
 import { InvitationController } from "../controllers/invitation.controller";
 import { IProjectController } from "../types/controller-interfaces/IProjectController";
 import { ProjectController } from "../controllers/project.controller";
+import { ITaskController } from "../types/controller-interfaces/ITaskController";
+import { TaskController } from "../controllers/task.controller";
 
 export class ControllerRegistry {
   static registerController(): void {
@@ -39,6 +41,9 @@ export class ControllerRegistry {
     });
     container.register<IProjectController>("IProjectController", {
       useClass: ProjectController,
+    });
+    container.register<ITaskController>("ITaskController", {
+      useClass: TaskController,
     });
   }
 }

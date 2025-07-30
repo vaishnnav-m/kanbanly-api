@@ -1,11 +1,14 @@
 import { inject, injectable } from "tsyringe";
 import { BaseRoute } from "../../base.routes";
 import { IProjectController } from "../../../types/controller-interfaces/IProjectController";
+import { TaskRoutes } from "./tasks/task.routes";
 
 @injectable()
 export class ProjectRoutes extends BaseRoute {
   constructor(
-    @inject("IProjectController") private _projectController: IProjectController
+    @inject("IProjectController")
+    private _projectController: IProjectController,
+    @inject(TaskRoutes) private _taskRoutes: TaskRoutes
   ) {
     super({ mergeParams: true });
     this.initializeRoutes();
@@ -20,5 +23,6 @@ export class ProjectRoutes extends BaseRoute {
       "/",
       this._projectController.getAllProjects.bind(this._projectController)
     );
+    this._router.use("/:projectId/tasks", this._taskRoutes.router);
   }
 }

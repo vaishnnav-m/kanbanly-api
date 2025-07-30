@@ -9,6 +9,8 @@ import { IInvitationRepository } from "../types/repository-interfaces/IInvitatio
 import { InvitationRepository } from "../repositories/invitation.repository";
 import { IProjectRepository } from "../types/repository-interfaces/IProjectRepository";
 import { ProjectRepository } from "../repositories/project.repository";
+import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository";
+import { TaskRepository } from "../repositories/task.repository";
 
 export class RepositoryRegistry {
   static registerRepositories(): void {
@@ -29,6 +31,9 @@ export class RepositoryRegistry {
     });
     container.register<IProjectRepository>("IProjectRepository", {
       useClass: ProjectRepository,
+    });
+    container.register<ITaskRepository>("ITaskRepository", {
+      useClass: TaskRepository,
     });
   }
 }

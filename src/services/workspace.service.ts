@@ -1,5 +1,9 @@
 import { inject, injectable } from "tsyringe";
-import { CreateWorkspaceDto } from "../types/dtos/workspaces/workspace.dto";
+import {
+  CreateWorkspaceDto,
+  GetOneWorkspaceDto,
+  GetOneWorkspaceResponseDto,
+} from "../types/dtos/workspaces/workspace.dto";
 import { IWorkspace } from "../types/entities/IWrokspace";
 import { IWorkspaceService } from "../types/service-interface/IWorkspaceService";
 import { IWorkspaceRepository } from "../types/repository-interfaces/IWorkspaceRepository";
@@ -10,6 +14,7 @@ import { IWorkspaceMemberService } from "../types/service-interface/IWorkspaceMe
 import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
 import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWorkspaceMember";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
+import { ERROR_MESSAGES } from "../shared/constants/messages";
 
 @injectable()
 export class WorkspaceService implements IWorkspaceService {
@@ -74,5 +79,33 @@ export class WorkspaceService implements IWorkspaceService {
     const workspaces: IWorkspace[] =
       await this._workspaceRepo.findAllWorkspaces(memberWorkspaceIds, userId);
     return workspaces;
+  }
+
+  async getOneWorkspace(
+    workspaceData: GetOneWorkspaceDto
+  ): Promise<GetOneWorkspaceResponseDto> {
+    const { workspaceId, userId } = workspaceData;
+    const workspace = await this._workspaceRepo.findOne({
+      workspaceId,
+      createdBy: userId,
+    });
+    if (!workspace) {
+      throw new AppError(
+        ERROR_MESSAGES.WORKSPACE_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    const count = await this._workspaceMemberRepo.getCount(workspaceId);
+
+    const mappedWorkspace = {
+      name: workspace.name,
+      description: workspace.description || "",
+      createdAt: workspace.createdAt,
+      logo: workspace.logo || "",
+      members: count,
+    };
+
+    return mappedWorkspace;
   }
 }
