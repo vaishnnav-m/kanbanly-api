@@ -58,7 +58,7 @@ export class TaskService implements ITaskService {
       }
     }
 
-    const task: ITask = {
+    const task: Omit<ITask, "isDeleted"> = {
       taskId: uuidv4(),
       task: data.task.trim(),
       description: data.description,
@@ -104,13 +104,38 @@ export class TaskService implements ITaskService {
       workspaceMember.role === workspaceRoles.projectManager;
 
     const tasks = isManager
-      ? await this._taskRepo.find({ workspaceId, projectId })
+      ? await this._taskRepo.find({ workspaceId, projectId, isDeleted: false })
       : await this._taskRepo.find({
           workspaceId,
           projectId,
           assignedTo: userId,
+          isDeleted: false,
         });
 
     return tasks;
+  }
+
+  async removeTask(
+    workspaceId: string,
+    taskId: string,
+    userId: string
+  ): Promise<void> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      userId,
+      workspaceId,
+    });
+
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
+    }
+
+    if (
+      workspaceMember.role !== workspaceRoles.owner &&
+      workspaceMember.role !== workspaceRoles.projectManager
+    ) {
+      throw new AppError(ERROR_MESSAGES.ACTION_DENIED, HTTP_STATUS.BAD_REQUEST);
+    }
+
+    await this._taskRepo.update({ taskId }, { isDeleted: true });
   }
 }
