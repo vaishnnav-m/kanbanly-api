@@ -11,4 +11,5 @@ export interface ITask {
   assignedTo?: string;
   createdBy: string;
   dueDate?: Date;
+  isDeleted: false;
 }

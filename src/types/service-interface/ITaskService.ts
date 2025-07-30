@@ -8,4 +8,9 @@ export interface ITaskService {
     projectId: string,
     userId: string
   ): Promise<ITask[]>;
+  removeTask(
+    workspaceId: string,
+    taskId: string,
+    userId: string
+  ): Promise<void>;
 }

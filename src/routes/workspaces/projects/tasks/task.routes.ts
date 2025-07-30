@@ -19,5 +19,9 @@ export class TaskRoutes extends BaseRoute {
       "/",
       this._taskController.getAllTasks.bind(this._taskController)
     );
+    this._router.delete(
+      "/:taskId",
+      this._taskController.removeTask.bind(this._taskController)
+    );
   }
 }

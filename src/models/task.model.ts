@@ -42,6 +42,11 @@ const taskShcema = new Schema<ITask>(
     dueDate: {
       type: Date,
     },
+    isDeleted: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
   },
   { timestamps: true }
 );
