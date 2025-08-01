@@ -59,4 +59,11 @@ export class WorkspaceMemberRepository
   async getCount(workspaceId: string): Promise<number> {
     return await this.model.countDocuments({ workspaceId });
   }
+
+  async getMember(
+    workspaceId: string,
+    userId: string
+  ): Promise<IWorkspaceMember | null> {
+    return await this.model.findOne({ workspaceId, userId }).populate("userId");
+  }
 }

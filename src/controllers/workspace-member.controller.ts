@@ -14,7 +14,7 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
     private _workspaceMemberService: IWorkspaceMemberService
   ) {}
 
-  async addUser(req: Request, res: Response) {
+  async addUser(req: Request, res: Response): Promise<void> {
     const { userId, workspaceId, role } = req.body as WorkspaceMemberDto;
     await this._workspaceMemberService.addMember({ userId, workspaceId, role });
 
@@ -23,7 +23,7 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
       .json({ success: true, message: "User added to workspace successfully" });
   }
 
-  async getMembers(req: Request, res: Response) {
+  async getMembers(req: Request, res: Response): Promise<void> {
     const userId = req.user?.userid;
     if (!userId) {
       throw new AppError(
@@ -42,12 +42,34 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
       page
     );
 
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_FETCHED,
+      data: members,
+    });
+  }
+
+  async getCurrentMember(req: Request, res: Response): Promise<void> {
+    const userId = req.user?.userid;
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.FORBIDDEN_ACCESS,
+        HTTP_STATUS.FORBIDDEN
+      );
+    }
+    const workspaceId = req.params.workspaceId;
+
+    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+      workspaceId,
+      userId
+    );
+
     res
       .status(HTTP_STATUS.OK)
       .json({
         success: true,
         message: SUCCESS_MESSAGES.DATA_FETCHED,
-        data: members,
+        data: workspaceMember,
       });
   }
 }

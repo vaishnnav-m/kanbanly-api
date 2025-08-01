@@ -41,6 +41,7 @@ export const ERROR_MESSAGES = {
   NOT_MEMBER: "User is not a member of this workspace",
   ACTION_DENIED:
     "Action denied: your role does not have the required permissions.",
+  MEMBER_NOT_FOUND: "The member is not found",
 
   // PROJECT
   PROJECT_ALREADY_EXISTS: "Project with this name already exists",

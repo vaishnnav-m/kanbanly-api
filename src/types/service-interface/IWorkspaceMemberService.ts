@@ -1,8 +1,9 @@
 import { PaginatedResponseDto } from "../dtos/paginated.dto";
 import {
   WorkspaceMemberDto,
-  WorkspaceMemberListDto,
+  WorkspaceMemberResponseDto,
 } from "../dtos/workspaces/workspace-member.dto";
+import { IWorkspaceMember } from "../entities/IWorkspaceMember";
 
 export interface IWorkspaceMemberService {
   addMember(data: WorkspaceMemberDto): Promise<void>;
@@ -11,5 +12,9 @@ export interface IWorkspaceMemberService {
     workspaceId: string,
     userId: string,
     page: number
-  ): Promise<PaginatedResponseDto<WorkspaceMemberListDto[]>>;
+  ): Promise<PaginatedResponseDto<WorkspaceMemberResponseDto[]>>;
+  getCurrentMember(
+    workspaceId: string,
+    userId: string
+  ): Promise<IWorkspaceMember>;
 }
