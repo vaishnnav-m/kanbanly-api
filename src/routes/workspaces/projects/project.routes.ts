@@ -23,6 +23,14 @@ export class ProjectRoutes extends BaseRoute {
       "/",
       this._projectController.getAllProjects.bind(this._projectController)
     );
+    this._router.get(
+      "/:projectId",
+      this._projectController.getOneProject.bind(this._projectController)
+    );
+    this._router.delete(
+      "/:projectId",
+      this._projectController.deleteProject.bind(this._projectController)
+    );
     this._router.use("/:projectId/tasks", this._taskRoutes.router);
   }
 }

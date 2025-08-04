@@ -17,6 +17,8 @@ import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
 import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWorkspaceMember";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
+import { IProjectRepository } from "../types/repository-interfaces/IProjectRepository";
+import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository";
 
 @injectable()
 export class WorkspaceService implements IWorkspaceService {
@@ -26,7 +28,9 @@ export class WorkspaceService implements IWorkspaceService {
     @inject("IWorkspaceMemberService")
     private _workspaceMemberService: IWorkspaceMemberService,
     @inject("IWorkspaceMemberRepository")
-    private _workspaceMemberRepo: IWorkspaceMemberRepository
+    private _workspaceMemberRepo: IWorkspaceMemberRepository,
+    @inject("IProjectRepository") private _projectRepo: IProjectRepository,
+    @inject("ITaskRepository") private _taskRepo: ITaskRepository
   ) {}
 
   private slugify(name: string) {
@@ -179,6 +183,9 @@ export class WorkspaceService implements IWorkspaceService {
       );
     }
 
+    await this._workspaceMemberRepo.deleteMany({ workspaceId });
+    await this._projectRepo.deleteMany({ workspaceId });
+    await this._taskRepo.deleteMany({ workspaceId });
     await this._workspaceRepo.delete({ workspaceId });
   }
 }

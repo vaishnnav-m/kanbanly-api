@@ -32,6 +32,10 @@ const projectSchema = new Schema<IProject>(
       required: true,
     },
     members: [{ type: String, ref: "workspaceMember" }],
+    status: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

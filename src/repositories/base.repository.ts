@@ -63,4 +63,8 @@ export class BaseRepository<T> implements IBaseRepository<T> {
   async delete(query: Partial<T>): Promise<void> {
     await this.model.deleteOne(query);
   }
+
+  async deleteMany(query: Partial<T>): Promise<void> {
+    await this.model.deleteMany(query);
+  }
 }

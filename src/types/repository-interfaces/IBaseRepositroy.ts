@@ -13,4 +13,5 @@ export interface IBaseRepository<T> {
     options: { skip?: number; limit?: number; sort?: any }
   ): Promise<{ data: T[]; totalPages: number }>;
   delete(query: Partial<T>): Promise<void>;
+  deleteMany(query: Partial<T>): Promise<void>;
 }
