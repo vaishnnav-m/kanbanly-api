@@ -10,4 +10,8 @@ export interface IWorkspaceMemberRepository
     limit: number
   ): Promise<WorkspaceMemberRepoDto>;
   getCount(workspaceId: string): Promise<number>;
+  getMember(
+    workspaceId: string,
+    userId: string
+  ): Promise<IWorkspaceMember | null>;
 }

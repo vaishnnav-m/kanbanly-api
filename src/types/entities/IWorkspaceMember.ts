@@ -5,5 +5,5 @@ export interface IWorkspaceMember {
   workspaceId: string | ObjectId;
   userId: string | ObjectId;
   role: workspaceRoles;
-  joinedAt: Date;
+  createdAt: Date;
 }

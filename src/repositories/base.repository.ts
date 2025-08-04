@@ -5,7 +5,7 @@ export class BaseRepository<T> implements IBaseRepository<T> {
   constructor(protected model: Model<T>) {}
 
   async findOne(query: Partial<T>): Promise<T | null> {
-    return this.model.findOne(query);
+    return this.model.findOne(query, { _id: 0, __v: 0 });
   }
 
   async find(
@@ -58,5 +58,9 @@ export class BaseRepository<T> implements IBaseRepository<T> {
     const totalPages = Math.ceil(total / limit);
 
     return { data, totalPages };
+  }
+
+  async delete(query: Partial<T>): Promise<void> {
+    await this.model.deleteOne(query);
   }
 }

@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import {
   WorkspaceMemberDto,
-  WorkspaceMemberListDto,
+  WorkspaceMemberResponseDto,
   workspaceRoles,
 } from "../types/dtos/workspaces/workspace-member.dto";
 import { IWorkspaceMemberService } from "../types/service-interface/IWorkspaceMemberService";
@@ -11,6 +11,7 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 import { IWorkspaceRepository } from "../types/repository-interfaces/IWorkspaceRepository";
 import { PaginatedResponseDto } from "../types/dtos/paginated.dto";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
+import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 
 @injectable()
 export class WorkspaceMemberService implements IWorkspaceMemberService {
@@ -55,7 +56,7 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     workspaceId: string,
     userId: string,
     page: number
-  ): Promise<PaginatedResponseDto<WorkspaceMemberListDto[]>> {
+  ): Promise<PaginatedResponseDto<WorkspaceMemberResponseDto[]>> {
     const limit = 10;
     const skip = (page - 1) * limit;
 
@@ -85,5 +86,29 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     const totalPages = Math.ceil(rawMembers.count / limit);
 
     return { data: members, totalPages, total: rawMembers.count };
+  }
+
+  async getCurrentMember(
+    workspaceId: string,
+    userId: string
+  ): Promise<IWorkspaceMember> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      workspaceId,
+      userId,
+    });
+
+    if (!workspaceMember) {
+      throw new AppError(
+        ERROR_MESSAGES.MEMBER_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    return {
+      userId: workspaceMember.userId,
+      workspaceId: workspaceMember.workspaceId,
+      role: workspaceMember.role,
+      createdAt: workspaceMember.createdAt,
+    };
   }
 }

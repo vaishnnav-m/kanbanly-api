@@ -3,6 +3,7 @@ export const SUCCESS_MESSAGES = {
   LOGIN_SUCCESSFUL: "User logged in successfully.",
   DATA_FETCHED: "Data fetched successfully.",
   DATA_CREATED: "Data Created Successfully",
+  DATA_EDITED:"Data Edited Successfully",
   DATA_DELETED: "Data Deleted Successfully",
   USER_UPDATED: "User updated successfully.",
   USER_LOGOUT: "User logout successfully.",
@@ -35,12 +36,14 @@ export const ERROR_MESSAGES = {
 
   // WORKSPACE
   WORKSPACE_NOT_FOUND: "The workspace is not exists",
+  WORKSPACE_ALREADY_EXISTS:"The workspace already exists",
 
   // WORKSPACE MEMBER
   NOT_OWNER: "You are not the owner of this workspace",
   NOT_MEMBER: "User is not a member of this workspace",
   ACTION_DENIED:
     "Action denied: your role does not have the required permissions.",
+  MEMBER_NOT_FOUND: "The member is not found",
 
   // PROJECT
   PROJECT_ALREADY_EXISTS: "Project with this name already exists",

@@ -13,7 +13,7 @@ export interface WorkspaceMemberDto {
 }
 
 // response dto
-export interface WorkspaceMemberListDto {
+export interface WorkspaceMemberResponseDto {
   name: string;
   email: string;
   role: workspaceRoles;
