@@ -25,16 +25,7 @@ const workspaceSchema = new Schema<IWorkspace>(
       type: String,
       ref: "user",
       required: true,
-    },
-    members: {
-      type: [
-        {
-          type: Types.ObjectId,
-          ref: "workspaceMember",
-        },
-      ],
-      default: [],
-    },
+    }
   },
   { timestamps: true }
 );

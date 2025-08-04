@@ -7,6 +7,5 @@ export interface IWorkspace {
   description?: string;
   logo?: string;
   createdBy: string | ObjectId;
-  members: [ObjectId];
   createdAt: Date;
 }

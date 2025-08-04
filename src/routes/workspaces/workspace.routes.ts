@@ -44,6 +44,16 @@ export class WorkspaceRoutes extends BaseRoute {
         this._invitationController
       )
     );
+    this._router.put(
+      "/:workspaceId",
+      authenticateToken,
+      this._workspaceController.editWorkspace.bind(this._workspaceController)
+    );
+    this._router.delete(
+      "/:workspaceId",
+      authenticateToken,
+      this._workspaceController.removeWorkspace.bind(this._workspaceController)
+    );
     this._router.use(
       "/:workspaceId/members",
       authenticateToken,

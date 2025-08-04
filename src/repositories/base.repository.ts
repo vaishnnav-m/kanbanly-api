@@ -59,4 +59,8 @@ export class BaseRepository<T> implements IBaseRepository<T> {
 
     return { data, totalPages };
   }
+
+  async delete(query: Partial<T>): Promise<void> {
+    await this.model.deleteOne(query);
+  }
 }

@@ -1,8 +1,10 @@
 import { inject, injectable } from "tsyringe";
 import {
   CreateWorkspaceDto,
+  EditWorkspaceDto,
   GetOneWorkspaceDto,
   GetOneWorkspaceResponseDto,
+  WorkspaceListResponseDto,
 } from "../types/dtos/workspaces/workspace.dto";
 import { IWorkspace } from "../types/entities/IWrokspace";
 import { IWorkspaceService } from "../types/service-interface/IWorkspaceService";
@@ -31,9 +33,7 @@ export class WorkspaceService implements IWorkspaceService {
     return name.toLowerCase().replace(/\s+/g, "-");
   }
 
-  async createWorkspace(
-    workspaceData: CreateWorkspaceDto
-  ): Promise<IWorkspace | null> {
+  async createWorkspace(workspaceData: CreateWorkspaceDto): Promise<void> {
     const slugName = this.slugify(workspaceData.name);
 
     const isExists = await this._workspaceRepo.findOne({
@@ -43,7 +43,7 @@ export class WorkspaceService implements IWorkspaceService {
 
     if (isExists) {
       throw new AppError(
-        "The workspace already exists",
+        ERROR_MESSAGES.WORKSPACE_ALREADY_EXISTS,
         HTTP_STATUS.BAD_REQUEST
       );
     }
@@ -57,18 +57,16 @@ export class WorkspaceService implements IWorkspaceService {
       createdBy: workspaceData.createdBy,
     };
 
-    const newWorkspace = await this._workspaceRepo.create(workspace);
+    await this._workspaceRepo.create(workspace);
 
     await this._workspaceMemberService.addMember({
       userId: workspaceData.createdBy,
       workspaceId: workspace.workspaceId,
       role: workspaceRoles.owner,
     });
-
-    return newWorkspace;
   }
 
-  async getAllWorkspaces(userId: string): Promise<IWorkspace[] | null> {
+  async getAllWorkspaces(userId: string): Promise<WorkspaceListResponseDto[]> {
     const memberWorkspaces: IWorkspaceMember[] =
       await this._workspaceMemberRepo.find({ userId });
 
@@ -76,18 +74,40 @@ export class WorkspaceService implements IWorkspaceService {
       workspace.workspaceId.toString()
     );
 
-    const workspaces: IWorkspace[] =
-      await this._workspaceRepo.findAllWorkspaces(memberWorkspaceIds, userId);
-    return workspaces;
+    const workspaces = await this._workspaceRepo.findAllWorkspaces(
+      memberWorkspaceIds,
+      userId
+    );
+
+    const modified = workspaces.map((workspace) => {
+      return {
+        workspaceId: workspace.workspaceId,
+        name: workspace.name,
+        description: workspace.description,
+        logo: workspace.logo,
+        slug: workspace.slug,
+      };
+    });
+
+    return modified;
   }
 
   async getOneWorkspace(
     workspaceData: GetOneWorkspaceDto
   ): Promise<GetOneWorkspaceResponseDto> {
     const { workspaceId, userId } = workspaceData;
+
+    const workspaceMember = this._workspaceMemberRepo.findOne({
+      userId,
+      workspaceId,
+    });
+
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
+    }
+
     const workspace = await this._workspaceRepo.findOne({
       workspaceId,
-      createdBy: userId,
     });
     if (!workspace) {
       throw new AppError(
@@ -107,5 +127,58 @@ export class WorkspaceService implements IWorkspaceService {
     };
 
     return mappedWorkspace;
+  }
+
+  async editWorkspace(data: EditWorkspaceDto): Promise<void> {
+    const workspace = await this._workspaceRepo.findOne({
+      workspaceId: data.workspaceId,
+      createdBy: data.createdBy,
+    });
+
+    if (!workspace) {
+      throw new AppError(
+        ERROR_MESSAGES.WORKSPACE_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    if (data.name) {
+      const slugName = this.slugify(data.name);
+
+      const isExists = await this._workspaceRepo.findOne({
+        createdBy: data.createdBy,
+        slug: slugName,
+      });
+
+      if (isExists) {
+        throw new AppError(
+          ERROR_MESSAGES.WORKSPACE_ALREADY_EXISTS,
+          HTTP_STATUS.BAD_REQUEST
+        );
+      }
+    }
+
+    await this._workspaceRepo.update(
+      {
+        workspaceId: data.workspaceId,
+        createdBy: data.createdBy,
+      },
+      data
+    );
+  }
+
+  async removeWorkspace(workspaceId: string, userId: string): Promise<void> {
+    const workspace = await this._workspaceRepo.findOne({
+      workspaceId,
+      createdBy: userId,
+    });
+    if (!workspace) {
+      throw new AppError(
+        "Workspace not found or you don't have enough permission",
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    await this._workspaceRepo.delete({ workspaceId });
   }
 }
