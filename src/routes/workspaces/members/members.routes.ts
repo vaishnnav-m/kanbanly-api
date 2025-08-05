@@ -21,5 +21,9 @@ export class WorkspaceMembersRoutes extends BaseRoute {
       "/me",
       this._memberController.getCurrentMember.bind(this._memberController)
     );
+    this._router.get(
+      "/search",
+      this._memberController.searchMember.bind(this._memberController)
+    );
   }
 }

@@ -17,4 +17,9 @@ export interface IWorkspaceMemberService {
     workspaceId: string,
     userId: string
   ): Promise<IWorkspaceMember>;
+  searchMember(
+    workspaceId: string,
+    userId: string,
+    email: string
+  ): Promise<WorkspaceMemberResponseDto>;
 }

@@ -12,13 +12,16 @@ import { IWorkspaceRepository } from "../types/repository-interfaces/IWorkspaceR
 import { PaginatedResponseDto } from "../types/dtos/paginated.dto";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
+import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
 
 @injectable()
 export class WorkspaceMemberService implements IWorkspaceMemberService {
   constructor(
     @inject("IWorkspaceMemberRepository")
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
-    @inject("IWorkspaceRepository") private _workspaceRepo: IWorkspaceRepository
+    @inject("IWorkspaceRepository")
+    private _workspaceRepo: IWorkspaceRepository,
+    @inject("IUserRepository") private _userRepo: IUserRepository
   ) {}
 
   async addMember(data: WorkspaceMemberDto): Promise<void> {
@@ -60,8 +63,11 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     const limit = 10;
     const skip = (page - 1) * limit;
 
-    const isOwner = await this._workspaceRepo.isOwner(workspaceId, userId);
-    if (!isOwner) {
+    const member = await this._workspaceMemberRepo.findOne({
+      workspaceId,
+      userId,
+    });
+    if (!member) {
       throw new AppError(
         ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
         HTTP_STATUS.UNAUTHORIZED
@@ -109,6 +115,51 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
       workspaceId: workspaceMember.workspaceId,
       role: workspaceMember.role,
       createdAt: workspaceMember.createdAt,
+    };
+  }
+
+  async searchMember(
+    workspaceId: string,
+    userId: string,
+    email: string
+  ): Promise<WorkspaceMemberResponseDto> {
+    const member = await this._workspaceMemberRepo.findOne({
+      userId,
+      workspaceId,
+    });
+    if (!member) {
+      throw new AppError(
+        "You are not a member of this workspace",
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    const isAllowed = member.role !== "member";
+    if (!isAllowed) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    const user = await this._userRepo.findOne({ email });
+    if (!user) {
+      throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+    }
+
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      userId: user?.userId,
+      workspaceId,
+    });
+
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+    }
+
+    return {
+      email: user.email,
+      name: user.firstName,
+      role: workspaceMember?.role,
     };
   }
 }

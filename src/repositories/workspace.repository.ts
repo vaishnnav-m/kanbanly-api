@@ -32,8 +32,4 @@ export class WorkspaceRepository
       .select("createdBy");
     return userId === onwner?.createdBy;
   }
-
-  async deleteWorkspace(workspaceId: string): Promise<void> {
-      
-  }
 }
