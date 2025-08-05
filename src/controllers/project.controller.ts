@@ -52,12 +52,82 @@ export class ProjectController implements IProjectController {
       userId
     );
 
-    res
-      .status(HTTP_STATUS.OK)
-      .json({
-        success: true,
-        message: SUCCESS_MESSAGES.PROJECT_CREATED,
-        data: projects,
-      });
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_FETCHED,
+      data: projects,
+    });
+  }
+
+  async getOneProject(req: Request, res: Response): Promise<void> {
+    const projectId = req.params.projectId;
+    const workspaceId = req.params.workspaceId;
+    const userId = req.user?.userid;
+
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    const project = await this._projectService.getOneProject(
+      workspaceId,
+      userId,
+      projectId
+    );
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_FETCHED,
+      data: project,
+    });
+  }
+
+  async editProject(req: Request, res: Response): Promise<void> {
+    const projectId = req.params.projectId;
+    const workspaceId = req.params.workspaceId;
+    const userId = req.user?.userid;
+    const { name, description } = req.body;
+
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    await this._projectService.editProject({
+      name,
+      description,
+      projectId,
+      workspaceId,
+      userId,
+    });
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_EDITED,
+    });
+  }
+
+  async deleteProject(req: Request, res: Response): Promise<void> {
+    const projectId = req.params.projectId;
+    const workspaceId = req.params.workspaceId;
+    const userId = req.user?.userid;
+
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    await this._projectService.removeProject(workspaceId, userId, projectId);
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_DELETED,
+    });
   }
 }

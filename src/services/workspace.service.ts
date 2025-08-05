@@ -17,6 +17,8 @@ import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
 import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWorkspaceMember";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
+import { IProjectRepository } from "../types/repository-interfaces/IProjectRepository";
+import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository";
 
 @injectable()
 export class WorkspaceService implements IWorkspaceService {
@@ -26,7 +28,9 @@ export class WorkspaceService implements IWorkspaceService {
     @inject("IWorkspaceMemberService")
     private _workspaceMemberService: IWorkspaceMemberService,
     @inject("IWorkspaceMemberRepository")
-    private _workspaceMemberRepo: IWorkspaceMemberRepository
+    private _workspaceMemberRepo: IWorkspaceMemberRepository,
+    @inject("IProjectRepository") private _projectRepo: IProjectRepository,
+    @inject("ITaskRepository") private _taskRepo: ITaskRepository
   ) {}
 
   private slugify(name: string) {
@@ -142,9 +146,9 @@ export class WorkspaceService implements IWorkspaceService {
       );
     }
 
+    let slugName;
     if (data.name) {
-      const slugName = this.slugify(data.name);
-
+      slugName = this.slugify(data.name);
       const isExists = await this._workspaceRepo.findOne({
         createdBy: data.createdBy,
         slug: slugName,
@@ -158,12 +162,19 @@ export class WorkspaceService implements IWorkspaceService {
       }
     }
 
+    const newWorkspace: Partial<IWorkspace> = {
+      ...(data.name && { name: data.name }),
+      ...(data.description && { description: data.description }),
+      ...(data.logo && { logo: data.logo }),
+      ...(data.name && { slug: slugName }),
+    };
+
     await this._workspaceRepo.update(
       {
         workspaceId: data.workspaceId,
         createdBy: data.createdBy,
       },
-      data
+      newWorkspace
     );
   }
 
@@ -179,6 +190,9 @@ export class WorkspaceService implements IWorkspaceService {
       );
     }
 
+    await this._workspaceMemberRepo.deleteMany({ workspaceId });
+    await this._projectRepo.deleteMany({ workspaceId });
+    await this._taskRepo.deleteMany({ workspaceId });
     await this._workspaceRepo.delete({ workspaceId });
   }
 }

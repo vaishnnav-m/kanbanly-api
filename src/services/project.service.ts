@@ -4,6 +4,7 @@ import { IProjectService } from "../types/service-interface/IProjectService";
 import { IProjectRepository } from "../types/repository-interfaces/IProjectRepository";
 import {
   CreateProjectDto,
+  EditProjectDto,
   ProjectListDto,
 } from "../types/dtos/project/project.dto";
 import AppError from "../shared/utils/AppError";
@@ -12,6 +13,9 @@ import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { IWorkspaceRepository } from "../types/repository-interfaces/IWorkspaceRepository";
 import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWorkspaceMember";
 import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
+import { IProject } from "../types/entities/IProject";
+import { projectStatus } from "../types/enums/project-status.enum";
+import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository";
 
 @injectable()
 export class ProjectService implements IProjectService {
@@ -20,12 +24,17 @@ export class ProjectService implements IProjectService {
     @inject("IWorkspaceRepository")
     private _workspaceRepo: IWorkspaceRepository,
     @inject("IWorkspaceMemberRepository")
-    private _workspaceMemberRepo: IWorkspaceMemberRepository
+    private _workspaceMemberRepo: IWorkspaceMemberRepository,
+    @inject("ITaskRepository") private _taskRepo: ITaskRepository
   ) {}
+
+  private _normalizeName(name: string) {
+    return name.replace(/\s+/g, "").toLowerCase();
+  }
 
   async addProject(data: CreateProjectDto): Promise<void> {
     const { name, createdBy, workspaceId } = data;
-    const normalizedName = name.replace(/\s+/g, "").toLowerCase();
+    const normalizedName = this._normalizeName(name);
 
     // checking if the workspace exists or not
     const workspace = await this._workspaceRepo.findOne({
@@ -59,12 +68,18 @@ export class ProjectService implements IProjectService {
       );
     }
 
-    // creating the project
-    await this._projectRepo.create({
+    const project: Omit<IProject, "createdAt" | "updatedAt"> = {
       projectId: uuidv4(),
-      ...data,
+      workspaceId: data.workspaceId,
+      name: data.name,
+      description: data.description,
       normalizedName,
-    });
+      createdBy: data.createdBy,
+      members: [data.createdBy],
+      status: projectStatus.active,
+    };
+    // creating the project
+    await this._projectRepo.create(project);
   }
 
   async getAllProjects(
@@ -94,9 +109,107 @@ export class ProjectService implements IProjectService {
         projectId: project.projectId,
         name: project.name,
         description: project.description,
+        members: project.members,
+        status: project.status,
+        lastUpdated: project.updatedAt.toString(),
       };
     });
 
     return projects;
+  }
+
+  async getOneProject(
+    workspaceId: string,
+    userId: string,
+    projectId: string
+  ): Promise<ProjectListDto> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      workspaceId,
+      userId,
+    });
+    if (!workspaceMember || workspaceMember.role === workspaceRoles.member) {
+      throw new AppError(
+        "Member not exists or insufficient permission",
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const project = await this._projectRepo.findOne({ projectId, workspaceId });
+    if (!project) {
+      throw new AppError(
+        ERROR_MESSAGES.RESOURCE_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+    return {
+      projectId: project.projectId,
+      name: project.name,
+      description: project.description,
+      members: project.members,
+      status: project.status,
+      lastUpdated: project.updatedAt.toString(),
+      createdAt: project.createdAt.toString(),
+    };
+  }
+
+  async editProject(data: EditProjectDto): Promise<void> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      workspaceId: data.workspaceId,
+      userId: data.userId,
+    });
+    if (!workspaceMember || workspaceMember.role === workspaceRoles.member) {
+      throw new AppError(
+        "Member not exists or insufficient permission",
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    let normalizedName;
+    if (data.name) {
+      normalizedName = this._normalizeName(data.name);
+      const isProjectExists = await this._projectRepo.findOne({
+        name: normalizedName,
+      });
+      if (isProjectExists) {
+        throw new AppError(
+          ERROR_MESSAGES.PROJECT_ALREADY_EXISTS,
+          HTTP_STATUS.CONFLICT
+        );
+      }
+    }
+
+    const newProject: Partial<IProject> = {
+      ...(data.name && { name: data.name }),
+      ...(data.name && { normalizedName: normalizedName }),
+      ...(data.description && { name: data.description }),
+    };
+
+    await this._projectRepo.update(
+      {
+        projectId: data.projectId,
+        workspaceId: data.workspaceId,
+      },
+      newProject
+    );
+  }
+
+  async removeProject(
+    workspaceId: string,
+    userId: string,
+    projectId: string
+  ): Promise<void> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      workspaceId,
+      userId,
+    });
+    if (!workspaceMember || workspaceMember.role !== workspaceRoles.owner) {
+      throw new AppError(
+        "Member not exists or insufficient permission",
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    await this._taskRepo.deleteMany({ projectId, workspaceId });
+    await this._projectRepo.delete({ projectId, workspaceId });
   }
 }

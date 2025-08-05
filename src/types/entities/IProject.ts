@@ -1,3 +1,5 @@
+import { projectStatus } from "../enums/project-status.enum";
+
 export interface IProject {
   projectId: string;
   name: string;
@@ -6,6 +8,7 @@ export interface IProject {
   workspaceId: string;
   createdBy: string;
   members: string[];
+  status: projectStatus;
   createdAt: Date;
   updatedAt: Date;
 }
