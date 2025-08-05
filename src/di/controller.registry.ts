@@ -15,6 +15,8 @@ import { IProjectController } from "../types/controller-interfaces/IProjectContr
 import { ProjectController } from "../controllers/project.controller";
 import { ITaskController } from "../types/controller-interfaces/ITaskController";
 import { TaskController } from "../controllers/task.controller";
+import { IUserController } from "../types/controller-interfaces/IUserController";
+import { UserController } from "../controllers/user.controller";
 
 export class ControllerRegistry {
   static registerController(): void {
@@ -44,6 +46,9 @@ export class ControllerRegistry {
     });
     container.register<ITaskController>("ITaskController", {
       useClass: TaskController,
+    });
+    container.register<IUserController>("IUserController", {
+      useClass: UserController,
     });
   }
 }

@@ -23,6 +23,8 @@ import { IProjectService } from "../types/service-interface/IProjectService";
 import { ProjectService } from "../services/project.service";
 import { ITaskService } from "../types/service-interface/ITaskService";
 import { TaskService } from "../services/task.service";
+import { IUserService } from "../types/service-interface/IUserService";
+import { UserService } from "../services/user.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -61,6 +63,9 @@ export class ServiceRegistry {
     });
     container.register<ITaskService>("ITaskService", {
       useClass: TaskService,
+    });
+    container.register<IUserService>("IUserService", {
+      useClass: UserService,
     });
   }
 }

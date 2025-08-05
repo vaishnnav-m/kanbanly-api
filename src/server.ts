@@ -11,6 +11,7 @@ import { AdminRoutes } from "./routes/admin/admin.routes";
 import { WorkspaceRoutes } from "./routes/workspaces/workspace.routes";
 import { InvitationRoutes } from "./routes/invitations/invitation.routes";
 import { registerUserEventListner } from "./events/listeners/auth.listener";
+import { UserRoutes } from "./routes/user/user.routes";
 
 export default class Server {
   private _app: Application;
@@ -24,7 +25,7 @@ export default class Server {
 
   private initialize() {
     DependencyInjection.registerAll();
-    registerUserEventListner()
+    registerUserEventListner();
     this.configureMiddlewares();
     this.configureRoutes();
     this.configureErrorMiddlewares();
@@ -46,6 +47,7 @@ export default class Server {
   private configureRoutes(): void {
     this._app.use("/api/v1/auth", container.resolve(AuthRoutes).router);
     this._app.use("/api/v1/admin", container.resolve(AdminRoutes).router);
+    this._app.use("/api/v1/user", container.resolve(UserRoutes).router);
     this._app.use(
       "/api/v1/workspace",
       container.resolve(WorkspaceRoutes).router
