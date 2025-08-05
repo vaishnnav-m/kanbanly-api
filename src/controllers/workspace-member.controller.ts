@@ -64,12 +64,34 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
       userId
     );
 
-    res
-      .status(HTTP_STATUS.OK)
-      .json({
-        success: true,
-        message: SUCCESS_MESSAGES.DATA_FETCHED,
-        data: workspaceMember,
-      });
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_FETCHED,
+      data: workspaceMember,
+    });
+  }
+
+  async searchMember(req: Request, res: Response): Promise<void> {
+    const userId = req.user?.userid;
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.FORBIDDEN_ACCESS,
+        HTTP_STATUS.FORBIDDEN
+      );
+    }
+    const workspaceId = req.params.workspaceId;
+    const email = req.query.email as string;
+
+    const workspaceMember = await this._workspaceMemberService.searchMember(
+      workspaceId,
+      userId,
+      email
+    );
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_FETCHED,
+      data: workspaceMember,
+    });
   }
 }

@@ -8,5 +8,4 @@ export interface IWorkspaceRepository extends IBaseRepository<IWorkspace> {
     userId: string
   ): Promise<IWorkspace[]>;
   isOwner(workspaceId: string, userId: string): Promise<boolean>;
-  deleteWorkspace(workspaceId: string): Promise<void>;
 }

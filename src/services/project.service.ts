@@ -12,10 +12,17 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { IWorkspaceRepository } from "../types/repository-interfaces/IWorkspaceRepository";
 import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWorkspaceMember";
-import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
+import {
+  WorkspaceMemberResponseDto,
+  workspaceRoles,
+} from "../types/dtos/workspaces/workspace-member.dto";
 import { IProject } from "../types/entities/IProject";
 import { projectStatus } from "../types/enums/project-status.enum";
 import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository";
+import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
+import { FilterQuery } from "mongoose";
+import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
+import { IUser } from "../types/entities/IUser";
 
 @injectable()
 export class ProjectService implements IProjectService {
@@ -25,7 +32,8 @@ export class ProjectService implements IProjectService {
     private _workspaceRepo: IWorkspaceRepository,
     @inject("IWorkspaceMemberRepository")
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
-    @inject("ITaskRepository") private _taskRepo: ITaskRepository
+    @inject("ITaskRepository") private _taskRepo: ITaskRepository,
+    @inject("IUserRepository") private _userRepo: IUserRepository
   ) {}
 
   private _normalizeName(name: string) {
@@ -212,4 +220,71 @@ export class ProjectService implements IProjectService {
     await this._taskRepo.deleteMany({ projectId, workspaceId });
     await this._projectRepo.delete({ projectId, workspaceId });
   }
+
+  async addMember(
+    workspaceId: string,
+    userId: string,
+    projectId: string,
+    email: string
+  ): Promise<void> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      workspaceId,
+      userId,
+    });
+    if (!workspaceMember) {
+      throw new AppError(
+        ERROR_MESSAGES.MEMBER_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+    if (workspaceMember.role === workspaceRoles.member) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const user = await this._userRepo.findOne({ email });
+    if (!user) {
+      throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+    }
+
+    await this._projectRepo.update(
+      { projectId, workspaceId },
+      { $addToSet: { members: user.userId } }
+    );
+  }
+
+  // async getMembers(
+  //   workspaceId: string,
+  //   userId: string,
+  //   projectId: string
+  // ): Promise<WorkspaceMemberResponseDto[]> {
+  //   const workspaceMember = await this._workspaceMemberRepo.findOne({
+  //     workspaceId,
+  //     userId,
+  //   });
+  //   if (!workspaceMember) {
+  //     throw new AppError(
+  //       ERROR_MESSAGES.MEMBER_NOT_FOUND,
+  //       HTTP_STATUS.NOT_FOUND
+  //     );
+  //   }
+
+  //   const project = await this._projectRepo.findOne({ workspaceId, projectId });
+  //   const members = await this._workspaceMemberRepo.find({
+  //     workspaceId,
+  //     userId: { $in: project?.members },
+  //   } as FilterQuery<IWorkspaceMember>);
+
+  //   const usersData = await this._userRepo.find({
+  //     userId: { $in: project?.members },
+  //   }as FilterQuery<IUser>);
+
+  //   const mapedMembers:WorkspaceMemberResponseDto[] =  members.map((member) => ({
+  //     email:usersData.
+  //   }))
+
+  //   return mapedMembers;
+  // }
 }

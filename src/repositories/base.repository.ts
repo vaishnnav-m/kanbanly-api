@@ -1,4 +1,4 @@
-import { Model } from "mongoose";
+import { FilterQuery, Model } from "mongoose";
 import { IBaseRepository } from "../types/repository-interfaces/IBaseRepositroy";
 
 export class BaseRepository<T> implements IBaseRepository<T> {
@@ -9,7 +9,7 @@ export class BaseRepository<T> implements IBaseRepository<T> {
   }
 
   async find(
-    query: Partial<T>,
+    query: FilterQuery<T>,
     options: { skip?: number; limit?: number; sort?: any } = {}
   ): Promise<T[]> {
     let q = this.model.find(query, { _id: 0, __v: 0 });

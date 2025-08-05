@@ -6,4 +6,5 @@ export interface IProjectController {
   getOneProject: controllerMethod;
   editProject: controllerMethod;
   deleteProject: controllerMethod;
+  addMember: controllerMethod;
 }
