@@ -84,6 +84,33 @@ export class ProjectController implements IProjectController {
     });
   }
 
+  async editProject(req: Request, res: Response): Promise<void> {
+    const projectId = req.params.projectId;
+    const workspaceId = req.params.workspaceId;
+    const userId = req.user?.userid;
+    const { name, description } = req.body;
+
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    await this._projectService.editProject({
+      name,
+      description,
+      projectId,
+      workspaceId,
+      userId,
+    });
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_EDITED,
+    });
+  }
+
   async deleteProject(req: Request, res: Response): Promise<void> {
     const projectId = req.params.projectId;
     const workspaceId = req.params.workspaceId;

@@ -4,6 +4,7 @@ import { IProjectService } from "../types/service-interface/IProjectService";
 import { IProjectRepository } from "../types/repository-interfaces/IProjectRepository";
 import {
   CreateProjectDto,
+  EditProjectDto,
   ProjectListDto,
 } from "../types/dtos/project/project.dto";
 import AppError from "../shared/utils/AppError";
@@ -27,9 +28,13 @@ export class ProjectService implements IProjectService {
     @inject("ITaskRepository") private _taskRepo: ITaskRepository
   ) {}
 
+  private _normalizeName(name: string) {
+    return name.replace(/\s+/g, "").toLowerCase();
+  }
+
   async addProject(data: CreateProjectDto): Promise<void> {
     const { name, createdBy, workspaceId } = data;
-    const normalizedName = name.replace(/\s+/g, "").toLowerCase();
+    const normalizedName = this._normalizeName(name);
 
     // checking if the workspace exists or not
     const workspace = await this._workspaceRepo.findOne({
@@ -143,7 +148,49 @@ export class ProjectService implements IProjectService {
       members: project.members,
       status: project.status,
       lastUpdated: project.updatedAt.toString(),
+      createdAt: project.createdAt.toString(),
     };
+  }
+
+  async editProject(data: EditProjectDto): Promise<void> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      workspaceId: data.workspaceId,
+      userId: data.userId,
+    });
+    if (!workspaceMember || workspaceMember.role === workspaceRoles.member) {
+      throw new AppError(
+        "Member not exists or insufficient permission",
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    let normalizedName;
+    if (data.name) {
+      normalizedName = this._normalizeName(data.name);
+      const isProjectExists = await this._projectRepo.findOne({
+        name: normalizedName,
+      });
+      if (isProjectExists) {
+        throw new AppError(
+          ERROR_MESSAGES.PROJECT_ALREADY_EXISTS,
+          HTTP_STATUS.CONFLICT
+        );
+      }
+    }
+
+    const newProject: Partial<IProject> = {
+      ...(data.name && { name: data.name }),
+      ...(data.name && { normalizedName: normalizedName }),
+      ...(data.description && { name: data.description }),
+    };
+
+    await this._projectRepo.update(
+      {
+        projectId: data.projectId,
+        workspaceId: data.workspaceId,
+      },
+      newProject
+    );
   }
 
   async removeProject(
@@ -161,7 +208,7 @@ export class ProjectService implements IProjectService {
         HTTP_STATUS.BAD_REQUEST
       );
     }
-    
+
     await this._taskRepo.deleteMany({ projectId, workspaceId });
     await this._projectRepo.delete({ projectId, workspaceId });
   }

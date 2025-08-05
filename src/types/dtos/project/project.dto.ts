@@ -1,3 +1,4 @@
+import { IProject } from "../../entities/IProject";
 import { projectStatus } from "../../enums/project-status.enum";
 
 export interface CreateProjectDto {
@@ -14,4 +15,10 @@ export interface ProjectListDto {
   members: string[];
   status?: projectStatus;
   lastUpdated?: string;
+  createdAt?: string;
 }
+
+export type EditProjectDto = {
+  projectId: string;
+  userId: string;
+} & Partial<Omit<CreateProjectDto, "createdBy">>;

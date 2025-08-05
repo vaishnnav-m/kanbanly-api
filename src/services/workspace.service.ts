@@ -146,9 +146,9 @@ export class WorkspaceService implements IWorkspaceService {
       );
     }
 
+    let slugName;
     if (data.name) {
-      const slugName = this.slugify(data.name);
-
+      slugName = this.slugify(data.name);
       const isExists = await this._workspaceRepo.findOne({
         createdBy: data.createdBy,
         slug: slugName,
@@ -162,12 +162,19 @@ export class WorkspaceService implements IWorkspaceService {
       }
     }
 
+    const newWorkspace: Partial<IWorkspace> = {
+      ...(data.name && { name: data.name }),
+      ...(data.description && { description: data.description }),
+      ...(data.logo && { logo: data.logo }),
+      ...(data.name && { slug: slugName }),
+    };
+
     await this._workspaceRepo.update(
       {
         workspaceId: data.workspaceId,
         createdBy: data.createdBy,
       },
-      data
+      newWorkspace
     );
   }
 

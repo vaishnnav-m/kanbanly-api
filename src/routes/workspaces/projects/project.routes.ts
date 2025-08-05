@@ -27,6 +27,10 @@ export class ProjectRoutes extends BaseRoute {
       "/:projectId",
       this._projectController.getOneProject.bind(this._projectController)
     );
+    this._router.put(
+      "/:projectId",
+      this._projectController.editProject.bind(this._projectController)
+    );
     this._router.delete(
       "/:projectId",
       this._projectController.deleteProject.bind(this._projectController)
