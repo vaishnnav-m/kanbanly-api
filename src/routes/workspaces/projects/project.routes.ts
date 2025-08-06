@@ -39,6 +39,10 @@ export class ProjectRoutes extends BaseRoute {
       "/:projectId/members",
       this._projectController.addMember.bind(this._projectController)
     );
+    this._router.get(
+      "/:projectId/members",
+      this._projectController.getMembers.bind(this._projectController)
+    );
     this._router.use("/:projectId/tasks", this._taskRoutes.router);
   }
 }

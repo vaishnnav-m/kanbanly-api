@@ -19,10 +19,8 @@ import {
 import { IProject } from "../types/entities/IProject";
 import { projectStatus } from "../types/enums/project-status.enum";
 import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository";
-import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
 import { FilterQuery } from "mongoose";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
-import { IUser } from "../types/entities/IUser";
 
 @injectable()
 export class ProjectService implements IProjectService {
@@ -33,7 +31,6 @@ export class ProjectService implements IProjectService {
     @inject("IWorkspaceMemberRepository")
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
     @inject("ITaskRepository") private _taskRepo: ITaskRepository,
-    @inject("IUserRepository") private _userRepo: IUserRepository
   ) {}
 
   private _normalizeName(name: string) {
@@ -273,36 +270,36 @@ export class ProjectService implements IProjectService {
     );
   }
 
-  // async getMembers(
-  //   workspaceId: string,
-  //   userId: string,
-  //   projectId: string
-  // ): Promise<WorkspaceMemberResponseDto[]> {
-  //   const workspaceMember = await this._workspaceMemberRepo.findOne({
-  //     workspaceId,
-  //     userId,
-  //   });
-  //   if (!workspaceMember) {
-  //     throw new AppError(
-  //       ERROR_MESSAGES.MEMBER_NOT_FOUND,
-  //       HTTP_STATUS.NOT_FOUND
-  //     );
-  //   }
+  async getMembers(
+    workspaceId: string,
+    userId: string,
+    projectId: string
+  ): Promise<WorkspaceMemberResponseDto[]> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      workspaceId,
+      userId,
+    });
+    if (!workspaceMember) {
+      throw new AppError(
+        ERROR_MESSAGES.MEMBER_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
 
-  //   const project = await this._projectRepo.findOne({ workspaceId, projectId });
-  //   const members = await this._workspaceMemberRepo.find({
-  //     workspaceId,
-  //     userId: { $in: project?.members },
-  //   } as FilterQuery<IWorkspaceMember>);
+    const project = await this._projectRepo.findOne({ workspaceId, projectId });
+    const members = await this._workspaceMemberRepo.find({
+      workspaceId,
+      userId: { $in: project?.members },
+    } as FilterQuery<IWorkspaceMember>);
 
-  //   const usersData = await this._userRepo.find({
-  //     userId: { $in: project?.members },
-  //   }as FilterQuery<IUser>);
+    const mapedMembers: WorkspaceMemberResponseDto[] = members.map(
+      (member) => ({
+        email: member.email,
+        name: member.name,
+        role: member.role,
+      })
+    );
 
-  //   const mapedMembers:WorkspaceMemberResponseDto[] =  members.map((member) => ({
-  //     email:usersData.
-  //   }))
-
-  //   return mapedMembers;
-  // }
+    return mapedMembers;
+  }
 }

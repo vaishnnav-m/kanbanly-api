@@ -28,9 +28,9 @@ export interface IProjectService {
     projectId: string,
     email: string
   ): Promise<void>;
-  // getMembers(
-  //   workspaceId: string,
-  //   userId: string,
-  //   projectId: string
-  // ): Promise<WorkspaceMemberResponseDto[]>;
+  getMembers(
+    workspaceId: string,
+    userId: string,
+    projectId: string
+  ): Promise<WorkspaceMemberResponseDto[]>;
 }
