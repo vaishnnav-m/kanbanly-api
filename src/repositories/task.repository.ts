@@ -37,6 +37,7 @@ export class TaskRepository
       {
         $project: {
           _id: 0,
+          taskId: 1,
           task: 1,
           description: 1,
           assignedTo: 1,

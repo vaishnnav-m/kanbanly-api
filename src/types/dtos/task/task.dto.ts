@@ -25,15 +25,14 @@ export interface CreateTaskDto {
 }
 
 export interface TaskDetailsDto {
+  taskId: string;
   task: string;
   description?: string;
   status: string;
-  assignedTo:
-    | {
-        email: string;
-        name: string;
-      }
-    | null;
+  assignedTo: {
+    email: string;
+    name: string;
+  } | null;
   priority: TaskPriority;
   dueDate?: Date;
 }

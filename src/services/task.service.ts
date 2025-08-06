@@ -151,6 +151,7 @@ export class TaskService implements ITaskService {
     }
 
     return {
+      taskId: task.taskId,
       task: task.task,
       description: task.description,
       dueDate: task.dueDate,
@@ -163,6 +164,38 @@ export class TaskService implements ITaskService {
           },
       status: task.status,
     };
+  }
+
+  async changeTaskStatus(
+    taskId: string,
+    userId: string,
+    newStatus: TaskStatus
+  ): Promise<void> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({ userId });
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.UNAUTHORIZED);
+    }
+
+    const task = await this._taskRepo.findOne({ taskId });
+    if (!task) {
+      throw new AppError(
+        ERROR_MESSAGES.RESOURCE_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    const isAllowed =
+      workspaceMember.role === "member"
+        ? task.assignedTo === workspaceMember.userId
+        : true;
+    if (!isAllowed) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    await this._taskRepo.update({ taskId }, { status: newStatus });
   }
 
   async removeTask(
