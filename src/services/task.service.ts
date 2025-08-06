@@ -2,7 +2,12 @@ import { inject, injectable } from "tsyringe";
 import { v4 as uuidv4 } from "uuid";
 import { ITaskService } from "../types/service-interface/ITaskService";
 import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository";
-import { CreateTaskDto, TaskStatus } from "../types/dtos/task/task.dto";
+import {
+  CreateTaskDto,
+  EditTaskDto,
+  TaskDetailsDto,
+  TaskStatus,
+} from "../types/dtos/task/task.dto";
 import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWorkspaceMember";
 import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
@@ -113,6 +118,130 @@ export class TaskService implements ITaskService {
         });
 
     return tasks;
+  }
+
+  async getOneTask(
+    workspaceId: string,
+    projectId: string,
+    userId: string,
+    taskId: string
+  ): Promise<TaskDetailsDto> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      userId,
+      workspaceId,
+    });
+
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
+    }
+
+    const query =
+      workspaceMember.role === "member" ? { assignedTo: userId } : {};
+
+    const task = await this._taskRepo.getTasksWithAssigness({
+      taskId,
+      projectId,
+      ...query,
+    });
+
+    if (!task) {
+      throw new AppError(
+        ERROR_MESSAGES.RESOURCE_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    return {
+      taskId: task.taskId,
+      task: task.task,
+      description: task.description,
+      dueDate: task.dueDate,
+      priority: task.priority,
+      assignedTo: Array.isArray(task.assignedTo)
+        ? null
+        : {
+            name: task.assignedTo.name,
+            email: task.assignedTo.email,
+          },
+      status: task.status,
+    };
+  }
+
+  async changeTaskStatus(
+    taskId: string,
+    userId: string,
+    newStatus: TaskStatus
+  ): Promise<void> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({ userId });
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.UNAUTHORIZED);
+    }
+
+    const task = await this._taskRepo.findOne({ taskId, isDeleted: false });
+    if (!task) {
+      throw new AppError(ERROR_MESSAGES.TASK_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+    }
+
+    const isAllowed =
+      workspaceMember.role === "member"
+        ? task.assignedTo === workspaceMember.userId
+        : true;
+    if (!isAllowed) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    await this._taskRepo.update({ taskId }, { status: newStatus });
+  }
+
+  async editTaskStatus(
+    taskId: string,
+    userId: string,
+    data: EditTaskDto
+  ): Promise<void> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({ userId });
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.UNAUTHORIZED);
+    }
+
+    const task = await this._taskRepo.findOne({ taskId });
+    if (!task) {
+      throw new AppError(ERROR_MESSAGES.TASK_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+    }
+
+    const isAllowed = workspaceMember.role !== "member";
+    if (!isAllowed) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    let assigneeId: string = "";
+    if (data.assignedTo) {
+      const assignee = await this._workspaceMemberRepo.findOne({
+        email: data.assignedTo,
+      });
+      if (!assignee) {
+        throw new AppError(
+          ERROR_MESSAGES.MEMBER_NOT_FOUND,
+          HTTP_STATUS.NOT_FOUND
+        );
+      }
+      assigneeId = assignee.userId.toString();
+    }
+
+    const newTask: Partial<ITask> = {
+      ...(data.task && { task: data.task }),
+      ...(data.description && { description: data.description }),
+      ...(data.priority && { priority: data.priority }),
+      ...(data.dueDate && { dueDate: data.dueDate }),
+      ...(data.assignedTo && assigneeId && { assignedTo: assigneeId }),
+    };
+
+    await this._taskRepo.update({ taskId }, newTask);
   }
 
   async removeTask(

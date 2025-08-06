@@ -41,14 +41,18 @@ export const ERROR_MESSAGES = {
 
   // WORKSPACE MEMBER
   NOT_OWNER: "You are not the owner of this workspace",
-  NOT_MEMBER: "User is not a member of this workspace",
+  NOT_MEMBER: "You are not a member of this workspace",
   ACTION_DENIED:
     "Action denied: your role does not have the required permissions.",
   MEMBER_NOT_FOUND: "The member is not found",
   INSUFFICIENT_PERMISSION: "Insufficient permission",
+  ALREADY_MEMBER: "The member already exists",
 
   // PROJECT
   PROJECT_ALREADY_EXISTS: "Project with this name already exists",
   INVALID_PROJECT_ID:
     "Invalid project or project doesn't belong to the specified workspace",
+
+  // TASK
+  TASK_NOT_FOUND: "The task not found",
 };

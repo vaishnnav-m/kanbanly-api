@@ -25,6 +25,14 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
   ) {}
 
   async addMember(data: WorkspaceMemberDto): Promise<void> {
+    const user = await this._userRepo.findOne({ userId: data.userId });
+    if (!user) {
+      throw new AppError(
+        ERROR_MESSAGES.MEMBER_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
     if (!Object.values(workspaceRoles).includes(data.role)) {
       throw new AppError("invalid role", HTTP_STATUS.BAD_REQUEST);
     }
@@ -44,7 +52,15 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
       throw new AppError("member already exists", HTTP_STATUS.BAD_REQUEST);
     }
 
-    await this._workspaceMemberRepo.create(data);
+    const workspaceMember: Omit<IWorkspaceMember, "createdAt"> = {
+      workspaceId: data.workspaceId,
+      userId: data.userId,
+      email: user.email,
+      name: user.firstName,
+      role: data.role,
+    };
+
+    await this._workspaceMemberRepo.create(workspaceMember);
   }
 
   async isMember(workspaceId: string, userId: string): Promise<boolean> {
@@ -114,6 +130,8 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
       userId: workspaceMember.userId,
       workspaceId: workspaceMember.workspaceId,
       role: workspaceMember.role,
+      email: workspaceMember.email,
+      name: workspaceMember.name,
       createdAt: workspaceMember.createdAt,
     };
   }
@@ -142,13 +160,8 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
       );
     }
 
-    const user = await this._userRepo.findOne({ email });
-    if (!user) {
-      throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
-    }
-
     const workspaceMember = await this._workspaceMemberRepo.findOne({
-      userId: user?.userId,
+      email,
       workspaceId,
     });
 
@@ -157,8 +170,8 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     }
 
     return {
-      email: user.email,
-      name: user.firstName,
+      email: workspaceMember.email,
+      name: workspaceMember.name,
       role: workspaceMember?.role,
     };
   }

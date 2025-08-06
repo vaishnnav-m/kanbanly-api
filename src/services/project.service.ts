@@ -47,12 +47,18 @@ export class ProjectService implements IProjectService {
     // checking if the workspace exists or not
     const workspace = await this._workspaceRepo.findOne({
       workspaceId,
-      createdBy,
     });
     if (!workspace) {
       throw new AppError(
         ERROR_MESSAGES.WORKSPACE_NOT_FOUND,
         HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    if (workspace.createdBy !== createdBy) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
       );
     }
 
@@ -232,10 +238,7 @@ export class ProjectService implements IProjectService {
       userId,
     });
     if (!workspaceMember) {
-      throw new AppError(
-        ERROR_MESSAGES.MEMBER_NOT_FOUND,
-        HTTP_STATUS.NOT_FOUND
-      );
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.UNAUTHORIZED);
     }
     if (workspaceMember.role === workspaceRoles.member) {
       throw new AppError(
@@ -244,14 +247,29 @@ export class ProjectService implements IProjectService {
       );
     }
 
-    const user = await this._userRepo.findOne({ email });
-    if (!user) {
-      throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+    const isMemberExists = await this._workspaceMemberRepo.findOne({
+      email,
+      workspaceId,
+    });
+    if (!isMemberExists) {
+      throw new AppError(
+        ERROR_MESSAGES.MEMBER_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    const alreadyMember = await this._projectRepo.findOne({
+      workspaceId,
+      projectId,
+      members: isMemberExists.userId,
+    });
+    if (alreadyMember) {
+      throw new AppError(ERROR_MESSAGES.ALREADY_MEMBER, HTTP_STATUS.CONFLICT);
     }
 
     await this._projectRepo.update(
       { projectId, workspaceId },
-      { $addToSet: { members: user.userId } }
+      { $addToSet: { members: isMemberExists.userId } }
     );
   }
 

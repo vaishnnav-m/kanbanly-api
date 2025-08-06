@@ -25,7 +25,7 @@ export interface WorkspaceMemberRepoDto {
     user: {
       email: string;
       firstName: string;
-      userId:string
+      userId: string;
     };
     role: workspaceRoles;
   }[];

@@ -52,7 +52,6 @@ export class WorkspaceMemberRepository
     ]);
     const { data, totalCount } = result[0];
     const count = totalCount?.[0]?.count || 0;
-    console.log(data);
     return { data, count };
   }
 
