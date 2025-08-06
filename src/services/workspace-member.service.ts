@@ -12,6 +12,7 @@ import { IWorkspaceRepository } from "../types/repository-interfaces/IWorkspaceR
 import { PaginatedResponseDto } from "../types/dtos/paginated.dto";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
+import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
 
 @injectable()
 export class WorkspaceMemberService implements IWorkspaceMemberService {
@@ -20,9 +21,18 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
     @inject("IWorkspaceRepository")
     private _workspaceRepo: IWorkspaceRepository,
+    @inject("IUserRepository") private _userRepo: IUserRepository
   ) {}
 
   async addMember(data: WorkspaceMemberDto): Promise<void> {
+    const user = await this._userRepo.findOne({ userId: data.userId });
+    if (!user) {
+      throw new AppError(
+        ERROR_MESSAGES.MEMBER_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
     if (!Object.values(workspaceRoles).includes(data.role)) {
       throw new AppError("invalid role", HTTP_STATUS.BAD_REQUEST);
     }
@@ -42,7 +52,15 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
       throw new AppError("member already exists", HTTP_STATUS.BAD_REQUEST);
     }
 
-    await this._workspaceMemberRepo.create(data);
+    const workspaceMember: Omit<IWorkspaceMember, "createdAt"> = {
+      workspaceId: data.workspaceId,
+      userId: data.userId,
+      email: user.email,
+      name: user.firstName,
+      role: data.role,
+    };
+
+    await this._workspaceMemberRepo.create(workspaceMember);
   }
 
   async isMember(workspaceId: string, userId: string): Promise<boolean> {

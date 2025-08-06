@@ -4,6 +4,7 @@ import { ITaskService } from "../types/service-interface/ITaskService";
 import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository";
 import {
   CreateTaskDto,
+  EditTaskDto,
   TaskDetailsDto,
   TaskStatus,
 } from "../types/dtos/task/task.dto";
@@ -176,12 +177,9 @@ export class TaskService implements ITaskService {
       throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.UNAUTHORIZED);
     }
 
-    const task = await this._taskRepo.findOne({ taskId });
+    const task = await this._taskRepo.findOne({ taskId, isDeleted: false });
     if (!task) {
-      throw new AppError(
-        ERROR_MESSAGES.RESOURCE_NOT_FOUND,
-        HTTP_STATUS.NOT_FOUND
-      );
+      throw new AppError(ERROR_MESSAGES.TASK_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
     }
 
     const isAllowed =
@@ -196,6 +194,54 @@ export class TaskService implements ITaskService {
     }
 
     await this._taskRepo.update({ taskId }, { status: newStatus });
+  }
+
+  async editTaskStatus(
+    taskId: string,
+    userId: string,
+    data: EditTaskDto
+  ): Promise<void> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({ userId });
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.UNAUTHORIZED);
+    }
+
+    const task = await this._taskRepo.findOne({ taskId });
+    if (!task) {
+      throw new AppError(ERROR_MESSAGES.TASK_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+    }
+
+    const isAllowed = workspaceMember.role !== "member";
+    if (!isAllowed) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    let assigneeId: string = "";
+    if (data.assignedTo) {
+      const assignee = await this._workspaceMemberRepo.findOne({
+        email: data.assignedTo,
+      });
+      if (!assignee) {
+        throw new AppError(
+          ERROR_MESSAGES.MEMBER_NOT_FOUND,
+          HTTP_STATUS.NOT_FOUND
+        );
+      }
+      assigneeId = assignee.userId.toString();
+    }
+
+    const newTask: Partial<ITask> = {
+      ...(data.task && { task: data.task }),
+      ...(data.description && { description: data.description }),
+      ...(data.priority && { priority: data.priority }),
+      ...(data.dueDate && { dueDate: data.dueDate }),
+      ...(data.assignedTo && assigneeId && { assignedTo: assigneeId }),
+    };
+
+    await this._taskRepo.update({ taskId }, newTask);
   }
 
   async removeTask(

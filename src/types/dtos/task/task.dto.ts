@@ -24,6 +24,16 @@ export interface CreateTaskDto {
   dueDate: Date;
 }
 
+export interface EditTaskDto {
+  taskId: string;
+  userId: string;
+  task?: string;
+  description?: string;
+  priority?: TaskPriority;
+  assignedTo?: string;
+  dueDate?: Date;
+}
+
 export interface TaskDetailsDto {
   taskId: string;
   task: string;

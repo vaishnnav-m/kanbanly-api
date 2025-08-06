@@ -22,7 +22,7 @@ export class TaskRepository
       { $match: { ...query, isDeleted: false } },
       {
         $lookup: {
-          from: "workspaceMembers",
+          from: "workspacemembers",
           localField: "assignedTo",
           foreignField: "userId",
           as: "assignedTo",
@@ -30,7 +30,7 @@ export class TaskRepository
       },
       {
         $unwind: {
-          path: "$assignedMember",
+          path: "$assignedTo",
           preserveNullAndEmptyArrays: true,
         },
       },

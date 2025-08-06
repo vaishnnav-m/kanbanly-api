@@ -52,4 +52,7 @@ export const ERROR_MESSAGES = {
   PROJECT_ALREADY_EXISTS: "Project with this name already exists",
   INVALID_PROJECT_ID:
     "Invalid project or project doesn't belong to the specified workspace",
+
+  // TASK
+  TASK_NOT_FOUND: "The task not found",
 };

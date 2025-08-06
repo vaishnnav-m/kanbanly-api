@@ -9,8 +9,6 @@ export enum workspaceRoles {
 export interface WorkspaceMemberDto {
   workspaceId: string;
   userId: string;
-  email: string;
-  name: string;
   role: workspaceRoles;
 }
 
