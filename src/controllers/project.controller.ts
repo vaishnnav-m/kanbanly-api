@@ -151,4 +151,28 @@ export class ProjectController implements IProjectController {
       message: SUCCESS_MESSAGES.MEMBER_ADDED,
     });
   }
+
+  async getMembers(req: Request, res: Response): Promise<void> {
+    const projectId = req.params.projectId;
+    const workspaceId = req.params.workspaceId;
+    const userId = req.user?.userid;
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    const members = await this._projectService.getMembers(
+      workspaceId,
+      userId,
+      projectId
+    );
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_FETCHED,
+      data: members,
+    });
+  }
 }
