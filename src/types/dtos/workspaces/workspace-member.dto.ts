@@ -9,6 +9,8 @@ export enum workspaceRoles {
 export interface WorkspaceMemberDto {
   workspaceId: string;
   userId: string;
+  email: string;
+  name: string;
   role: workspaceRoles;
 }
 
@@ -25,7 +27,7 @@ export interface WorkspaceMemberRepoDto {
     user: {
       email: string;
       firstName: string;
-      userId:string
+      userId: string;
     };
     role: workspaceRoles;
   }[];

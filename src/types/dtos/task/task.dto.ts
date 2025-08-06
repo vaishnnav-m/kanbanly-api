@@ -1,4 +1,5 @@
 import { ITask } from "../../entities/ITask";
+import { IWorkspaceMember } from "../../entities/IWorkspaceMember";
 
 export enum TaskStatus {
   Todo = "todo",
@@ -21,4 +22,22 @@ export interface CreateTaskDto {
   assignedTo: string;
   createdBy: string;
   dueDate: Date;
-} 
+}
+
+export interface TaskDetailsDto {
+  task: string;
+  description?: string;
+  status: string;
+  assignedTo:
+    | {
+        email: string;
+        name: string;
+      }
+    | null;
+  priority: TaskPriority;
+  dueDate?: Date;
+}
+
+export type TaskDetailRepoDto = Omit<ITask, "assignedTo"> & {
+  assignedTo: IWorkspaceMember;
+};

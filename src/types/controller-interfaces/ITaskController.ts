@@ -4,4 +4,5 @@ export interface ITaskController {
   createTask: controllerMethod;
   getAllTasks: controllerMethod;
   removeTask: controllerMethod;
+  getOneTask: controllerMethod;
 }

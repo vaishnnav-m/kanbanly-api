@@ -1,7 +1,7 @@
-import { ObjectId } from "mongoose";
+import { FilterQuery, ObjectId } from "mongoose";
 
 export interface IBaseRepository<T> {
-  findOne(query: Partial<T>): Promise<T | null>;
+  findOne(query: FilterQuery<T>): Promise<T | null>;
   find(
     query?: Partial<T>,
     options?: { skip?: number; limit?: number; sort?: any }

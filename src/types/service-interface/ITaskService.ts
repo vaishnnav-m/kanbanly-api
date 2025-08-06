@@ -1,4 +1,4 @@
-import { CreateTaskDto } from "../dtos/task/task.dto";
+import { CreateTaskDto, TaskDetailsDto } from "../dtos/task/task.dto";
 import { ITask } from "../entities/ITask";
 
 export interface ITaskService {
@@ -8,6 +8,12 @@ export interface ITaskService {
     projectId: string,
     userId: string
   ): Promise<ITask[]>;
+  getOneTask(
+    workspaceId: string,
+    projectId: string,
+    userId: string,
+    taskId: string
+  ): Promise<TaskDetailsDto>;
   removeTask(
     workspaceId: string,
     taskId: string,

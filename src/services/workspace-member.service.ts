@@ -12,7 +12,6 @@ import { IWorkspaceRepository } from "../types/repository-interfaces/IWorkspaceR
 import { PaginatedResponseDto } from "../types/dtos/paginated.dto";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
-import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
 
 @injectable()
 export class WorkspaceMemberService implements IWorkspaceMemberService {
@@ -21,7 +20,6 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
     @inject("IWorkspaceRepository")
     private _workspaceRepo: IWorkspaceRepository,
-    @inject("IUserRepository") private _userRepo: IUserRepository
   ) {}
 
   async addMember(data: WorkspaceMemberDto): Promise<void> {
@@ -114,6 +112,8 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
       userId: workspaceMember.userId,
       workspaceId: workspaceMember.workspaceId,
       role: workspaceMember.role,
+      email: workspaceMember.email,
+      name: workspaceMember.name,
       createdAt: workspaceMember.createdAt,
     };
   }
@@ -142,13 +142,8 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
       );
     }
 
-    const user = await this._userRepo.findOne({ email });
-    if (!user) {
-      throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
-    }
-
     const workspaceMember = await this._workspaceMemberRepo.findOne({
-      userId: user?.userId,
+      email,
       workspaceId,
     });
 
@@ -157,8 +152,8 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     }
 
     return {
-      email: user.email,
-      name: user.firstName,
+      email: workspaceMember.email,
+      name: workspaceMember.name,
       role: workspaceMember?.role,
     };
   }
