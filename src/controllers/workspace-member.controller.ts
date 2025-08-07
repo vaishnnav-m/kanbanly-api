@@ -121,4 +121,27 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
       message: SUCCESS_MESSAGES.DATA_EDITED,
     });
   }
+
+  async removeMember(req: Request, res: Response): Promise<void> {
+    const userId = req.user?.userid;
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.FORBIDDEN_ACCESS,
+        HTTP_STATUS.FORBIDDEN
+      );
+    }
+    const workspaceId = req.params.workspaceId;
+    const memberId = req.params.memberId;
+
+    await this._workspaceMemberService.deleteMember(
+      workspaceId,
+      userId,
+      memberId
+    );
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_EDITED,
+    });
+  }
 }

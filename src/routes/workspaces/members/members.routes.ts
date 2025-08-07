@@ -21,6 +21,10 @@ export class WorkspaceMembersRoutes extends BaseRoute {
       "/",
       this._memberController.editMember.bind(this._memberController)
     );
+    this._router.delete(
+      "/:memberId",
+      this._memberController.removeMember.bind(this._memberController)
+    );
     this._router.get(
       "/me",
       this._memberController.getCurrentMember.bind(this._memberController)

@@ -13,9 +13,7 @@ export interface IWorkspaceMemberService {
     workspaceId: string,
     userId: string,
     page: number
-  ): Promise<
-    PaginatedResponseDto<WorkspaceMemberResponseDto[]>
-  >;
+  ): Promise<PaginatedResponseDto<WorkspaceMemberResponseDto[]>>;
   getCurrentMember(
     workspaceId: string,
     userId: string
@@ -29,5 +27,10 @@ export interface IWorkspaceMemberService {
     workspaceId: string,
     userId: string,
     data: EditWorkspaceMemberDto
+  ): Promise<void>;
+  deleteMember(
+    workspaceId: string,
+    userId: string,
+    memberId: string
   ): Promise<void>;
 }

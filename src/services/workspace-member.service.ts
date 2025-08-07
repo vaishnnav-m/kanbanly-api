@@ -232,4 +232,45 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
       newMemberData
     );
   }
+
+  async deleteMember(
+    workspaceId: string,
+    userId: string,
+    memberId: string
+  ): Promise<void> {
+    const member = await this._workspaceMemberRepo.findOne({
+      userId,
+      workspaceId,
+      isActive: true,
+    });
+    if (!member) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.NOT_FOUND);
+    }
+
+    if (member.role !== "owner") {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      userId: memberId,
+    });
+    if (!workspaceMember) {
+      throw new AppError(
+        ERROR_MESSAGES.MEMBER_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    if (memberId === userId) {
+      throw new AppError(
+        ERROR_MESSAGES.DELETE_YOURSELF,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    await this._workspaceMemberRepo.delete({ userId: memberId });
+  }
 }

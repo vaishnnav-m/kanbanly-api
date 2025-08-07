@@ -322,7 +322,7 @@ export class ProjectService implements IProjectService {
 
     if (userId === userToRemove) {
       throw new AppError(
-        "You cannot remove yourself from the project.",
+        ERROR_MESSAGES.DELETE_YOURSELF,
         HTTP_STATUS.BAD_REQUEST
       );
     }
