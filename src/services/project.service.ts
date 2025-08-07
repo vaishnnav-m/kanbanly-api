@@ -63,6 +63,7 @@ export class ProjectService implements IProjectService {
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       userId: createdBy,
       workspaceId,
+      isActive: true,
     });
     if (!workspaceMember || workspaceMember.role !== workspaceRoles.owner) {
       throw new AppError(ERROR_MESSAGES.NOT_OWNER, HTTP_STATUS.BAD_REQUEST);
@@ -271,7 +272,7 @@ export class ProjectService implements IProjectService {
     workspaceId: string,
     userId: string,
     projectId: string
-  ): Promise<WorkspaceMemberResponseDto[]> {
+  ): Promise<Omit<WorkspaceMemberResponseDto, "isActive">[]> {
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       workspaceId,
       userId,
@@ -289,14 +290,12 @@ export class ProjectService implements IProjectService {
       userId: { $in: project?.members },
     } as FilterQuery<IWorkspaceMember>);
 
-    const mapedMembers: WorkspaceMemberResponseDto[] = members.map(
-      (member) => ({
-        _id: member.userId.toString(),
-        email: member.email,
-        name: member.name,
-        role: member.role,
-      })
-    );
+    const mapedMembers = members.map((member) => ({
+      _id: member.userId.toString(),
+      email: member.email,
+      name: member.name,
+      role: member.role,
+    }));
 
     return mapedMembers;
   }

@@ -1,5 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import {
+  EditWorkspaceMemberDto,
   WorkspaceMemberDto,
   WorkspaceMemberResponseDto,
   workspaceRoles,
@@ -49,7 +50,10 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
       userId: data.userId,
     });
     if (existingMember) {
-      throw new AppError("member already exists", HTTP_STATUS.BAD_REQUEST);
+      throw new AppError(
+        ERROR_MESSAGES.ALREADY_MEMBER,
+        HTTP_STATUS.BAD_REQUEST
+      );
     }
 
     const workspaceMember: Omit<IWorkspaceMember, "createdAt"> = {
@@ -58,6 +62,7 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
       email: user.email,
       name: user.firstName,
       role: data.role,
+      isActive: true,
     };
 
     await this._workspaceMemberRepo.create(workspaceMember);
@@ -82,6 +87,7 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     const member = await this._workspaceMemberRepo.findOne({
       workspaceId,
       userId,
+      isActive: true,
     });
     if (!member) {
       throw new AppError(
@@ -96,12 +102,19 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
       limit
     );
 
-    const members = rawMembers.data.map((member) => {
+    const isOwner = member.role === "owner";
+
+    const filteredData = isOwner
+      ? rawMembers.data
+      : rawMembers.data.filter((member) => member.isActive);
+
+    const members = filteredData.map((member) => {
       return {
         name: member.user.firstName,
         email: member.user.email,
         role: member.role,
         _id: member.user.userId,
+        isActive: member.isActive,
       };
     });
 
@@ -113,10 +126,11 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
   async getCurrentMember(
     workspaceId: string,
     userId: string
-  ): Promise<IWorkspaceMember> {
+  ): Promise<Omit<IWorkspaceMember, "isActive">> {
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       workspaceId,
       userId,
+      isActive: true,
     });
 
     if (!workspaceMember) {
@@ -144,12 +158,10 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     const member = await this._workspaceMemberRepo.findOne({
       userId,
       workspaceId,
+      isActive: true,
     });
     if (!member) {
-      throw new AppError(
-        "You are not a member of this workspace",
-        HTTP_STATUS.NOT_FOUND
-      );
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.NOT_FOUND);
     }
 
     const isAllowed = member.role !== "member";
@@ -163,6 +175,7 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       email,
       workspaceId,
+      isActive: true,
     });
 
     if (!workspaceMember) {
@@ -173,6 +186,50 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
       email: workspaceMember.email,
       name: workspaceMember.name,
       role: workspaceMember?.role,
+      isActive: workspaceMember.isActive,
     };
+  }
+
+  async editWorkspaceMember(
+    workspaceId: string,
+    userId: string,
+    data: EditWorkspaceMemberDto
+  ): Promise<void> {
+    const member = await this._workspaceMemberRepo.findOne({
+      userId,
+      workspaceId,
+      isActive: true,
+    });
+    if (!member) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.NOT_FOUND);
+    }
+
+    if (member.role !== "owner") {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    if (data.memberId === userId) {
+      throw new AppError("You can't edit yourself", HTTP_STATUS.BAD_REQUEST);
+    }
+
+    if (data?.role === "owner") {
+      throw new AppError(
+        "Can't make the member owner",
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const newMemberData: Partial<IWorkspaceMember> = {
+      ...(data.role && { role: data.role }),
+      ...(data.isActive !== undefined && { isActive: data.isActive }),
+    };
+
+    await this._workspaceMemberRepo.update(
+      { userId: data.memberId, workspaceId },
+      newMemberData
+    );
   }
 }

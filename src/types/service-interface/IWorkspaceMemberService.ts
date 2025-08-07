@@ -1,5 +1,6 @@
 import { PaginatedResponseDto } from "../dtos/paginated.dto";
 import {
+  EditWorkspaceMemberDto,
   WorkspaceMemberDto,
   WorkspaceMemberResponseDto,
 } from "../dtos/workspaces/workspace-member.dto";
@@ -12,14 +13,21 @@ export interface IWorkspaceMemberService {
     workspaceId: string,
     userId: string,
     page: number
-  ): Promise<PaginatedResponseDto<WorkspaceMemberResponseDto[]>>;
+  ): Promise<
+    PaginatedResponseDto<WorkspaceMemberResponseDto[]>
+  >;
   getCurrentMember(
     workspaceId: string,
     userId: string
-  ): Promise<IWorkspaceMember>;
+  ): Promise<Omit<IWorkspaceMember, "isActive">>;
   searchMember(
     workspaceId: string,
     userId: string,
     email: string
   ): Promise<WorkspaceMemberResponseDto>;
+  editWorkspaceMember(
+    workspaceId: string,
+    userId: string,
+    data: EditWorkspaceMemberDto
+  ): Promise<void>;
 }

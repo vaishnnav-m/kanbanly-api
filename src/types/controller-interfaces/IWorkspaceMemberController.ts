@@ -5,4 +5,5 @@ export interface IWorkspaceMemberController {
   getMembers: controllerMethod;
   getCurrentMember: controllerMethod;
   searchMember: controllerMethod;
+  editMember: controllerMethod;
 }

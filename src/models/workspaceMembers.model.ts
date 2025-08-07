@@ -27,6 +27,10 @@ const workspaceMemberSchema = new Schema<IWorkspaceMember>(
       enum: Object.values(workspaceRoles),
       required: true,
     },
+    isActive: {
+      type: Boolean,
+      required: true,
+    },
   },
   { timestamps: true }
 );

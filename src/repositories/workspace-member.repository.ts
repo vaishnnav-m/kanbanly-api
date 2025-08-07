@@ -41,6 +41,7 @@ export class WorkspaceMemberRepository
           "user.firstName": 1,
           "user.email": 1,
           "user.userId": 1,
+          "isActive": 1,
         },
       },
       {
