@@ -14,6 +14,7 @@ export interface WorkspaceMemberDto {
 
 // response dto
 export interface WorkspaceMemberResponseDto {
+  _id?: string;
   name: string;
   email: string;
   role: workspaceRoles;

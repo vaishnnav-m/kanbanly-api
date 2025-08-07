@@ -175,4 +175,29 @@ export class ProjectController implements IProjectController {
       data: members,
     });
   }
+  
+  async removeMember(req: Request, res: Response): Promise<void> {
+    const projectId = req.params.projectId;
+    const workspaceId = req.params.workspaceId;
+    const memberId = req.params.memberId;
+    const userId = req.user?.userid;
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    await this._projectService.removeMember(
+      workspaceId,
+      projectId,
+      userId,
+      memberId
+    );
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.MEMBER_REMOVED,
+    });
+  }
 }

@@ -33,4 +33,10 @@ export interface IProjectService {
     userId: string,
     projectId: string
   ): Promise<WorkspaceMemberResponseDto[]>;
+  removeMember(
+    workspaceId: string,
+    projectId: string,
+    userId: string,
+    userToRemove: string
+  ): Promise<void>;
 }
