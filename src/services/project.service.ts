@@ -97,7 +97,6 @@ export class ProjectService implements IProjectService {
     workspaceId: string,
     userId: string
   ): Promise<ProjectListDto[] | null> {
-    console.log(userId)
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       userId,
       workspaceId,
@@ -139,11 +138,8 @@ export class ProjectService implements IProjectService {
       workspaceId,
       userId,
     });
-    if (!workspaceMember || workspaceMember.role === workspaceRoles.member) {
-      throw new AppError(
-        "Member not exists or insufficient permission",
-        HTTP_STATUS.BAD_REQUEST
-      );
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
     }
 
     const project = await this._projectRepo.findOne({ projectId, workspaceId });
@@ -295,6 +291,7 @@ export class ProjectService implements IProjectService {
 
     const mapedMembers: WorkspaceMemberResponseDto[] = members.map(
       (member) => ({
+        _id: member.userId.toString(),
         email: member.email,
         name: member.name,
         role: member.role,
@@ -302,5 +299,56 @@ export class ProjectService implements IProjectService {
     );
 
     return mapedMembers;
+  }
+
+  async removeMember(
+    workspaceId: string,
+    projectId: string,
+    userId: string,
+    userToRemove: string
+  ): Promise<void> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      workspaceId,
+      userId,
+    });
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.UNAUTHORIZED);
+    }
+    if (workspaceMember.role === workspaceRoles.member) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    if (userId === userToRemove) {
+      throw new AppError(
+        "You cannot remove yourself from the project.",
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const project = await this._projectRepo.findOne({ workspaceId, projectId });
+    if (!project) {
+      throw new AppError(
+        ERROR_MESSAGES.PROJECT_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+    if (!project.members.includes(userToRemove)) {
+      throw new AppError(
+        ERROR_MESSAGES.MEMBER_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    const newMembers = project.members.filter(
+      (memberid) => memberid !== userToRemove
+    );
+
+    await this._projectRepo.update(
+      { projectId, workspaceId },
+      { members: newMembers }
+    );
   }
 }

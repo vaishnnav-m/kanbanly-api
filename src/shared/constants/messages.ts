@@ -14,6 +14,7 @@ export const SUCCESS_MESSAGES = {
   EMAIL_VERIFIED: "Email verification was successfull",
   PROJECT_CREATED: "Project Created Successfully",
   MEMBER_ADDED: "Member added successfully",
+  MEMBER_REMOVED:"Member successfully removed"
 };
 
 export const ERROR_MESSAGES = {
@@ -50,7 +51,7 @@ export const ERROR_MESSAGES = {
 
   // PROJECT
   PROJECT_ALREADY_EXISTS: "Project with this name already exists",
-  INVALID_PROJECT_ID:
+  PROJECT_NOT_FOUND:
     "Invalid project or project doesn't belong to the specified workspace",
 
   // TASK

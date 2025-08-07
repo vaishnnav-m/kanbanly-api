@@ -50,7 +50,7 @@ export class TaskService implements ITaskService {
 
     if (!project || project.workspaceId !== data.workspaceId) {
       throw new AppError(
-        ERROR_MESSAGES.INVALID_PROJECT_ID,
+        ERROR_MESSAGES.PROJECT_NOT_FOUND,
         HTTP_STATUS.BAD_REQUEST
       );
     }
@@ -101,7 +101,7 @@ export class TaskService implements ITaskService {
 
     if (!project || project.workspaceId !== workspaceId) {
       throw new AppError(
-        ERROR_MESSAGES.INVALID_PROJECT_ID,
+        ERROR_MESSAGES.PROJECT_NOT_FOUND,
         HTTP_STATUS.BAD_REQUEST
       );
     }

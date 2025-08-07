@@ -8,4 +8,5 @@ export interface IProjectController {
   deleteProject: controllerMethod;
   addMember: controllerMethod;
   getMembers: controllerMethod;
+  removeMember: controllerMethod;
 }
