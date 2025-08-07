@@ -24,7 +24,9 @@ export interface ITaskService {
     userId: string,
     newStatus: TaskStatus
   ): Promise<void>;
-  editTaskStatus(
+  editTask(
+    workspaceId: string,
+    projectId: string,
     taskId: string,
     userId: string,
     data: EditTaskDto

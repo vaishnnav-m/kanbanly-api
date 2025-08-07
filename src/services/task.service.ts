@@ -15,6 +15,7 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
 import { IProjectRepository } from "../types/repository-interfaces/IProjectRepository";
 import { ITask } from "../types/entities/ITask";
+import { IProjectService } from "../types/service-interface/IProjectService";
 
 @injectable()
 export class TaskService implements ITaskService {
@@ -22,7 +23,8 @@ export class TaskService implements ITaskService {
     @inject("ITaskRepository") private _taskRepo: ITaskRepository,
     @inject("IWorkspaceMemberRepository")
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
-    @inject("IProjectRepository") private _projectRepo: IProjectRepository
+    @inject("IProjectRepository") private _projectRepo: IProjectRepository,
+    @inject("IProjectService") private _projectService: IProjectService
   ) {}
 
   async createTask(data: CreateTaskDto): Promise<void> {
@@ -157,12 +159,13 @@ export class TaskService implements ITaskService {
       description: task.description,
       dueDate: task.dueDate,
       priority: task.priority,
-      assignedTo: Array.isArray(task.assignedTo)
-        ? null
-        : {
-            name: task.assignedTo.name,
-            email: task.assignedTo.email,
-          },
+      assignedTo:
+        !task?.assignedTo || Array.isArray(task?.assignedTo)
+          ? null
+          : {
+              name: task.assignedTo.name,
+              email: task.assignedTo.email,
+            },
       status: task.status,
     };
   }
@@ -196,12 +199,17 @@ export class TaskService implements ITaskService {
     await this._taskRepo.update({ taskId }, { status: newStatus });
   }
 
-  async editTaskStatus(
+  async editTask(
+    workspaceId: string,
+    projectId: string,
     taskId: string,
     userId: string,
     data: EditTaskDto
   ): Promise<void> {
-    const workspaceMember = await this._workspaceMemberRepo.findOne({ userId });
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      userId,
+      workspaceId,
+    });
     if (!workspaceMember) {
       throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.UNAUTHORIZED);
     }
@@ -230,7 +238,26 @@ export class TaskService implements ITaskService {
           HTTP_STATUS.NOT_FOUND
         );
       }
+
       assigneeId = assignee.userId.toString();
+      const projectMembers = await this._projectService.getMembers(
+        workspaceId,
+        userId,
+        projectId
+      );
+
+      const isAssigneeInProject = projectMembers.some(
+        (member) => member.email === data.assignedTo
+      );
+
+      if (!isAssigneeInProject) {
+        await this._projectService.addMember(
+          workspaceId,
+          userId,
+          projectId,
+          data.assignedTo
+        );
+      }
     }
 
     const newTask: Partial<ITask> = {

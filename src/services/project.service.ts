@@ -30,7 +30,7 @@ export class ProjectService implements IProjectService {
     private _workspaceRepo: IWorkspaceRepository,
     @inject("IWorkspaceMemberRepository")
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
-    @inject("ITaskRepository") private _taskRepo: ITaskRepository,
+    @inject("ITaskRepository") private _taskRepo: ITaskRepository
   ) {}
 
   private _normalizeName(name: string) {
@@ -97,12 +97,13 @@ export class ProjectService implements IProjectService {
     workspaceId: string,
     userId: string
   ): Promise<ProjectListDto[] | null> {
+    console.log(userId)
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       userId,
       workspaceId,
     });
     if (!workspaceMember) {
-      return null;
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.FORBIDDEN);
     }
 
     // getting the role to get projects user have access
@@ -111,7 +112,7 @@ export class ProjectService implements IProjectService {
       workspaceId,
     };
     if (role === workspaceRoles.member) {
-      query.members = workspaceId;
+      query.members = { $in: [userId] };
     }
 
     const projectsData = await this._projectRepo.find(query);
