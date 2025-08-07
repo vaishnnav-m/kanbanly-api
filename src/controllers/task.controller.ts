@@ -102,6 +102,7 @@ export class TaskController implements ITaskController {
   async changeTaskStatus(req: Request, res: Response) {
     const userId = req.user?.userid;
     const taskId = req.params.taskId;
+
     const data = req.body as { newStatus: TaskStatus };
     if (!userId) {
       throw new AppError(
@@ -127,6 +128,9 @@ export class TaskController implements ITaskController {
   async editTask(req: Request, res: Response) {
     const userId = req.user?.userid;
     const taskId = req.params.taskId;
+    const projectId = req.params.projectId;
+    const workspaceId = req.params.workspaceId;
+
     const data = req.body as Omit<EditTaskDto, "userId" | "taskId">;
     if (!userId) {
       throw new AppError(
@@ -142,7 +146,7 @@ export class TaskController implements ITaskController {
       throw new AppError("The priority not exists", HTTP_STATUS.BAD_REQUEST);
     }
 
-    await this._taskService.editTaskStatus(taskId, userId, {
+    await this._taskService.editTask(workspaceId, projectId, taskId, userId, {
       taskId,
       userId,
       ...data,
