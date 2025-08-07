@@ -31,6 +31,7 @@ export class TaskService implements ITaskService {
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       userId: data.createdBy,
       workspaceId: data.workspaceId,
+      isActive: true,
     });
 
     if (!workspaceMember) {
@@ -59,6 +60,7 @@ export class TaskService implements ITaskService {
       const assignee = await this._workspaceMemberRepo.findOne({
         userId: data.assignedTo,
         workspaceId: data.workspaceId,
+        isActive: true,
       });
       if (!assignee) {
         throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
@@ -89,6 +91,7 @@ export class TaskService implements ITaskService {
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       userId,
       workspaceId,
+      isActive: true,
     });
 
     if (!workspaceMember) {
@@ -131,6 +134,7 @@ export class TaskService implements ITaskService {
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       userId,
       workspaceId,
+      isActive: true,
     });
 
     if (!workspaceMember) {
@@ -175,7 +179,10 @@ export class TaskService implements ITaskService {
     userId: string,
     newStatus: TaskStatus
   ): Promise<void> {
-    const workspaceMember = await this._workspaceMemberRepo.findOne({ userId });
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      userId,
+      isActive: true,
+    });
     if (!workspaceMember) {
       throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.UNAUTHORIZED);
     }
@@ -209,6 +216,7 @@ export class TaskService implements ITaskService {
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       userId,
       workspaceId,
+      isActive: true,
     });
     if (!workspaceMember) {
       throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.UNAUTHORIZED);
@@ -231,6 +239,7 @@ export class TaskService implements ITaskService {
     if (data.assignedTo) {
       const assignee = await this._workspaceMemberRepo.findOne({
         email: data.assignedTo,
+        isActive: true,
       });
       if (!assignee) {
         throw new AppError(
@@ -279,6 +288,7 @@ export class TaskService implements ITaskService {
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       userId,
       workspaceId,
+      isActive: true,
     });
 
     if (!workspaceMember) {

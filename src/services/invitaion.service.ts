@@ -128,12 +128,10 @@ export class InvitationService implements IInvitationService {
       workspaceId: invitation.workspaceId,
       userId: user.userId,
       role: invitation.role,
-      email: user.email,
-      name: user.firstName,
     });
 
     await this._invitationRepo.update(
-      { _id: invitation._id },
+      { invitationToken: token },
       { status: invitationStatus.accepted }
     );
   }

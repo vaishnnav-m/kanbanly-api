@@ -8,4 +8,5 @@ export interface IWorkspaceMember {
   name: string;
   role: workspaceRoles;
   createdAt: Date;
+  isActive: boolean;
 }

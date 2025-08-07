@@ -32,7 +32,7 @@ export interface IProjectService {
     workspaceId: string,
     userId: string,
     projectId: string
-  ): Promise<WorkspaceMemberResponseDto[]>;
+  ): Promise<Omit<WorkspaceMemberResponseDto,"isActive">[]>;
   removeMember(
     workspaceId: string,
     projectId: string,
