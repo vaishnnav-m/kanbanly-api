@@ -25,7 +25,7 @@ export const ERROR_MESSAGES = {
   USER_NOT_FOUND: "User not found.",
   INVALID_CREDENTIALS: "Invalid email or password.",
   RESOURCE_NOT_FOUND: "The requested resource was not found.",
-  UNAUTHORIZED_ACCESS: "Unauthorized access.",
+  UNAUTHORIZED_ACCESS: "Unauthorized: Missing information",
   FORBIDDEN_ACCESS: "Forbidden access.",
   AUTH_NO_TOKEN_PROVIDED: "Access Denied: No authentication token provided.",
   AUTH_INVALID_TOKEN: "Access Denied: Invalid or expired authentication token.",
@@ -57,4 +57,7 @@ export const ERROR_MESSAGES = {
 
   // TASK
   TASK_NOT_FOUND: "The task not found",
+
+  // INVITATION
+  EXPIRED_LINK: "The link has expired",
 };

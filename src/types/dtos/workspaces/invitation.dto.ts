@@ -1,13 +1,5 @@
-import { z } from "zod";
+import { IInvitation } from "../../entities/IInvitation";
 import { workspaceRoles } from "./workspace-member.dto";
-
-export const CreateInvitationSchema = z.object({
-  workspaceId: z.string(),
-  invitedEmail: z.email(),
-  role: z.enum(workspaceRoles),
-});
-
-type BaseInvitationDto = z.infer<typeof CreateInvitationSchema>;
 
 export interface CreateInvitationDto {
   workspaceId: string;
@@ -19,4 +11,9 @@ export interface CreateInvitationDto {
 export type CreateInvitationBodyDto = Omit<
   CreateInvitationDto,
   "invitedBy" | "workspaceId"
+>;
+
+export type invitationListingDto = Omit<
+  IInvitation,
+  "_id" | "invitationToken" | "workspaceId"
 >;
