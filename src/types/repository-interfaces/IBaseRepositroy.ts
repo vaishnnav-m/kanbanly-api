@@ -3,7 +3,7 @@ import { FilterQuery, ObjectId } from "mongoose";
 export interface IBaseRepository<T> {
   findOne(query: FilterQuery<T>): Promise<T | null>;
   find(
-    query?: Partial<T>,
+    query?: FilterQuery<T>,
     options?: { skip?: number; limit?: number; sort?: any }
   ): Promise<T[]>;
   create(data: Partial<T>): Promise<T>;

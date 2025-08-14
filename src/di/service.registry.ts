@@ -25,6 +25,8 @@ import { ITaskService } from "../types/service-interface/ITaskService";
 import { TaskService } from "../services/task.service";
 import { IUserService } from "../types/service-interface/IUserService";
 import { UserService } from "../services/user.service";
+import { IPlanService } from "../types/service-interface/IPlanService";
+import { PlanService } from "../services/plan.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -66,6 +68,9 @@ export class ServiceRegistry {
     });
     container.register<IUserService>("IUserService", {
       useClass: UserService,
+    });
+    container.register<IPlanService>("IPlanService", {
+      useClass: PlanService,
     });
   }
 }

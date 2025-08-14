@@ -17,6 +17,8 @@ import { ITaskController } from "../types/controller-interfaces/ITaskController"
 import { TaskController } from "../controllers/task.controller";
 import { IUserController } from "../types/controller-interfaces/IUserController";
 import { UserController } from "../controllers/user.controller";
+import { IPlanController } from "../types/controller-interfaces/IPlanController";
+import { PlanController } from "../controllers/plan.controller";
 
 export class ControllerRegistry {
   static registerController(): void {
@@ -49,6 +51,9 @@ export class ControllerRegistry {
     });
     container.register<IUserController>("IUserController", {
       useClass: UserController,
+    });
+    container.register<IPlanController>("IPlanController", {
+      useClass: PlanController,
     });
   }
 }
