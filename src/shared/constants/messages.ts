@@ -25,6 +25,7 @@ export const ERROR_MESSAGES = {
   USER_NOT_FOUND: "User not found.",
   INVALID_CREDENTIALS: "Invalid email or password.",
   RESOURCE_NOT_FOUND: "The requested resource was not found.",
+  RESOURCE_ALREADY_EXISTS: "The resource already exists.",
   UNAUTHORIZED_ACCESS: "Unauthorized: Missing information",
   FORBIDDEN_ACCESS: "Forbidden access.",
   AUTH_NO_TOKEN_PROVIDED: "Access Denied: No authentication token provided.",

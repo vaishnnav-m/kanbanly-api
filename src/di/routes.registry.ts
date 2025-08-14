@@ -4,6 +4,7 @@ import { WorkspaceRoutes } from "../routes/workspaces/workspace.routes";
 import { AdminRoutes } from "../routes/admin/admin.routes";
 import { InvitationRoutes } from "../routes/invitations/invitation.routes";
 import { UserRoutes } from "../routes/user/user.routes";
+import { PlanRoutes } from "../routes/plan/plan.routes";
 
 export class RoutesRegistry {
   static registerRoutes(): void {
@@ -21,6 +22,9 @@ export class RoutesRegistry {
     });
     container.register(UserRoutes, {
       useClass: UserRoutes,
+    });
+    container.register(PlanRoutes, {
+      useClass: PlanRoutes,
     });
   }
 }

@@ -12,6 +12,7 @@ import { WorkspaceRoutes } from "./routes/workspaces/workspace.routes";
 import { InvitationRoutes } from "./routes/invitations/invitation.routes";
 import { registerUserEventListner } from "./events/listeners/auth.listener";
 import { UserRoutes } from "./routes/user/user.routes";
+import { PlanRoutes } from "./routes/plan/plan.routes";
 
 export default class Server {
   private _app: Application;
@@ -56,6 +57,7 @@ export default class Server {
       "/api/v1/invitations",
       container.resolve(InvitationRoutes).router
     );
+    this._app.use("/api/v1/plans", container.resolve(PlanRoutes).router);
   }
 
   public start(): void {

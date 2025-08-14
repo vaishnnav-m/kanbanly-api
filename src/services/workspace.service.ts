@@ -19,9 +19,11 @@ import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { IProjectRepository } from "../types/repository-interfaces/IProjectRepository";
 import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository";
+import { normalizeString } from "../shared/utils/stringNormalizer";
 
 @injectable()
 export class WorkspaceService implements IWorkspaceService {
+  private _slugify;
   constructor(
     @inject("IWorkspaceRepository")
     private _workspaceRepo: IWorkspaceRepository,
@@ -31,14 +33,12 @@ export class WorkspaceService implements IWorkspaceService {
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
     @inject("IProjectRepository") private _projectRepo: IProjectRepository,
     @inject("ITaskRepository") private _taskRepo: ITaskRepository
-  ) {}
-
-  private slugify(name: string) {
-    return name.toLowerCase().replace(/\s+/g, "-");
+  ) {
+    this._slugify = normalizeString;
   }
 
   async createWorkspace(workspaceData: CreateWorkspaceDto): Promise<void> {
-    const slugName = this.slugify(workspaceData.name);
+    const slugName = this._slugify(workspaceData.name);
 
     const isExists = await this._workspaceRepo.findOne({
       createdBy: workspaceData.createdBy,
@@ -148,7 +148,7 @@ export class WorkspaceService implements IWorkspaceService {
 
     let slugName;
     if (data.name) {
-      slugName = this.slugify(data.name);
+      slugName = this._slugify(data.name);
       const isExists = await this._workspaceRepo.findOne({
         createdBy: data.createdBy,
         slug: slugName,

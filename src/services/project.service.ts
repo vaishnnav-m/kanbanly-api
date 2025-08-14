@@ -21,9 +21,11 @@ import { projectStatus } from "../types/enums/project-status.enum";
 import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository";
 import { FilterQuery } from "mongoose";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
+import { normalizeString } from "../shared/utils/stringNormalizer";
 
 @injectable()
 export class ProjectService implements IProjectService {
+  private _normalizeName;
   constructor(
     @inject("IProjectRepository") private _projectRepo: IProjectRepository,
     @inject("IWorkspaceRepository")
@@ -31,10 +33,8 @@ export class ProjectService implements IProjectService {
     @inject("IWorkspaceMemberRepository")
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
     @inject("ITaskRepository") private _taskRepo: ITaskRepository
-  ) {}
-
-  private _normalizeName(name: string) {
-    return name.replace(/\s+/g, "").toLowerCase();
+  ) {
+    this._normalizeName = normalizeString;
   }
 
   async addProject(data: CreateProjectDto): Promise<void> {
