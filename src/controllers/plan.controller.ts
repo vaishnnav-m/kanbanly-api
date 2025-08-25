@@ -5,6 +5,7 @@ import { IPlanService } from "../types/service-interface/IPlanService";
 import { CreatePlanDto } from "../types/dtos/plan/plan.dto";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { SUCCESS_MESSAGES } from "../shared/constants/messages";
+import { success } from "zod";
 
 @injectable()
 export class PlanController implements IPlanController {
@@ -21,7 +22,7 @@ export class PlanController implements IPlanController {
       memberLimit: body.memberLimit,
       projectLimit: body.projectLimit,
       taskLimit: body.taskLimit,
-      features:body.features
+      features: body.features,
     };
 
     await this._planService.createPlan(newPlan);
@@ -29,5 +30,17 @@ export class PlanController implements IPlanController {
     res
       .status(HTTP_STATUS.CREATED)
       .json({ success: true, message: SUCCESS_MESSAGES.DATA_CREATED });
+  }
+
+  async getAllPlans(req: Request, res: Response): Promise<void> {
+    const plans = await this._planService.getAllPlans();
+
+    res
+      .status(HTTP_STATUS.OK)
+      .json({
+        success: true,
+        message: SUCCESS_MESSAGES.DATA_FETCHED,
+        data: plans,
+      });
   }
 }
