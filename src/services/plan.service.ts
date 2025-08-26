@@ -48,7 +48,7 @@ export class PlanService implements IPlanService {
   }
 
   async getAllPlans(): Promise<PlanListDto[]> {
-    const plans = await this._planRepo.find({});
+    const plans = await this._planRepo.find({}, { sort: { monthlyPrice: 1 } });
     if (!plans) {
       throw new AppError("No plans found", HTTP_STATUS.NOT_FOUND);
     }

@@ -39,6 +39,14 @@ const userSchema = new Schema<IUser>(
       required: true,
       default: false,
     },
+    plan: {
+      type: String,
+      required: true,
+    },
+    planValidTill: {
+      type: Date,
+      required: true,
+    },
     isActive: {
       type: Boolean,
       required: true,

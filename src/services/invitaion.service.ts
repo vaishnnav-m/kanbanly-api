@@ -156,7 +156,7 @@ export class InvitationService implements IInvitationService {
 
     const invitations = await this._invitationRepo.find({
       workspaceId,
-      status: { $not: invitationStatus.accepted },
+      status: { $ne: invitationStatus.accepted },
     });
 
     const mapped = invitations.map(
