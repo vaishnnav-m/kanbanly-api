@@ -8,5 +8,5 @@ RUN npm ci
 #Development Stage
 FROM builder AS development
 COPY ./src ./src
-COPY ./package*.json ./tsconfig.json ./
+COPY package*.json tsconfig.json ./
 CMD ["npm","run","dev"]

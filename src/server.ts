@@ -1,5 +1,6 @@
 import express, { Application } from "express";
 import cors from "cors";
+import morgan from "morgan";
 import { config } from "./config";
 import { AuthRoutes } from "./routes/auth/auth.routes";
 import { container } from "tsyringe";
@@ -36,6 +37,7 @@ export default class Server {
     this._app.use(cors(corsOptions));
     this._app.use(express.json());
     this._app.use(cookieParser());
+    this._app.use(morgan("dev"));
   }
 
   private configureErrorMiddlewares() {
