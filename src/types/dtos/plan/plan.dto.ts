@@ -7,9 +7,9 @@ export interface CreatePlanDto {
   projectLimit: number | string;
   taskLimit: number | string;
   memberLimit: number | string;
-  features?: [string];
+  features?: string[];
 }
 
-// export interface PlanListDto {
-
-// }
+export type PlanListDto = CreatePlanDto & {
+  planId: string;
+};

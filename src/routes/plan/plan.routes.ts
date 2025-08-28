@@ -1,6 +1,8 @@
 import { inject, injectable } from "tsyringe";
 import { BaseRoute } from "../base.routes";
 import { IPlanController } from "../../types/controller-interfaces/IPlanController";
+import { checkRole } from "../../middlewares/admin.middleware";
+import { authenticateToken } from "../../middlewares/auth.middleware";
 
 @injectable()
 export class PlanRoutes extends BaseRoute {
@@ -14,7 +16,13 @@ export class PlanRoutes extends BaseRoute {
   protected initializeRoutes(): void {
     this._router.post(
       "/",
+      authenticateToken,
+      checkRole("admin"),
       this._planController.createPlan.bind(this._planController)
+    );
+    this._router.get(
+      "/",
+      this._planController.getAllPlans.bind(this._planController)
     );
   }
 }

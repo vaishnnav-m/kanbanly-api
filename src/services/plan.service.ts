@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { v4 as uuidv4 } from "uuid";
-import { CreatePlanDto } from "../types/dtos/plan/plan.dto";
+import { CreatePlanDto, PlanListDto } from "../types/dtos/plan/plan.dto";
 import { IPlanService } from "../types/service-interface/IPlanService";
 import { normalizeString } from "../shared/utils/stringNormalizer";
 import { IPlanRepository } from "../types/repository-interfaces/IPlanRepository";
@@ -45,5 +45,27 @@ export class PlanService implements IPlanService {
     };
 
     await this._planRepo.create(newPlan);
+  }
+
+  async getAllPlans(): Promise<PlanListDto[]> {
+    const plans = await this._planRepo.find({}, { sort: { monthlyPrice: 1 } });
+    if (!plans) {
+      throw new AppError("No plans found", HTTP_STATUS.NOT_FOUND);
+    }
+
+    const mappedPlans = plans.map((plan) => ({
+      planId: plan.planId,
+      name: plan.name,
+      description: plan.description,
+      memberLimit: plan.memberLimit,
+      monthlyPrice: plan.monthlyPrice,
+      yearlyPrice: plan.yearlyPrice,
+      projectLimit: plan.projectLimit,
+      taskLimit: plan.taskLimit,
+      workspaceLimit: plan.workspaceLimit,
+      features: plan.features,
+    }));
+
+    return mappedPlans;
   }
 }
