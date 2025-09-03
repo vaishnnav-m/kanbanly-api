@@ -4,4 +4,5 @@ export interface IInvitationController {
   createInvitation: controllerMethod;
   acceptInvitation: controllerMethod;
   getAllInvitations: controllerMethod;
+  removeInvitation: controllerMethod;
 }

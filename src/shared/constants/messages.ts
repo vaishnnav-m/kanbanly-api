@@ -61,4 +61,10 @@ export const ERROR_MESSAGES = {
 
   // INVITATION
   EXPIRED_LINK: "The link has expired",
+
+  // PLAN
+  PLAN_NOT_EXISTS: "Plan not found",
+
+  // SUBSCRIPTION
+  ACTIVE_SUBSCRIPTION: "User already have an active subscription",
 };

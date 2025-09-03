@@ -5,6 +5,7 @@ import { AdminRoutes } from "../routes/admin/admin.routes";
 import { InvitationRoutes } from "../routes/invitations/invitation.routes";
 import { UserRoutes } from "../routes/user/user.routes";
 import { PlanRoutes } from "../routes/plan/plan.routes";
+import { SubscriptionRoutes } from "../routes/subscription/subscription.routes";
 
 export class RoutesRegistry {
   static registerRoutes(): void {
@@ -25,6 +26,9 @@ export class RoutesRegistry {
     });
     container.register(PlanRoutes, {
       useClass: PlanRoutes,
+    });
+    container.register(SubscriptionRoutes, {
+      useClass: SubscriptionRoutes,
     });
   }
 }

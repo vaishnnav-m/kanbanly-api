@@ -14,6 +14,7 @@ import { InvitationRoutes } from "./routes/invitations/invitation.routes";
 import { registerUserEventListner } from "./events/listeners/auth.listener";
 import { UserRoutes } from "./routes/user/user.routes";
 import { PlanRoutes } from "./routes/plan/plan.routes";
+import { SubscriptionRoutes } from "./routes/subscription/subscription.routes";
 
 export default class Server {
   private _app: Application;
@@ -60,6 +61,10 @@ export default class Server {
       container.resolve(InvitationRoutes).router
     );
     this._app.use("/api/v1/plans", container.resolve(PlanRoutes).router);
+    this._app.use(
+      "/api/v1/subscriptions",
+      container.resolve(SubscriptionRoutes).router
+    );
   }
 
   public start(): void {

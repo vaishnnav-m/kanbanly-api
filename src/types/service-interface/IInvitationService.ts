@@ -10,4 +10,9 @@ export interface IInvitationService {
     workspaceId: string,
     userId: string
   ): Promise<invitationListingDto[]>;
+  removeInvitation(
+    workspaceId: string,
+    userId: string,
+    email: string
+  ): Promise<void>;
 }

@@ -27,6 +27,8 @@ import { IUserService } from "../types/service-interface/IUserService";
 import { UserService } from "../services/user.service";
 import { IPlanService } from "../types/service-interface/IPlanService";
 import { PlanService } from "../services/plan.service";
+import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
+import { SubscriptionService } from "../services/subscription.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -71,6 +73,9 @@ export class ServiceRegistry {
     });
     container.register<IPlanService>("IPlanService", {
       useClass: PlanService,
+    });
+    container.register<ISubscriptionService>("ISubscriptionService", {
+      useClass: SubscriptionService,
     });
   }
 }

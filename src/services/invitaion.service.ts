@@ -171,4 +171,31 @@ export class InvitationService implements IInvitationService {
 
     return mapped;
   }
+
+  async removeInvitation(
+    workspaceId: string,
+    userId: string,
+    email: string
+  ): Promise<void> {
+    const workspace = await this._workspaceRepo.findOne({ workspaceId });
+    if (!workspace || workspace.createdBy !== userId) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    const invitation = await this._invitationRepo.findOne({
+      workspaceId,
+      invitedEmail: email,
+    });
+    if (!invitation) {
+      throw new AppError(
+        ERROR_MESSAGES.RESOURCE_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    await this._invitationRepo.delete({ workspaceId, invitedEmail: email });
+  }
 }
