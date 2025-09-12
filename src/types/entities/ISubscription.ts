@@ -10,7 +10,6 @@ export interface ISubscription {
   status: SubscriptionStatus;
   currentPeriodStart?: Date;
   currentPeriodEnd?: Date;
-  cancelAtPeriodEnd?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

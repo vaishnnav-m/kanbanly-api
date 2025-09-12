@@ -1,15 +1,21 @@
 import { inject, injectable } from "tsyringe";
+import { v4 as uuidv4 } from "uuid";
+import Stripe from "stripe";
 import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
 import { ISubscriptionRepository } from "../types/repository-interfaces/ISubscriptionRepository";
 import { stripe } from "../shared/utils/stripeClient";
 import { config } from "../config";
 import { SubscriptionStatus } from "../types/enums/subscription-status.enum";
-import { createCheckoutSessionDto } from "../types/dtos/subscription/subscription.dto";
+import {
+  CreateCheckoutSessionDto,
+  VerifyCheckoutSessionResponseDto,
+} from "../types/dtos/subscription/subscription.dto";
 import { IPlanRepository } from "../types/repository-interfaces/IPlanRepository";
 import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import logger from "../logger/winston.logger";
+import { ISubscription } from "../types/entities/ISubscription";
 
 @injectable()
 export class SubscriptionService implements ISubscriptionService {
@@ -24,7 +30,7 @@ export class SubscriptionService implements ISubscriptionService {
     planId,
     billingCycle,
     email,
-  }: createCheckoutSessionDto): Promise<{
+  }: CreateCheckoutSessionDto): Promise<{
     url: string | null;
     sessionId: string;
   }> {
@@ -74,8 +80,8 @@ export class SubscriptionService implements ISubscriptionService {
       mode: "subscription",
       customer: stripeCustomerId,
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${config.stripe.STRIPE_FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${config.stripe.STRIPE_FRONTEND_URL}/cancel`,
+      success_url: `${config.stripe.STRIPE_FRONTEND_URL}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${config.stripe.STRIPE_FRONTEND_URL}/billing/cancel`,
       metadata: {
         userId,
         planId,
@@ -92,17 +98,46 @@ export class SubscriptionService implements ISubscriptionService {
 
     return { url: session.url, sessionId: session.id };
   }
-  
+
+  private getCurrentPeriodEnd(currentPeriodStart: Date, interval: string) {
+    if (!interval) {
+      throw new AppError(
+        "Subscription interval missing",
+        HTTP_STATUS.INTERNAL_SERVER_ERROR
+      );
+    }
+    let currentPeriodEnd;
+    if (interval === "month") {
+      currentPeriodEnd = new Date(currentPeriodStart);
+      currentPeriodEnd.setMonth(currentPeriodEnd.getMonth() + 1);
+    } else if (interval === "year") {
+      currentPeriodEnd = new Date(currentPeriodStart);
+      currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + 1);
+    }
+
+    return currentPeriodEnd;
+  }
+
   async handleWebhookEvent(event: any): Promise<void> {
-    switch (event) {
+    logger.log("event:", event);
+    switch (event.type) {
       case "checkout.session.completed":
         await this.handleCheckoutCompleted(event.data.object);
         break;
-      case "invoice.payment_succeded":
+      case "invoice.payment_succeeded":
         await this.handleInvoiceSucceded(event.data.object);
         break;
+      case "invoice.payment_failed":
+        await this.handlePaymentFailed(event.data.object);
+        break;
+      case "customer.subscription.updated":
+        await this.handleSubscriptionUpdated(event.data.object);
+        break;
+      case "customer.subscription.deleted":
+        await this.handleSubscriptionDeleted(event.data.object);
+        break;
       default:
-        logger.log("Unhandled event", event.type);
+        logger.warn("Unhandled event", event.type);
     }
   }
 
@@ -110,32 +145,143 @@ export class SubscriptionService implements ISubscriptionService {
     const { userId, planId, billingCycle } = session.metadata;
     const subscriptionId = session.subscription;
 
-    const stripeSubscription = await stripe.subscriptions.retrieve(
+    const stripeSubscription = (await stripe.subscriptions.retrieve(
       subscriptionId
+    )) as Stripe.Subscription;
+
+    // calculating the start and end of the plan
+    const currentPeriodStart = new Date(
+      stripeSubscription.billing_cycle_anchor * 1000
     );
 
-    logger.debug(session);
+    const interval = stripeSubscription.items.data[0].price.recurring?.interval;
+    if (!interval) {
+      throw new AppError(
+        "Subscription interval missing",
+        HTTP_STATUS.INTERNAL_SERVER_ERROR
+      );
+    }
+    let currentPeriodEnd = this.getCurrentPeriodEnd(
+      currentPeriodStart,
+      interval
+    );
 
-    // await this._subscriptionRepo.create({
-    //   subscriptionId: uuidv4(),
-    //   userId,
-    //   planId,
-    //   stripeCustomerId: session.customer,
-    //   stripeSubscriptionId: subscriptionId,
-    //   stripePriceId: stripeSubscription.items.data[0].price.id,
-    //   status: SubscriptionStatus.active,
-    //   currentPeriodStart:new Date(stripeSubscription)
-    // });
+    // saving to the database
+    await this._subscriptionRepo.create({
+      subscriptionId: uuidv4(),
+      userId,
+      planId,
+      stripeCustomerId: session.customer,
+      stripeSubscriptionId: subscriptionId,
+      stripePriceId: stripeSubscription.items.data[0].price.id,
+      status: SubscriptionStatus.pending,
+      currentPeriodStart: new Date(
+        stripeSubscription.billing_cycle_anchor * 1000
+      ),
+      currentPeriodEnd,
+    });
   }
 
-  private async handleInvoiceSucceded(session: any): Promise<void> {
-    const { userId, planId, billingCycle } = session.metadata;
-    const subscriptionId = session.subscription;
+  private async handleInvoiceSucceded(invoice: Stripe.Invoice): Promise<void> {
+    const subscriptionId = invoice.parent?.subscription_details?.subscription;
 
-    const stripeSubscription = await stripe.subscriptions.retrieve(
-      subscriptionId
+    const subscription = await this._subscriptionRepo.findOne({stripeSubscriptionId:subscriptionId});
+      
+
+    if (subscriptionId) {
+      await this._subscriptionRepo.update(
+        {
+          stripeSubscriptionId: subscriptionId,
+        },
+        { status: SubscriptionStatus.active }
+      );
+    }
+  }
+
+  private async handlePaymentFailed(invoice: Stripe.Invoice): Promise<void> {
+    const subscriptionId = invoice.parent?.subscription_details?.subscription;
+
+    if (subscriptionId) {
+      await this._subscriptionRepo.update(
+        {
+          stripeSubscriptionId: subscriptionId,
+        },
+        { status: SubscriptionStatus.past_due }
+      );
+    }
+  }
+
+  private async handleSubscriptionUpdated(
+    subscription: Stripe.Subscription
+  ): Promise<void> {
+    const currentPeriodStart = new Date(
+      subscription.billing_cycle_anchor * 1000
+    );
+    const interval = subscription.items.data[0].price.recurring?.interval;
+    if (!interval) {
+      throw new AppError(
+        "Subscription interval missing",
+        HTTP_STATUS.INTERNAL_SERVER_ERROR
+      );
+    }
+    const currentPeriodEnd = this.getCurrentPeriodEnd(
+      currentPeriodStart,
+      interval
     );
 
-    logger.debug(session);
+    const updates: Partial<ISubscription> = {
+      currentPeriodStart,
+      currentPeriodEnd,
+    };
+
+    switch (subscription.status) {
+      case "active":
+        updates.status = SubscriptionStatus.active;
+        break;
+      case "past_due":
+        updates.status = SubscriptionStatus.past_due;
+        break;
+      case "canceled":
+        updates.status = SubscriptionStatus.canceled;
+        break;
+    }
+
+    await this._subscriptionRepo.update(
+      {
+        stripeSubscriptionId: subscription.id,
+      },
+      updates
+    );
+  }
+
+  private async handleSubscriptionDeleted(subscription: any): Promise<void> {
+    await this._subscriptionRepo.update(
+      { stripeSubscriptionId: subscription.id },
+      { status: SubscriptionStatus.canceled }
+    );
+  }
+
+  async verifyCheckoutSession(
+    sessionId: string
+  ): Promise<VerifyCheckoutSessionResponseDto> {
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    if (!session) {
+      throw new AppError("invalid checkout session", HTTP_STATUS.BAD_REQUEST);
+    }
+
+    const subscriptionId = session.subscription;
+    console.log("subscription id in verify checkout", subscriptionId);
+    if (!subscriptionId) {
+      return { status: SubscriptionStatus.pending };
+    }
+
+    const subscription = await this._subscriptionRepo.findOne({
+      stripeSubscriptionId: subscriptionId,
+    });
+    if (!subscription) {
+      return { status: SubscriptionStatus.pending };
+    }
+
+    return { status: subscription.status };
   }
 }

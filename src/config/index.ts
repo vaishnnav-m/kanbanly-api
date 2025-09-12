@@ -44,7 +44,7 @@ export const config = {
   stripe: {
     currency: "inr",
     STRIPE_SERCRET: process.env.STRIPE_SECRET_KEY,
-    WEBHOOK_SECRET: process.env.WEBHOOK_SECRET,
+    WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET!,
     STRIPE_FRONTEND_URL: process.env.CORS_ALLOWED_ORIGIN,
   },
 };

@@ -35,10 +35,6 @@ const subscriptionSchema = new Schema<ISubscription>(
       type: Date,
       required: true,
     },
-    cancelAtPeriodEnd: {
-      type: Date,
-      required: true,
-    },
     status: {
       type: String,
       required: true,
