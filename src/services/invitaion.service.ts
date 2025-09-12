@@ -150,7 +150,7 @@ export class InvitationService implements IInvitationService {
     if (!workspace || workspace.createdBy !== userId) {
       throw new AppError(
         ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
-        HTTP_STATUS.UNAUTHORIZED
+        HTTP_STATUS.FORBIDDEN
       );
     }
 
@@ -181,7 +181,7 @@ export class InvitationService implements IInvitationService {
     if (!workspace || workspace.createdBy !== userId) {
       throw new AppError(
         ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
-        HTTP_STATUS.UNAUTHORIZED
+        HTTP_STATUS.FORBIDDEN
       );
     }
 

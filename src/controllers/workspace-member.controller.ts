@@ -9,7 +9,6 @@ import { IWorkspaceMemberService } from "../types/service-interface/IWorkspaceMe
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../shared/constants/messages";
-import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 
 @injectable()
 export class WorkspaceMemberController implements IWorkspaceMemberController {
@@ -31,8 +30,8 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
     const userId = req.user?.userid;
     if (!userId) {
       throw new AppError(
-        ERROR_MESSAGES.FORBIDDEN_ACCESS,
-        HTTP_STATUS.FORBIDDEN
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
       );
     }
     const workspaceId = req.params.workspaceId;
@@ -57,8 +56,8 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
     const userId = req.user?.userid;
     if (!userId) {
       throw new AppError(
-        ERROR_MESSAGES.FORBIDDEN_ACCESS,
-        HTTP_STATUS.FORBIDDEN
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
       );
     }
     const workspaceId = req.params.workspaceId;
@@ -79,8 +78,8 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
     const userId = req.user?.userid;
     if (!userId) {
       throw new AppError(
-        ERROR_MESSAGES.FORBIDDEN_ACCESS,
-        HTTP_STATUS.FORBIDDEN
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
       );
     }
     const workspaceId = req.params.workspaceId;
@@ -103,8 +102,8 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
     const userId = req.user?.userid;
     if (!userId) {
       throw new AppError(
-        ERROR_MESSAGES.FORBIDDEN_ACCESS,
-        HTTP_STATUS.FORBIDDEN
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
       );
     }
     const workspaceId = req.params.workspaceId;
@@ -126,8 +125,8 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
     const userId = req.user?.userid;
     if (!userId) {
       throw new AppError(
-        ERROR_MESSAGES.FORBIDDEN_ACCESS,
-        HTTP_STATUS.FORBIDDEN
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
       );
     }
     const workspaceId = req.params.workspaceId;

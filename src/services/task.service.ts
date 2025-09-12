@@ -184,7 +184,7 @@ export class TaskService implements ITaskService {
       isActive: true,
     });
     if (!workspaceMember) {
-      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.UNAUTHORIZED);
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.FORBIDDEN);
     }
 
     const task = await this._taskRepo.findOne({ taskId, isDeleted: false });
@@ -219,7 +219,7 @@ export class TaskService implements ITaskService {
       isActive: true,
     });
     if (!workspaceMember) {
-      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.UNAUTHORIZED);
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.FORBIDDEN);
     }
 
     const task = await this._taskRepo.findOne({ taskId });

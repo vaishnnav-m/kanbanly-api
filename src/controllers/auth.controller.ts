@@ -150,7 +150,7 @@ export class AuthController implements IAuthController {
     if (!decoded) {
       throw new AppError(
         ERROR_MESSAGES.AUTH_INVALID_TOKEN,
-        HTTP_STATUS.FORBIDDEN
+        HTTP_STATUS.UNAUTHORIZED
       );
     }
 

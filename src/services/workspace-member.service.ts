@@ -91,8 +91,8 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     });
     if (!member) {
       throw new AppError(
-        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
-        HTTP_STATUS.UNAUTHORIZED
+        ERROR_MESSAGES.FORBIDDEN_ACCESS,
+        HTTP_STATUS.FORBIDDEN
       );
     }
 
@@ -167,8 +167,8 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     const isAllowed = member.role !== "member";
     if (!isAllowed) {
       throw new AppError(
-        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
-        HTTP_STATUS.UNAUTHORIZED
+        ERROR_MESSAGES.FORBIDDEN_ACCESS,
+        HTTP_STATUS.FORBIDDEN
       );
     }
 
@@ -206,8 +206,8 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
 
     if (member.role !== "owner") {
       throw new AppError(
-        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
-        HTTP_STATUS.UNAUTHORIZED
+        ERROR_MESSAGES.FORBIDDEN_ACCESS,
+        HTTP_STATUS.FORBIDDEN
       );
     }
 
@@ -250,7 +250,7 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     if (member.role !== "owner") {
       throw new AppError(
         ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
-        HTTP_STATUS.UNAUTHORIZED
+        HTTP_STATUS.FORBIDDEN
       );
     }
 

@@ -28,7 +28,7 @@ const subscriptionSchema = new Schema<ISubscription>(
       required: true,
     },
     currentPeriodStart: {
-      type: String,
+      type: Date,
       required: true,
     },
     currentPeriodEnd: {

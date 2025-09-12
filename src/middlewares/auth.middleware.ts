@@ -13,7 +13,7 @@ export const authenticateToken = (
   const token = req.cookies.accessToken;
 
   if (!token) {
-    res.status(HTTP_STATUS.FORBIDDEN).json({
+    res.status(HTTP_STATUS.UNAUTHORIZED).json({
       success: false,
       message: ERROR_MESSAGES.AUTH_NO_TOKEN_PROVIDED,
     });
@@ -25,55 +25,11 @@ export const authenticateToken = (
     const decoded = tokenService.verifyAccessToken(token);
 
     if (!decoded) {
-      res.status(HTTP_STATUS.FORBIDDEN).json({
-        success: false,
-        message: ERROR_MESSAGES.AUTH_INVALID_TOKEN,
-      });
-      return;
-    }
-
-    req.user = decoded;
-    next();
-  } catch (error) {
-    console.error(error);
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: ERROR_MESSAGES.UNEXPECTED_SERVER_ERROR,
-    });
-  }
-};
-
-export const adminTokenCheck = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const token = req.cookies.accessToken;
-
-  if (!token) {
-    res.status(HTTP_STATUS.FORBIDDEN).json({
-      success: false,
-      message: ERROR_MESSAGES.AUTH_NO_TOKEN_PROVIDED,
-    });
-    return;
-  }
-
-  try {
-    const tokenService = container.resolve<ITokenService>("ITokenService");
-    const decoded = tokenService.verifyAccessToken(token);
-
-    if (!decoded) {
-      res.status(HTTP_STATUS.FORBIDDEN).json({
-        success: false,
-        message: ERROR_MESSAGES.AUTH_INVALID_TOKEN,
-      });
-      return;
-    }
-    if (decoded.role !== "admin") {
       res.status(HTTP_STATUS.UNAUTHORIZED).json({
         success: false,
-        message: ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        message: ERROR_MESSAGES.AUTH_INVALID_TOKEN,
       });
+      return;
     }
 
     req.user = decoded;

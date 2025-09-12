@@ -186,7 +186,6 @@ export class SubscriptionService implements ISubscriptionService {
     const subscriptionId = invoice.parent?.subscription_details?.subscription;
 
     const subscription = await this._subscriptionRepo.findOne({stripeSubscriptionId:subscriptionId});
-      
 
     if (subscriptionId) {
       await this._subscriptionRepo.update(
