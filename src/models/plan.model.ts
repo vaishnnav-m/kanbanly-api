@@ -47,6 +47,18 @@ const planSchema = new Schema<IPlan>(
     features: {
       type: [String],
     },
+    stripeProductId: {
+      type: String,
+      required: true,
+    },
+    stripeMonthlyPriceId: {
+      type: String,
+      required: true,
+    },
+    stripeYearlyPriceId: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

@@ -13,6 +13,8 @@ import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository"
 import { TaskRepository } from "../repositories/task.repository";
 import { IPlanRepository } from "../types/repository-interfaces/IPlanRepository";
 import { PlanRepository } from "../repositories/plan.repository";
+import { ISubscriptionRepository } from "../types/repository-interfaces/ISubscriptionRepository";
+import { SubscriptionRepository } from "../repositories/subscription.repository";
 
 export class RepositoryRegistry {
   static registerRepositories(): void {
@@ -39,6 +41,9 @@ export class RepositoryRegistry {
     });
     container.register<IPlanRepository>("IPlanRepository", {
       useClass: PlanRepository,
+    });
+    container.register<ISubscriptionRepository>("ISubscriptionRepository", {
+      useClass: SubscriptionRepository,
     });
   }
 }

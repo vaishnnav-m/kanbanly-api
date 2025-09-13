@@ -5,7 +5,7 @@ export const checkRole =
   (allowedRole: string) =>
   (req: Request, res: Response, next: NextFunction) => {
     if (!req.user?.role || req.user.role !== allowedRole) {
-      res.status(HTTP_STATUS.UNAUTHORIZED).json({
+      res.status(HTTP_STATUS.FORBIDDEN).json({
         success: false,
         message: `You need ${allowedRole} access to proceed.`,
       });

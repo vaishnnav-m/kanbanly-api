@@ -35,9 +35,16 @@ export const config = {
   },
 
   redis: {
-    USER: process.env.REDIS_USER || 'default',
-    PASS: process.env.REDIS_PASS || '',
+    USER: process.env.REDIS_USER || "default",
+    PASS: process.env.REDIS_PASS || "",
     HOST: process.env.REDIS_HOST,
     PORT: process.env.REDIS_PORT,
+  },
+
+  stripe: {
+    currency: "inr",
+    STRIPE_SERCRET: process.env.STRIPE_SECRET_KEY,
+    WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET!,
+    STRIPE_FRONTEND_URL: process.env.CORS_ALLOWED_ORIGIN,
   },
 };

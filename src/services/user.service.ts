@@ -25,7 +25,7 @@ export class UserService implements IUserService {
       throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
     }
     if (!user.isActive) {
-      throw new AppError(ERROR_MESSAGES.USER_BLOCKED, HTTP_STATUS.BAD_REQUEST);
+      throw new AppError(ERROR_MESSAGES.USER_BLOCKED, HTTP_STATUS.FORBIDDEN);
     }
 
     return {

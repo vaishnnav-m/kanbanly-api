@@ -233,7 +233,7 @@ export class ProjectService implements IProjectService {
       userId,
     });
     if (!workspaceMember) {
-      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.UNAUTHORIZED);
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.FORBIDDEN);
     }
     if (workspaceMember.role === workspaceRoles.member) {
       throw new AppError(
@@ -311,7 +311,7 @@ export class ProjectService implements IProjectService {
       userId,
     });
     if (!workspaceMember) {
-      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.UNAUTHORIZED);
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.FORBIDDEN);
     }
     if (workspaceMember.role === workspaceRoles.member) {
       throw new AppError(

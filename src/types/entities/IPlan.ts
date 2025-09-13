@@ -10,4 +10,7 @@ export interface IPlan {
   taskLimit: number | string;
   memberLimit: number | string;
   features?: string[];
+  stripeProductId?: string;
+  stripeMonthlyPriceId?: string;
+  stripeYearlyPriceId?: string;
 }

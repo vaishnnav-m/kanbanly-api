@@ -19,6 +19,8 @@ import { IUserController } from "../types/controller-interfaces/IUserController"
 import { UserController } from "../controllers/user.controller";
 import { IPlanController } from "../types/controller-interfaces/IPlanController";
 import { PlanController } from "../controllers/plan.controller";
+import { ISubscriptionController } from "../types/controller-interfaces/ISubscriptionController";
+import { SubscriptionController } from "../controllers/subscription.controller";
 
 export class ControllerRegistry {
   static registerController(): void {
@@ -54,6 +56,9 @@ export class ControllerRegistry {
     });
     container.register<IPlanController>("IPlanController", {
       useClass: PlanController,
+    });
+    container.register<ISubscriptionController>("ISubscriptionController", {
+      useClass: SubscriptionController,
     });
   }
 }

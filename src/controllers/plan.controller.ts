@@ -5,7 +5,6 @@ import { IPlanService } from "../types/service-interface/IPlanService";
 import { CreatePlanDto } from "../types/dtos/plan/plan.dto";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { SUCCESS_MESSAGES } from "../shared/constants/messages";
-import { success } from "zod";
 
 @injectable()
 export class PlanController implements IPlanController {
