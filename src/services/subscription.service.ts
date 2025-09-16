@@ -8,6 +8,7 @@ import { config } from "../config";
 import { SubscriptionStatus } from "../types/enums/subscription-status.enum";
 import {
   CreateCheckoutSessionDto,
+  SubscriptionResponseDto,
   VerifyCheckoutSessionResponseDto,
 } from "../types/dtos/subscription/subscription.dto";
 import { IPlanRepository } from "../types/repository-interfaces/IPlanRepository";
@@ -185,7 +186,9 @@ export class SubscriptionService implements ISubscriptionService {
   private async handleInvoiceSucceded(invoice: Stripe.Invoice): Promise<void> {
     const subscriptionId = invoice.parent?.subscription_details?.subscription;
 
-    const subscription = await this._subscriptionRepo.findOne({stripeSubscriptionId:subscriptionId});
+    const subscription = await this._subscriptionRepo.findOne({
+      stripeSubscriptionId: subscriptionId,
+    });
 
     if (subscriptionId) {
       await this._subscriptionRepo.update(
@@ -269,7 +272,7 @@ export class SubscriptionService implements ISubscriptionService {
     }
 
     const subscriptionId = session.subscription;
-    console.log("subscription id in verify checkout", subscriptionId);
+
     if (!subscriptionId) {
       return { status: SubscriptionStatus.pending };
     }
@@ -282,5 +285,47 @@ export class SubscriptionService implements ISubscriptionService {
     }
 
     return { status: subscription.status };
+  }
+
+  async getUserSubscription(
+    userId: string
+  ): Promise<SubscriptionResponseDto | null> {
+    const subscription = await this._subscriptionRepo.findOne({
+      userId,
+      status: SubscriptionStatus.active,
+    });
+
+    if (!subscription) {
+      const freePlan = await this._planRepo.findOne({ monthlyPrice: 0 });
+      if (!freePlan) {
+        throw new AppError("Plan not found", HTTP_STATUS.NOT_FOUND);
+      }
+      return {
+        planName: freePlan.name,
+        currentPeriodEnd: null,
+        limits: {
+          workspaces: freePlan.workspaceLimit,
+          members: freePlan.memberLimit,
+          projects: freePlan.projectLimit,
+          tasks: freePlan.taskLimit,
+        },
+      };
+    }
+
+    const plan = await this._planRepo.findOne({ planId: subscription.planId });
+    if (!plan) {
+      throw new AppError("Plan not found", HTTP_STATUS.NOT_FOUND);
+    }
+
+    return {
+      planName: plan.name,
+      currentPeriodEnd: subscription.currentPeriodEnd!,
+      limits: {
+        workspaces: plan.workspaceLimit,
+        members: plan.memberLimit,
+        projects: plan.projectLimit,
+        tasks: plan.taskLimit,
+      },
+    };
   }
 }

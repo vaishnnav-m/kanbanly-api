@@ -13,3 +13,15 @@ export interface CreatePlanDto {
 export type PlanListDto = CreatePlanDto & {
   planId: string;
 };
+
+export interface PlanResponseDto {
+  name: string;
+  monthlyPrice: number;
+  yearlyPrice: number;
+  workspaceLimit: number | string;
+  projectLimit: number | string;
+  taskLimit: number | string;
+  memberLimit: number | string;
+  stripeMonthlyPriceId?: string;
+  stripeYearlyPriceId?: string;
+}

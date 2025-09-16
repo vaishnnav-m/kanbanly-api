@@ -1,6 +1,10 @@
 import { inject, injectable } from "tsyringe";
 import { v4 as uuidv4 } from "uuid";
-import { CreatePlanDto, PlanListDto } from "../types/dtos/plan/plan.dto";
+import {
+  CreatePlanDto,
+  PlanListDto,
+  PlanResponseDto,
+} from "../types/dtos/plan/plan.dto";
 import { IPlanService } from "../types/service-interface/IPlanService";
 import { normalizeString } from "../shared/utils/stringNormalizer";
 import { IPlanRepository } from "../types/repository-interfaces/IPlanRepository";
@@ -95,5 +99,24 @@ export class PlanService implements IPlanService {
     }));
 
     return mappedPlans;
+  }
+
+  async getPlanById(planId: string): Promise<PlanResponseDto | null> {
+    const plan = await this._planRepo.findOne({ planId });
+    if (!plan) {
+      return null;
+    }
+
+    return {
+      name: plan.name,
+      monthlyPrice: plan.monthlyPrice,
+      yearlyPrice: plan.yearlyPrice,
+      memberLimit: plan.memberLimit,
+      projectLimit: plan.projectLimit,
+      taskLimit: plan.taskLimit,
+      workspaceLimit: plan.workspaceLimit,
+      stripeMonthlyPriceId: plan.stripeMonthlyPriceId,
+      stripeYearlyPriceId: plan.stripeYearlyPriceId,
+    };
   }
 }

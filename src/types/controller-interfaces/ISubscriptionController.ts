@@ -4,4 +4,5 @@ export interface ISubscriptionController {
   createCheckoutSession: controllerMethod;
   handleStripeWebhook: controllerMethod;
   verifyCheckoutSession: controllerMethod;
+  getUserSubscription: controllerMethod;
 }

@@ -1,7 +1,9 @@
 import {
   CreateCheckoutSessionDto,
+  SubscriptionResponseDto,
   VerifyCheckoutSessionResponseDto,
 } from "../dtos/subscription/subscription.dto";
+import { ISubscription } from "../entities/ISubscription";
 
 export interface ISubscriptionService {
   createCheckoutSession(
@@ -11,4 +13,5 @@ export interface ISubscriptionService {
   verifyCheckoutSession(
     sessionId: string
   ): Promise<VerifyCheckoutSessionResponseDto>;
+  getUserSubscription(userId: string): Promise<SubscriptionResponseDto | null>;
 }
