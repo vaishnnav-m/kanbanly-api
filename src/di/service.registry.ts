@@ -29,6 +29,8 @@ import { IPlanService } from "../types/service-interface/IPlanService";
 import { PlanService } from "../services/plan.service";
 import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
 import { SubscriptionService } from "../services/subscription.service";
+import { IWebhookService } from "../types/service-interface/IWebhookService";
+import { WebhookService } from "../services/webhook.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -76,6 +78,9 @@ export class ServiceRegistry {
     });
     container.register<ISubscriptionService>("ISubscriptionService", {
       useClass: SubscriptionService,
+    });
+    container.register<IWebhookService>("IWebhookService", {
+      useClass: WebhookService,
     });
   }
 }

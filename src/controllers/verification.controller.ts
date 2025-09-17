@@ -29,13 +29,13 @@ export class VerificationController implements IVerificationController {
     const accessToken = this._tokenService.generateAccessToken({
       userid: user.userId as string,
       email: user.email,
-      role: user.isAdmin ? "Admin" : "User",
+      role: user.isAdmin ? "admin" : "user",
     });
 
     const refreshToken = this._tokenService.generateRefreshToken({
       userid: user.userId as string,
       email: user.email,
-      role: user.isAdmin ? "Admin" : "User",
+      role: user.isAdmin ? "admin" : "user",
     });
 
     setAuthCookies(res, "accessToken", accessToken, 60 * 60 * 1000);

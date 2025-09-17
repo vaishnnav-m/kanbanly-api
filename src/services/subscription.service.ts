@@ -8,6 +8,7 @@ import { config } from "../config";
 import { SubscriptionStatus } from "../types/enums/subscription-status.enum";
 import {
   CreateCheckoutSessionDto,
+  SubscriptionResponseDto,
   VerifyCheckoutSessionResponseDto,
 } from "../types/dtos/subscription/subscription.dto";
 import { IPlanRepository } from "../types/repository-interfaces/IPlanRepository";
@@ -25,6 +26,7 @@ export class SubscriptionService implements ISubscriptionService {
     @inject("IPlanRepository") private _planRepo: IPlanRepository
   ) {}
 
+  // checkout session creation
   async createCheckoutSession({
     userId,
     planId,
@@ -52,6 +54,19 @@ export class SubscriptionService implements ISubscriptionService {
         ERROR_MESSAGES.ACTIVE_SUBSCRIPTION,
         HTTP_STATUS.BAD_REQUEST
       );
+    }
+
+    if (plan.monthlyPrice === 0 && plan.yearlyPrice === 0) {
+      await this._subscriptionRepo.create({
+        subscriptionId: uuidv4(),
+        planId: plan.planId,
+        userId: userId,
+        status: SubscriptionStatus.active,
+        currentPeriodEnd: null,
+        currentPeriodStart: null,
+      });
+
+      return { sessionId: "", url: "" };
     }
 
     let stripeCustomerId = existingSubscription?.stripeCustomerId;
@@ -99,167 +114,7 @@ export class SubscriptionService implements ISubscriptionService {
     return { url: session.url, sessionId: session.id };
   }
 
-  private getCurrentPeriodEnd(currentPeriodStart: Date, interval: string) {
-    if (!interval) {
-      throw new AppError(
-        "Subscription interval missing",
-        HTTP_STATUS.INTERNAL_SERVER_ERROR
-      );
-    }
-    let currentPeriodEnd;
-    if (interval === "month") {
-      currentPeriodEnd = new Date(currentPeriodStart);
-      currentPeriodEnd.setMonth(currentPeriodEnd.getMonth() + 1);
-    } else if (interval === "year") {
-      currentPeriodEnd = new Date(currentPeriodStart);
-      currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + 1);
-    }
-
-    return currentPeriodEnd;
-  }
-
-  async handleWebhookEvent(event: any): Promise<void> {
-    logger.log("event:", event);
-    switch (event.type) {
-      case "checkout.session.completed":
-        await this.handleCheckoutCompleted(event.data.object);
-        break;
-      case "invoice.payment_succeeded":
-        await this.handleInvoiceSucceded(event.data.object);
-        break;
-      case "invoice.payment_failed":
-        await this.handlePaymentFailed(event.data.object);
-        break;
-      case "customer.subscription.updated":
-        await this.handleSubscriptionUpdated(event.data.object);
-        break;
-      case "customer.subscription.deleted":
-        await this.handleSubscriptionDeleted(event.data.object);
-        break;
-      default:
-        logger.warn("Unhandled event", event.type);
-    }
-  }
-
-  private async handleCheckoutCompleted(session: any): Promise<void> {
-    const { userId, planId, billingCycle } = session.metadata;
-    const subscriptionId = session.subscription;
-
-    const stripeSubscription = (await stripe.subscriptions.retrieve(
-      subscriptionId
-    )) as Stripe.Subscription;
-
-    // calculating the start and end of the plan
-    const currentPeriodStart = new Date(
-      stripeSubscription.billing_cycle_anchor * 1000
-    );
-
-    const interval = stripeSubscription.items.data[0].price.recurring?.interval;
-    if (!interval) {
-      throw new AppError(
-        "Subscription interval missing",
-        HTTP_STATUS.INTERNAL_SERVER_ERROR
-      );
-    }
-    let currentPeriodEnd = this.getCurrentPeriodEnd(
-      currentPeriodStart,
-      interval
-    );
-
-    // saving to the database
-    await this._subscriptionRepo.create({
-      subscriptionId: uuidv4(),
-      userId,
-      planId,
-      stripeCustomerId: session.customer,
-      stripeSubscriptionId: subscriptionId,
-      stripePriceId: stripeSubscription.items.data[0].price.id,
-      status: SubscriptionStatus.pending,
-      currentPeriodStart: new Date(
-        stripeSubscription.billing_cycle_anchor * 1000
-      ),
-      currentPeriodEnd,
-    });
-  }
-
-  private async handleInvoiceSucceded(invoice: Stripe.Invoice): Promise<void> {
-    const subscriptionId = invoice.parent?.subscription_details?.subscription;
-
-    const subscription = await this._subscriptionRepo.findOne({stripeSubscriptionId:subscriptionId});
-
-    if (subscriptionId) {
-      await this._subscriptionRepo.update(
-        {
-          stripeSubscriptionId: subscriptionId,
-        },
-        { status: SubscriptionStatus.active }
-      );
-    }
-  }
-
-  private async handlePaymentFailed(invoice: Stripe.Invoice): Promise<void> {
-    const subscriptionId = invoice.parent?.subscription_details?.subscription;
-
-    if (subscriptionId) {
-      await this._subscriptionRepo.update(
-        {
-          stripeSubscriptionId: subscriptionId,
-        },
-        { status: SubscriptionStatus.past_due }
-      );
-    }
-  }
-
-  private async handleSubscriptionUpdated(
-    subscription: Stripe.Subscription
-  ): Promise<void> {
-    const currentPeriodStart = new Date(
-      subscription.billing_cycle_anchor * 1000
-    );
-    const interval = subscription.items.data[0].price.recurring?.interval;
-    if (!interval) {
-      throw new AppError(
-        "Subscription interval missing",
-        HTTP_STATUS.INTERNAL_SERVER_ERROR
-      );
-    }
-    const currentPeriodEnd = this.getCurrentPeriodEnd(
-      currentPeriodStart,
-      interval
-    );
-
-    const updates: Partial<ISubscription> = {
-      currentPeriodStart,
-      currentPeriodEnd,
-    };
-
-    switch (subscription.status) {
-      case "active":
-        updates.status = SubscriptionStatus.active;
-        break;
-      case "past_due":
-        updates.status = SubscriptionStatus.past_due;
-        break;
-      case "canceled":
-        updates.status = SubscriptionStatus.canceled;
-        break;
-    }
-
-    await this._subscriptionRepo.update(
-      {
-        stripeSubscriptionId: subscription.id,
-      },
-      updates
-    );
-  }
-
-  private async handleSubscriptionDeleted(subscription: any): Promise<void> {
-    await this._subscriptionRepo.update(
-      { stripeSubscriptionId: subscription.id },
-      { status: SubscriptionStatus.canceled }
-    );
-  }
-
+  // checkout session verification
   async verifyCheckoutSession(
     sessionId: string
   ): Promise<VerifyCheckoutSessionResponseDto> {
@@ -269,7 +124,7 @@ export class SubscriptionService implements ISubscriptionService {
     }
 
     const subscriptionId = session.subscription;
-    console.log("subscription id in verify checkout", subscriptionId);
+
     if (!subscriptionId) {
       return { status: SubscriptionStatus.pending };
     }
@@ -282,5 +137,48 @@ export class SubscriptionService implements ISubscriptionService {
     }
 
     return { status: subscription.status };
+  }
+
+  // get user specific subscription
+  async getUserSubscription(
+    userId: string
+  ): Promise<SubscriptionResponseDto | null> {
+    const subscription = await this._subscriptionRepo.findOne({
+      userId,
+      status: SubscriptionStatus.active,
+    });
+
+    if (!subscription) {
+      const freePlan = await this._planRepo.findOne({ monthlyPrice: 0 });
+      if (!freePlan) {
+        throw new AppError("Plan not found", HTTP_STATUS.NOT_FOUND);
+      }
+      return {
+        planName: freePlan.name,
+        currentPeriodEnd: null,
+        limits: {
+          workspaces: freePlan.workspaceLimit,
+          members: freePlan.memberLimit,
+          projects: freePlan.projectLimit,
+          tasks: freePlan.taskLimit,
+        },
+      };
+    }
+
+    const plan = await this._planRepo.findOne({ planId: subscription.planId });
+    if (!plan) {
+      throw new AppError("Plan not found", HTTP_STATUS.NOT_FOUND);
+    }
+
+    return {
+      planName: plan.name,
+      currentPeriodEnd: subscription.currentPeriodEnd!,
+      limits: {
+        workspaces: plan.workspaceLimit,
+        members: plan.memberLimit,
+        projects: plan.projectLimit,
+        tasks: plan.taskLimit,
+      },
+    };
   }
 }

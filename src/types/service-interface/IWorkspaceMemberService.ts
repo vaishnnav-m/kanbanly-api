@@ -7,7 +7,7 @@ import {
 import { IWorkspaceMember } from "../entities/IWorkspaceMember";
 
 export interface IWorkspaceMemberService {
-  addMember(data: WorkspaceMemberDto): Promise<void>;
+  addMember(userId: string, data: WorkspaceMemberDto): Promise<void>;
   isMember(workspaceId: string, userId: string): Promise<boolean>;
   getMembers(
     workspaceId: string,

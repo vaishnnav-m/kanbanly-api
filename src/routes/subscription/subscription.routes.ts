@@ -35,5 +35,12 @@ export class SubscriptionRoutes extends BaseRoute {
         this._subscriptionController
       )
     );
+    this._router.get(
+      "/me",
+      authenticateToken,
+      this._subscriptionController.getUserSubscription.bind(
+        this._subscriptionController
+      )
+    );
   }
 }

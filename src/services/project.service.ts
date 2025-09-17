@@ -22,6 +22,7 @@ import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository"
 import { FilterQuery } from "mongoose";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 import { normalizeString } from "../shared/utils/stringNormalizer";
+import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
 
 @injectable()
 export class ProjectService implements IProjectService {
@@ -32,7 +33,9 @@ export class ProjectService implements IProjectService {
     private _workspaceRepo: IWorkspaceRepository,
     @inject("IWorkspaceMemberRepository")
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
-    @inject("ITaskRepository") private _taskRepo: ITaskRepository
+    @inject("ITaskRepository") private _taskRepo: ITaskRepository,
+    @inject("ISubscriptionService")
+    private _subscriptionService: ISubscriptionService
   ) {
     this._normalizeName = normalizeString;
   }
@@ -55,6 +58,26 @@ export class ProjectService implements IProjectService {
     if (workspace.createdBy !== createdBy) {
       throw new AppError(
         ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    // check for subscription limit
+    const subscription = await this._subscriptionService.getUserSubscription(
+      createdBy
+    );
+    const projects = await this._projectRepo.find({
+      workspaceId,
+      createdBy: createdBy,
+    });
+
+    const projectLimit = subscription?.limits.projects;
+    if (
+      projectLimit !== "unlimited" &&
+      Number(projectLimit) <= projects.length
+    ) {
+      throw new AppError(
+        ERROR_MESSAGES.PROJECT_LIMIT_EXCEED,
         HTTP_STATUS.BAD_REQUEST
       );
     }

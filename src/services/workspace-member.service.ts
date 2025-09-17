@@ -14,6 +14,7 @@ import { PaginatedResponseDto } from "../types/dtos/paginated.dto";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
+import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
 
 @injectable()
 export class WorkspaceMemberService implements IWorkspaceMemberService {
@@ -22,10 +23,44 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
     @inject("IWorkspaceRepository")
     private _workspaceRepo: IWorkspaceRepository,
-    @inject("IUserRepository") private _userRepo: IUserRepository
+    @inject("IUserRepository") private _userRepo: IUserRepository,
+    @inject("ISubscriptionService")
+    private _subscriptionService: ISubscriptionService
   ) {}
 
-  async addMember(data: WorkspaceMemberDto): Promise<void> {
+  async addMember(userId: string, data: WorkspaceMemberDto): Promise<void> {
+    const workspace = await this._workspaceRepo.findOne({
+      workspaceId: data.workspaceId,
+    });
+    if (!workspace) {
+      throw new AppError("workspace not found", HTTP_STATUS.BAD_REQUEST);
+    }
+    if (workspace.createdBy !== userId) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const subscription = await this._subscriptionService.getUserSubscription(
+      userId
+    );
+    const members = await this._workspaceMemberRepo.find({
+      userId,
+      workspaceId: data.workspaceId,
+    });
+
+    const memberLimit = subscription?.limits.members;
+    if (
+      memberLimit !== "unlimited" &&
+      Number(memberLimit) <= members.length
+    ) {
+      throw new AppError(
+        ERROR_MESSAGES.WORKSPACE_LIMIT_EXCEED,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
     const user = await this._userRepo.findOne({ userId: data.userId });
     if (!user) {
       throw new AppError(
@@ -36,13 +71,6 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
 
     if (!Object.values(workspaceRoles).includes(data.role)) {
       throw new AppError("invalid role", HTTP_STATUS.BAD_REQUEST);
-    }
-
-    const workspace = await this._workspaceRepo.findOne({
-      workspaceId: data.workspaceId,
-    });
-    if (!workspace) {
-      throw new AppError("workspace not found", HTTP_STATUS.BAD_REQUEST);
     }
 
     const existingMember = await this._workspaceMemberRepo.findOne({

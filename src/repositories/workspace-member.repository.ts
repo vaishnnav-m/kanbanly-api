@@ -3,9 +3,7 @@ import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWork
 import { BaseRepository } from "./base.repository";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 import { workspaceMemberModel } from "../models/workspaceMembers.model";
-import { PaginatedResponseDto } from "../types/dtos/paginated.dto";
 import {
-  WorkspaceMemberDto,
   WorkspaceMemberRepoDto,
 } from "../types/dtos/workspaces/workspace-member.dto";
 

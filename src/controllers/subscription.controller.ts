@@ -7,12 +7,14 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 import AppError from "../shared/utils/AppError";
 import { stripe } from "../shared/utils/stripeClient";
 import { config } from "../config";
+import { IWebhookService } from "../types/service-interface/IWebhookService";
 
 @injectable()
 export class SubscriptionController implements ISubscriptionController {
   constructor(
     @inject("ISubscriptionService")
-    private _subscriptionService: ISubscriptionService
+    private _subscriptionService: ISubscriptionService,
+    @inject("IWebhookService") private _webhookService: IWebhookService
   ) {}
 
   async createCheckoutSession(req: Request, res: Response): Promise<void> {
@@ -51,7 +53,7 @@ export class SubscriptionController implements ISubscriptionController {
       config.stripe.WEBHOOK_SECRET
     );
 
-    await this._subscriptionService.handleWebhookEvent(event);
+    await this._webhookService.handleStripeWebhookEvent(event);
     res.status(HTTP_STATUS.OK).json({ received: true });
   }
 
@@ -65,13 +67,30 @@ export class SubscriptionController implements ISubscriptionController {
       sessionId
     );
 
-    res
-      .status(HTTP_STATUS.OK)
-      .json({
-        success: true,
-        message: "successfully fetched session",
-        data: result,
-      });
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: "successfully fetched session",
+      data: result,
+    });
+  }
+
+  async getUserSubscription(req: Request, res: Response): Promise<void> {
+    const userId = req.user?.userid;
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.AUTH_INVALID_TOKEN,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    const subscription = await this._subscriptionService.getUserSubscription(
+      userId
+    );
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_FETCHED,
+      data: subscription,
+    });
   }
 }
-  

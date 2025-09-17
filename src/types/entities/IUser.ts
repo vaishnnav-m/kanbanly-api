@@ -1,6 +1,6 @@
-import { IPlan } from "./IPlan";
+import { Document } from "mongoose";
 
-export interface IUser {
+export interface IUser extends Document {
   userId: string;
   firstName: string;
   lastName?: string;
@@ -12,8 +12,6 @@ export interface IUser {
   isEmailVerified: boolean;
   isActive: boolean;
   isAdmin: boolean;
-  plan: string | IPlan;
-  planValidTill: Date;
   createdAt: Date;
   updatedAt: Date;
 }
