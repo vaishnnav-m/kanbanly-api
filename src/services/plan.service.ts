@@ -50,31 +50,33 @@ export class PlanService implements IPlanService {
       ...(plan.features && { features: plan.features }),
     };
 
-    const stripeProduct = await stripe.products.create({
-      name: plan.name,
-      description: plan.description,
-      metadata: { planId: newPlan.planId },
-    });
+    if (newPlan.monthlyPrice || newPlan.yearlyPrice) {
+      const stripeProduct = await stripe.products.create({
+        name: plan.name,
+        description: plan.description,
+        metadata: { planId: newPlan.planId },
+      });
 
-    const toMinor = (amt: number) => Math.round(amt * 100);
+      const toMinor = (amt: number) => Math.round(amt * 100);
 
-    const stripeMonthlyPrice = await stripe.prices.create({
-      unit_amount: toMinor(plan.monthlyPrice),
-      currency: config.stripe.currency,
-      recurring: { interval: "month" },
-      product: stripeProduct.id,
-    });
+      const stripeMonthlyPrice = await stripe.prices.create({
+        unit_amount: toMinor(plan.monthlyPrice),
+        currency: config.stripe.currency,
+        recurring: { interval: "month" },
+        product: stripeProduct.id,
+      });
 
-    const stripeYearlyPrice = await stripe.prices.create({
-      unit_amount: toMinor(plan.yearlyPrice),
-      currency: config.stripe.currency,
-      recurring: { interval: "year" },
-      product: stripeProduct.id,
-    });
+      const stripeYearlyPrice = await stripe.prices.create({
+        unit_amount: toMinor(plan.yearlyPrice),
+        currency: config.stripe.currency,
+        recurring: { interval: "year" },
+        product: stripeProduct.id,
+      });
 
-    newPlan.stripeProductId = stripeProduct.id;
-    newPlan.stripeMonthlyPriceId = stripeMonthlyPrice.id;
-    newPlan.stripeYearlyPriceId = stripeYearlyPrice.id;
+      newPlan.stripeProductId = stripeProduct.id;
+      newPlan.stripeMonthlyPriceId = stripeMonthlyPrice.id;
+      newPlan.stripeYearlyPriceId = stripeYearlyPrice.id;
+    }
 
     await this._planRepo.create(newPlan);
   }

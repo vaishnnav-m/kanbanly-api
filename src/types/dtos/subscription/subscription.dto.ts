@@ -1,5 +1,11 @@
 import { SubscriptionStatus } from "../../enums/subscription-status.enum";
 
+export interface CreateSubscriptionDto {
+  userId: string;
+  planId: string;
+  
+}
+
 export interface CreateCheckoutSessionDto {
   userId: string;
   planId: string;

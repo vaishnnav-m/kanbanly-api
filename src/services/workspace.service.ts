@@ -20,6 +20,7 @@ import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { IProjectRepository } from "../types/repository-interfaces/IProjectRepository";
 import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository";
 import { normalizeString } from "../shared/utils/stringNormalizer";
+import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
 
 @injectable()
 export class WorkspaceService implements IWorkspaceService {
@@ -32,13 +33,33 @@ export class WorkspaceService implements IWorkspaceService {
     @inject("IWorkspaceMemberRepository")
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
     @inject("IProjectRepository") private _projectRepo: IProjectRepository,
-    @inject("ITaskRepository") private _taskRepo: ITaskRepository
+    @inject("ITaskRepository") private _taskRepo: ITaskRepository,
+    @inject("ISubscriptionService")
+    private _subscriptionService: ISubscriptionService
   ) {
     this._slugify = normalizeString;
   }
 
   async createWorkspace(workspaceData: CreateWorkspaceDto): Promise<void> {
     const slugName = this._slugify(workspaceData.name);
+
+    const subscription = await this._subscriptionService.getUserSubscription(
+      workspaceData.createdBy
+    );
+    const workspaces = await this._workspaceRepo.find({
+      createdBy: workspaceData.createdBy,
+    });
+
+    const workspaceLimit = subscription?.limits.workspaces;
+    if (
+      workspaceLimit !== "unlimited" &&
+      Number(workspaceLimit) <= workspaces.length
+    ) {
+      throw new AppError(
+        ERROR_MESSAGES.WORKSPACE_LIMIT_EXCEED,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
 
     const isExists = await this._workspaceRepo.findOne({
       createdBy: workspaceData.createdBy,
@@ -63,7 +84,7 @@ export class WorkspaceService implements IWorkspaceService {
 
     await this._workspaceRepo.create(workspace);
 
-    await this._workspaceMemberService.addMember({
+    await this._workspaceMemberService.addMember(workspaceData.createdBy, {
       userId: workspaceData.createdBy,
       workspaceId: workspace.workspaceId,
       role: workspaceRoles.owner,

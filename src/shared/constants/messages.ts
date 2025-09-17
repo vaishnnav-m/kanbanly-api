@@ -41,6 +41,8 @@ export const ERROR_MESSAGES = {
   // WORKSPACE
   WORKSPACE_NOT_FOUND: "The workspace is not exists",
   WORKSPACE_ALREADY_EXISTS: "The workspace already exists",
+  WORKSPACE_LIMIT_EXCEED:
+    "Workspace limit exceeded.Upgrade the plan to continue",
 
   // WORKSPACE MEMBER
   NOT_OWNER: "You are not the owner of this workspace",
@@ -55,6 +57,8 @@ export const ERROR_MESSAGES = {
   PROJECT_ALREADY_EXISTS: "Project with this name already exists",
   PROJECT_NOT_FOUND:
     "Invalid project or project doesn't belong to the specified workspace",
+  PROJECT_LIMIT_EXCEED:
+    "Project limit in a workspace exceeded.Upgrade the plan to continue",
 
   // TASK
   TASK_NOT_FOUND: "The task not found",

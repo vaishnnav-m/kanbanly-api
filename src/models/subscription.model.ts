@@ -17,27 +17,21 @@ const subscriptionSchema = new Schema<ISubscription>(
     },
     stripeSubscriptionId: {
       type: String,
-      required: true,
     },
     stripeCustomerId: {
       type: String,
-      required: true,
     },
     stripePriceId: {
       type: String,
-      required: true,
     },
     currentPeriodStart: {
       type: Date,
-      required: true,
     },
     currentPeriodEnd: {
       type: Date,
-      required: true,
     },
     status: {
       type: String,
-      required: true,
     },
   },
   { timestamps: true }

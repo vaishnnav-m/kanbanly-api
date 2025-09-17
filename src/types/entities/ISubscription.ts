@@ -4,12 +4,12 @@ export interface ISubscription {
   subscriptionId: string;
   userId: string;
   planId: string;
-  stripeCustomerId: string;
-  stripeSubscriptionId: string;
-  stripePriceId: string;
   status: SubscriptionStatus;
-  currentPeriodStart?: Date;
-  currentPeriodEnd?: Date;
+  currentPeriodStart?: Date | null;
+  currentPeriodEnd?: Date | null;
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  stripePriceId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
