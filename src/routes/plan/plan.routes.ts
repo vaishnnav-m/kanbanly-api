@@ -24,5 +24,13 @@ export class PlanRoutes extends BaseRoute {
       "/",
       this._planController.getAllPlans.bind(this._planController)
     );
+    this._router.get(
+      "/:planId",
+      this._planController.getPlanById.bind(this._planController)
+    );
+    this._router.put(
+      "/:planId",
+      this._planController.editPlan.bind(this._planController)
+    );
   }
 }

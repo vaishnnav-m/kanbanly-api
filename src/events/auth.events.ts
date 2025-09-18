@@ -4,4 +4,5 @@ export const authEvents = new EventEmitter();
 
 export enum AuthEvent {
   UserRegistered = "userRegistered",
+  EmailVerified = "emailVerified",
 }

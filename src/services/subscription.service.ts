@@ -48,12 +48,15 @@ export class SubscriptionService implements ISubscriptionService {
     });
     if (
       existingSubscription &&
-      existingSubscription.status === SubscriptionStatus.active
+      existingSubscription.status === SubscriptionStatus.active &&
+      existingSubscription.stripeCustomerId
     ) {
-      throw new AppError(
-        ERROR_MESSAGES.ACTIVE_SUBSCRIPTION,
-        HTTP_STATUS.BAD_REQUEST
-      );
+      const portalSession = await stripe.billingPortal.sessions.create({
+        customer: existingSubscription.stripeCustomerId,
+        return_url: `${config.stripe.STRIPE_FRONTEND_URL}/settings/billing`,
+      });
+
+      return { url: portalSession.url, sessionId: portalSession.id };
     }
 
     if (plan.monthlyPrice === 0 && plan.yearlyPrice === 0) {
