@@ -5,4 +5,5 @@ export interface IPlanController {
   getAllPlans: controllerMethod;
   getPlanById: controllerMethod;
   editPlan: controllerMethod;
+  deletePlan: controllerMethod;
 }

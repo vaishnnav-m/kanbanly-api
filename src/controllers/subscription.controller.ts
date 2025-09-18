@@ -93,4 +93,5 @@ export class SubscriptionController implements ISubscriptionController {
       data: subscription,
     });
   }
+  
 }

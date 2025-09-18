@@ -10,4 +10,5 @@ export interface IPlanService {
   getAllPlans(): Promise<PlanListDto[]>;
   getPlanById(planId: string): Promise<PlanResponseDto | null>;
   editPlan(newPlan: EditPlanDto): Promise<void>;
+  deletePlan(planId: string): Promise<void>;
 }

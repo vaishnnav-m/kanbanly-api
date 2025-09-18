@@ -67,4 +67,17 @@ export class PlanController implements IPlanController {
       .status(HTTP_STATUS.OK)
       .json({ success: true, message: SUCCESS_MESSAGES.DATA_EDITED });
   }
+
+  async deletePlan(req: Request, res: Response): Promise<void> {
+    const planId = req.params.planId as string;
+    if (!planId) {
+      throw new AppError("PlanId is needed", HTTP_STATUS.BAD_REQUEST);
+    }
+
+    await this._planService.deletePlan(planId);
+
+    res
+      .status(HTTP_STATUS.OK)
+      .json({ success: true, message: SUCCESS_MESSAGES.DATA_DELETED });
+  }
 }

@@ -15,11 +15,16 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 import { IPlan } from "../types/entities/IPlan";
 import { config } from "../config";
 import { stripe } from "../shared/utils/stripeClient";
+import { ISubscriptionRepository } from "../types/repository-interfaces/ISubscriptionRepository";
 
 @injectable()
 export class PlanService implements IPlanService {
   private _normalizeName;
-  constructor(@inject("IPlanRepository") private _planRepo: IPlanRepository) {
+  constructor(
+    @inject("IPlanRepository") private _planRepo: IPlanRepository,
+    @inject("ISubscriptionRepository")
+    private _subscriptionRepo: ISubscriptionRepository
+  ) {
     this._normalizeName = normalizeString;
   }
 
@@ -230,5 +235,43 @@ export class PlanService implements IPlanService {
     if (Object.keys(updatePayload).length) {
       await this._planRepo.update({ planId: newPlan.planId }, updatePayload);
     }
+  }
+
+  async deletePlan(planId: string): Promise<void> {
+    const existingPlan = await this._planRepo.findOne({
+      planId,
+    });
+    if (!existingPlan) {
+      throw new AppError(ERROR_MESSAGES.PLAN_NOT_EXISTS, HTTP_STATUS.NOT_FOUND);
+    }
+
+    const subscriptions = await this._subscriptionRepo.find({ planId });
+
+    if (subscriptions.length) {
+      throw new AppError(
+        "There are active subscriptions with this plan",
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    if (existingPlan.stripeMonthlyPriceId) {
+      await stripe.prices.update(existingPlan.stripeMonthlyPriceId, {
+        active: false,
+      });
+    }
+
+    if (existingPlan.stripeYearlyPriceId) {
+      await stripe.prices.update(existingPlan.stripeYearlyPriceId, {
+        active: false,
+      });
+    }
+
+    if (existingPlan.stripeProductId) {
+      await stripe.products.update(existingPlan.stripeProductId, {
+        active: false,
+      });
+    }
+
+    await this._planRepo.delete({ planId });
   }
 }

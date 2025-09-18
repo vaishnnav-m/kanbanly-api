@@ -84,10 +84,7 @@ export class WebhookService implements IWebhookService {
       interval
     );
 
-    // saving to the database
-    await this._subscriptionRepo.create({
-      subscriptionId: uuidv4(),
-      userId,
+    const subscriptionData = {
       planId,
       stripeCustomerId: session.customer,
       stripeSubscriptionId: subscriptionId,
@@ -97,7 +94,21 @@ export class WebhookService implements IWebhookService {
         stripeSubscription.billing_cycle_anchor * 1000
       ),
       currentPeriodEnd,
+    };
+
+    const existingSubscription = await this._subscriptionRepo.findOne({
+      userId,
     });
+
+    if (existingSubscription) {
+      await this._subscriptionRepo.update({ userId }, subscriptionData);
+    } else {
+      await this._subscriptionRepo.create({
+        subscriptionId: uuidv4(),
+        userId,
+        ...subscriptionData,
+      });
+    }
   }
 
   private async _handleInvoiceSucceded(invoice: Stripe.Invoice): Promise<void> {

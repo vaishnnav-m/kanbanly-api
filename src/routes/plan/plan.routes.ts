@@ -32,5 +32,9 @@ export class PlanRoutes extends BaseRoute {
       "/:planId",
       this._planController.editPlan.bind(this._planController)
     );
+    this._router.delete(
+      "/:planId",
+      this._planController.deletePlan.bind(this._planController)
+    );
   }
 }
