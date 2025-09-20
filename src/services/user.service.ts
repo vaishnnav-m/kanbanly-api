@@ -68,7 +68,7 @@ export class UserService implements IUserService {
     if (!isPasswordMatch) {
       throw new AppError("Invalid Password", HTTP_STATUS.BAD_REQUEST);
     }
-    console.log(isPasswordMatch);
+    
     const hashedPassword = await this._passwordBcrypt.hash(data.newPassword);
 
     await this._userRepo.update(

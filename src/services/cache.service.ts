@@ -2,6 +2,7 @@ import { injectable } from "tsyringe";
 import { config } from "../config";
 import { ICacheService } from "../types/service-interface/ICacheService";
 import { createClient, RedisClientType } from "redis";
+import logger from "../logger/winston.logger";
 
 @injectable()
 export class CacheService implements ICacheService {
@@ -17,7 +18,7 @@ export class CacheService implements ICacheService {
     });
 
     this._client.on("error", (err) => {
-      console.log("Redis Client Error:", err);
+      logger.log("Redis Client Error:", err);
     });
 
     this.connect();

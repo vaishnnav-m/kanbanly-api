@@ -16,7 +16,6 @@ import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import logger from "../logger/winston.logger";
-import { ISubscription } from "../types/entities/ISubscription";
 
 @injectable()
 export class SubscriptionService implements ISubscriptionService {
@@ -49,7 +48,8 @@ export class SubscriptionService implements ISubscriptionService {
     if (
       existingSubscription &&
       existingSubscription.status === SubscriptionStatus.active &&
-      existingSubscription.stripeCustomerId
+      existingSubscription.stripeCustomerId &&
+      plan.monthlyPrice !== 0
     ) {
       const portalSession = await stripe.billingPortal.sessions.create({
         customer: existingSubscription.stripeCustomerId,
@@ -60,14 +60,25 @@ export class SubscriptionService implements ISubscriptionService {
     }
 
     if (plan.monthlyPrice === 0 && plan.yearlyPrice === 0) {
-      await this._subscriptionRepo.create({
-        subscriptionId: uuidv4(),
-        planId: plan.planId,
-        userId: userId,
+      const existingPlan = await this._subscriptionRepo.findOne({ userId });
+      const subscriptionData = {
+        planId,
         status: SubscriptionStatus.active,
         currentPeriodEnd: null,
         currentPeriodStart: null,
-      });
+        stripePriceId: undefined,
+        stripeSubscriptionId: undefined,
+      };
+
+      if (existingPlan) {
+        await this._subscriptionRepo.update({ userId }, subscriptionData);
+      } else {
+        await this._subscriptionRepo.create({
+          subscriptionId: uuidv4(),
+          userId: userId,
+          ...subscriptionData,
+        });
+      }
 
       return { sessionId: "", url: "" };
     }
@@ -152,6 +163,7 @@ export class SubscriptionService implements ISubscriptionService {
     });
 
     if (!subscription) {
+      logger.debug("inside free subscription");
       const freePlan = await this._planRepo.findOne({ monthlyPrice: 0 });
       if (!freePlan) {
         throw new AppError("Plan not found", HTTP_STATUS.NOT_FOUND);
@@ -183,5 +195,25 @@ export class SubscriptionService implements ISubscriptionService {
         tasks: plan.taskLimit,
       },
     };
+  }
+
+  async createFreeSubscription(userId: string): Promise<void> {
+    const plan = await this._planRepo.findOne({ monthlyPrice: 0 });
+    if (!plan) {
+      throw new AppError(ERROR_MESSAGES.PLAN_NOT_EXISTS, HTTP_STATUS.NOT_FOUND);
+    }
+
+    const subscriptionData = {
+      subscriptionId: uuidv4(),
+      userId,
+      planId: plan.planId,
+      status: SubscriptionStatus.active,
+      currentPeriodEnd: null,
+      currentPeriodStart: null,
+      stripePriceId: undefined,
+      stripeSubscriptionId: undefined,
+    };
+
+    await this._subscriptionRepo.create(subscriptionData);
   }
 }

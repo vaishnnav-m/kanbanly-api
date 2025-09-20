@@ -16,6 +16,7 @@ import { UserRoutes } from "./routes/user/user.routes";
 import { PlanRoutes } from "./routes/plan/plan.routes";
 import { SubscriptionRoutes } from "./routes/subscription/subscription.routes";
 import { WebhookRoutes } from "./routes/webhook/webhook.routes";
+import logger from "./logger/winston.logger";
 
 export default class Server {
   private _app: Application;
@@ -80,7 +81,7 @@ export default class Server {
   // server start
   public start(): void {
     this._app.listen(this._port, () => {
-      console.log(`server started at port ${this._port}`);
+      logger.info(`server started at port ${this._port}`);
     });
   }
 }

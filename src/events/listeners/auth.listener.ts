@@ -33,7 +33,7 @@ export function registerUserEventListner() {
     AuthEvent.EmailVerified,
     async ({ userId }: { userId: string }) => {
       try {
-        // await subscriptionService.createCheckoutSession({});
+        await subscriptionService.createFreeSubscription(userId);
       } catch (error) {
         logger.error(
           `[Event Listener] Failed to create subscription for ${userId}:`,

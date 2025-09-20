@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { config } from "./index.js";
+import logger from "../logger/winston.logger.js";
 
 export class ConnectDB {
   private _dburi: string;
@@ -10,9 +11,9 @@ export class ConnectDB {
   async connect() {
     try {
       await mongoose.connect(this._dburi);
-      console.log("MongoDB connected successfully");
+      logger.info("MongoDB connected successfully");
     } catch (error) {
-      console.log(error);
+      logger.error(error);
       throw new Error("Database connection failed");
     }
   }

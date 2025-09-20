@@ -8,6 +8,7 @@ import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { config } from "../config";
 import { IUser } from "../types/entities/IUser";
 import { IEmailService } from "../types/service-interface/IEmailService";
+import { AuthEvent, authEvents } from "../events/auth.events";
 
 @injectable()
 export class VerificationService implements IVerificationService {
@@ -71,6 +72,8 @@ export class VerificationService implements IVerificationService {
         HTTP_STATUS.INTERNAL_SERVER_ERROR
       );
     }
+
+    authEvents.emit(AuthEvent.EmailVerified, { userId: newUser.userId });
 
     return newUser;
   }

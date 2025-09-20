@@ -59,7 +59,7 @@ winston.addColors(customLevels.colors);
 
 const logger = winston.createLogger({
   levels: customLevels.levels,
-  level: "info",
+  level: "debug",
   transports: [
     new transports.Console({ format: consoleFormat, handleExceptions: true }),
     combinedFileTransport,
