@@ -17,15 +17,26 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
     private _workspaceMemberService: IWorkspaceMemberService
   ) {}
 
+  // add user to workspace by invitation
   async addUser(req: Request, res: Response): Promise<void> {
-    const { userId, workspaceId, role } = req.body as WorkspaceMemberDto;
-    await this._workspaceMemberService.addMember({ userId, workspaceId, role });
+    const {
+      userId: memberId,
+      workspaceId,
+      role,
+    } = req.body as WorkspaceMemberDto;
+
+    await this._workspaceMemberService.addMember({
+      userId: memberId,
+      workspaceId,
+      role,
+    });
 
     res
       .status(HTTP_STATUS.OK)
       .json({ success: true, message: "User added to workspace successfully" });
   }
 
+  // get all members of a workspace
   async getMembers(req: Request, res: Response): Promise<void> {
     const userId = req.user?.userid;
     if (!userId) {
@@ -38,11 +49,13 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
     const pageParam = req.query.page;
     const page =
       parseInt(typeof pageParam === "string" ? pageParam : "1", 10) || 1;
+    const search = req.query.search as string;
 
     const members = await this._workspaceMemberService.getMembers(
       workspaceId,
       userId,
-      page
+      page,
+      search
     );
 
     res.status(HTTP_STATUS.OK).json({
@@ -52,6 +65,7 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
     });
   }
 
+  // get current member of a workspace
   async getCurrentMember(req: Request, res: Response): Promise<void> {
     const userId = req.user?.userid;
     if (!userId) {
@@ -74,6 +88,7 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
     });
   }
 
+  // search member of a workspace
   async searchMember(req: Request, res: Response): Promise<void> {
     const userId = req.user?.userid;
     if (!userId) {
@@ -98,6 +113,7 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
     });
   }
 
+  // edit member of a workspace
   async editMember(req: Request, res: Response): Promise<void> {
     const userId = req.user?.userid;
     if (!userId) {
@@ -121,6 +137,7 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
     });
   }
 
+  // remove member of a workspace
   async removeMember(req: Request, res: Response): Promise<void> {
     const userId = req.user?.userid;
     if (!userId) {

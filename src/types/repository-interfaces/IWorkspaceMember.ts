@@ -7,7 +7,8 @@ export interface IWorkspaceMemberRepository
   getMembers(
     workspaceId: string,
     skip: number,
-    limit: number
+    limit: number,
+    search?: string
   ): Promise<WorkspaceMemberRepoDto>;
   getCount(workspaceId: string): Promise<number>;
   getMember(

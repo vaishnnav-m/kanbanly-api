@@ -15,6 +15,8 @@ import { config } from "../config";
 import { IEmailService } from "../types/service-interface/IEmailService";
 import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
+import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
+import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWorkspaceMember";
 
 @injectable()
 export class InvitationService implements IInvitationService {
@@ -24,10 +26,14 @@ export class InvitationService implements IInvitationService {
     private _invitationRepo: IInvitationRepository,
     @inject("IWorkspaceRepository")
     private _workspaceRepo: IWorkspaceRepository,
+    @inject("IWorkspaceMemberRepository")
+    private _workspaceMemberRepo: IWorkspaceMemberRepository,
     @inject("IWorkspaceMemberService")
     private _workspaceMemberService: IWorkspaceMemberService,
     @inject("IEmailService") private _mailService: IEmailService,
-    @inject("IUserRepository") private _userRepo: IUserRepository
+    @inject("IUserRepository") private _userRepo: IUserRepository,
+    @inject("ISubscriptionService")
+    private _subscriptionService: ISubscriptionService
   ) {
     this._frontendUrl = config.cors.ALLOWED_ORIGIN;
   }
@@ -46,6 +52,22 @@ export class InvitationService implements IInvitationService {
     if (data.invitedBy !== workspace.createdBy) {
       throw new AppError(
         ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const subscription = await this._subscriptionService.getUserSubscription(
+      data.invitedBy
+    );
+    const members = await this._workspaceMemberRepo.find({
+      userId: data.invitedBy,
+      workspaceId: data.workspaceId,
+    });
+
+    const memberLimit = subscription?.limits.members;
+    if (memberLimit !== "unlimited" && Number(memberLimit) <= members.length) {
+      throw new AppError(
+        ERROR_MESSAGES.WORKSPACE_LIMIT_EXCEED,
         HTTP_STATUS.BAD_REQUEST
       );
     }
