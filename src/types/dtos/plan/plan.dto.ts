@@ -14,6 +14,8 @@ export type PlanListDto = CreatePlanDto & {
   planId: string;
 };
 
+export type EditPlanDto = Partial<PlanListDto>;
+
 export interface PlanResponseDto {
   name: string;
   monthlyPrice: number;
