@@ -13,6 +13,7 @@ export interface IWorkspaceMemberService {
     workspaceId: string,
     userId: string,
     page: number,
+    limit: number,
     search?: string
   ): Promise<PaginatedResponseDto<WorkspaceMemberResponseDto[]>>;
   getCurrentMember(

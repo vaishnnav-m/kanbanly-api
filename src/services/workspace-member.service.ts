@@ -80,9 +80,9 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     workspaceId: string,
     userId: string,
     page: number,
-    search: string
+    limit: number,
+    search?: string
   ): Promise<PaginatedResponseDto<WorkspaceMemberResponseDto[]>> {
-    const limit = 10;
     const skip = (page - 1) * limit;
 
     const member = await this._workspaceMemberRepo.findOne({

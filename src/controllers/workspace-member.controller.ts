@@ -9,6 +9,7 @@ import { IWorkspaceMemberService } from "../types/service-interface/IWorkspaceMe
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../shared/constants/messages";
+import logger from "../logger/winston.logger";
 
 @injectable()
 export class WorkspaceMemberController implements IWorkspaceMemberController {
@@ -47,14 +48,24 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
     }
     const workspaceId = req.params.workspaceId;
     const pageParam = req.query.page;
+    // get page from query
     const page =
       parseInt(typeof pageParam === "string" ? pageParam : "1", 10) || 1;
-    const search = req.query.search as string;
+    const search = (req.query.search as string) || "";
+    // get limit from query
+    const paramLimit = parseInt(req.query.limit as string, 10);
+    const limit =
+      !isNaN(paramLimit) && paramLimit > 0 ? Math.min(paramLimit, 10) : 10;
+
+    logger.info(
+      `[getMembers] workspaceId: ${workspaceId}, userId: ${userId}, page: ${page}, limit: ${limit}, search: ${search}`
+    );
 
     const members = await this._workspaceMemberService.getMembers(
       workspaceId,
       userId,
       page,
+      limit,
       search
     );
 
