@@ -19,10 +19,11 @@ export class WorkspaceMemberRepository
   async getMembers(
     workspaceId: string,
     skip: number,
-    limit: number
+    limit: number,
+    search?: string
   ): Promise<WorkspaceMemberRepoDto> {
     const result = await this.model.aggregate([
-      { $match: { workspaceId } },
+      { $match: { workspaceId,email: { $regex: search, $options: "i" } } },
       {
         $lookup: {
           from: "users",

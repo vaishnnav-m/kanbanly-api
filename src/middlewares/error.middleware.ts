@@ -23,7 +23,7 @@ export class ErrorMiddleware {
       statusCode = err.statusCode || HTTP_STATUS.INTERNAL_SERVER_ERROR;
       message = ERROR_MESSAGES.UNEXPECTED_SERVER_ERROR;
     }
-    logger.error(`[${statusCode}] ${message}`);
+    logger.error(`[${statusCode}] ${message}`,err);
     res.status(statusCode).json({
       success: false,
       message,

@@ -14,7 +14,6 @@ import { PaginatedResponseDto } from "../types/dtos/paginated.dto";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
-import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
 
 @injectable()
 export class WorkspaceMemberService implements IWorkspaceMemberService {
@@ -24,41 +23,14 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     @inject("IWorkspaceRepository")
     private _workspaceRepo: IWorkspaceRepository,
     @inject("IUserRepository") private _userRepo: IUserRepository,
-    @inject("ISubscriptionService")
-    private _subscriptionService: ISubscriptionService
   ) {}
 
-  async addMember(userId: string, data: WorkspaceMemberDto): Promise<void> {
+  async addMember(data: WorkspaceMemberDto): Promise<void> {
     const workspace = await this._workspaceRepo.findOne({
       workspaceId: data.workspaceId,
     });
     if (!workspace) {
       throw new AppError("workspace not found", HTTP_STATUS.BAD_REQUEST);
-    }
-    if (workspace.createdBy !== userId) {
-      throw new AppError(
-        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
-        HTTP_STATUS.BAD_REQUEST
-      );
-    }
-
-    const subscription = await this._subscriptionService.getUserSubscription(
-      userId
-    );
-    const members = await this._workspaceMemberRepo.find({
-      userId,
-      workspaceId: data.workspaceId,
-    });
-
-    const memberLimit = subscription?.limits.members;
-    if (
-      memberLimit !== "unlimited" &&
-      Number(memberLimit) <= members.length
-    ) {
-      throw new AppError(
-        ERROR_MESSAGES.WORKSPACE_LIMIT_EXCEED,
-        HTTP_STATUS.BAD_REQUEST
-      );
     }
 
     const user = await this._userRepo.findOne({ userId: data.userId });
@@ -107,9 +79,10 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
   async getMembers(
     workspaceId: string,
     userId: string,
-    page: number
+    page: number,
+    limit: number,
+    search?: string
   ): Promise<PaginatedResponseDto<WorkspaceMemberResponseDto[]>> {
-    const limit = 10;
     const skip = (page - 1) * limit;
 
     const member = await this._workspaceMemberRepo.findOne({
@@ -127,7 +100,8 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     const rawMembers = await this._workspaceMemberRepo.getMembers(
       workspaceId,
       skip,
-      limit
+      limit,
+      search
     );
 
     const isOwner = member.role === "owner";

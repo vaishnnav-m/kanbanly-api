@@ -7,12 +7,14 @@ import {
 import { IWorkspaceMember } from "../entities/IWorkspaceMember";
 
 export interface IWorkspaceMemberService {
-  addMember(userId: string, data: WorkspaceMemberDto): Promise<void>;
+  addMember(data: WorkspaceMemberDto): Promise<void>;
   isMember(workspaceId: string, userId: string): Promise<boolean>;
   getMembers(
     workspaceId: string,
     userId: string,
-    page: number
+    page: number,
+    limit: number,
+    search?: string
   ): Promise<PaginatedResponseDto<WorkspaceMemberResponseDto[]>>;
   getCurrentMember(
     workspaceId: string,
