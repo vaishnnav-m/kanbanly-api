@@ -1,0 +1,3 @@
+import { IEpic } from "../../entities/IEpic";
+
+export type EpicCreationDto = Omit<IEpic, "epicId" | "createdAt" | "updatedAt" | "normalized">;

@@ -71,4 +71,7 @@ export const ERROR_MESSAGES = {
 
   // SUBSCRIPTION
   ACTIVE_SUBSCRIPTION: "User already have an active subscription",
+
+  // EPIC
+  EPIC_ALREADY_EXISTS: "An epic of the same name exists",
 };
