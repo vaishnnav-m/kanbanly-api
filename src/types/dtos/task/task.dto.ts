@@ -1,5 +1,11 @@
-import { ITask } from "../../entities/ITask";
+import { IWorkItem } from "../../entities/IWorkItem";
 import { IWorkspaceMember } from "../../entities/IWorkspaceMember";
+
+export enum WorkItemType {
+  Task = "task",
+  Bug = "bug",
+  Feature = "feature",
+}
 
 export enum TaskStatus {
   Todo = "todo",
@@ -19,6 +25,10 @@ export interface CreateTaskDto {
   projectId: string;
   workspaceId: string;
   priority: TaskPriority;
+  workItemType: WorkItemType;
+  status?: TaskStatus;
+  epicId?: string;
+  sprintId?: string;
   assignedTo: string;
   createdBy: string;
   dueDate: Date;
@@ -47,6 +57,6 @@ export interface TaskDetailsDto {
   dueDate?: Date;
 }
 
-export type TaskDetailRepoDto = Omit<ITask, "assignedTo"> & {
+export type TaskDetailRepoDto = Omit<IWorkItem, "assignedTo"> & {
   assignedTo: IWorkspaceMember;
 };

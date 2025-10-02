@@ -17,7 +17,6 @@ import { PlanRoutes } from "./routes/plan/plan.routes";
 import { SubscriptionRoutes } from "./routes/subscription/subscription.routes";
 import { WebhookRoutes } from "./routes/webhook/webhook.routes";
 import logger from "./logger/winston.logger";
-import { EpicRoutes } from "./routes/epic/epic.routes";
 
 export default class Server {
   private _app: Application;
@@ -77,7 +76,6 @@ export default class Server {
       "/api/v1/subscriptions",
       container.resolve(SubscriptionRoutes).router
     );
-    this._app.use("/api/v1/epics", container.resolve(EpicRoutes).router);
   }
 
   // Start server 

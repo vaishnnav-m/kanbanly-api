@@ -18,7 +18,7 @@ import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWork
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { IProjectRepository } from "../types/repository-interfaces/IProjectRepository";
-import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository";
+import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
 import { normalizeString } from "../shared/utils/stringNormalizer";
 import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
 
@@ -33,7 +33,7 @@ export class WorkspaceService implements IWorkspaceService {
     @inject("IWorkspaceMemberRepository")
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
     @inject("IProjectRepository") private _projectRepo: IProjectRepository,
-    @inject("ITaskRepository") private _taskRepo: ITaskRepository,
+    @inject("IWorkItemRepository") private _workItemRepo: IWorkItemRepository,
     @inject("ISubscriptionService")
     private _subscriptionService: ISubscriptionService
   ) {
@@ -84,7 +84,7 @@ export class WorkspaceService implements IWorkspaceService {
 
     await this._workspaceRepo.create(workspace);
 
-    await this._workspaceMemberService.addMember(workspaceData.createdBy, {
+    await this._workspaceMemberService.addMember({
       userId: workspaceData.createdBy,
       workspaceId: workspace.workspaceId,
       role: workspaceRoles.owner,
@@ -213,7 +213,7 @@ export class WorkspaceService implements IWorkspaceService {
 
     await this._workspaceMemberRepo.deleteMany({ workspaceId });
     await this._projectRepo.deleteMany({ workspaceId });
-    await this._taskRepo.deleteMany({ workspaceId });
+    await this._workItemRepo.deleteMany({ workspaceId });
     await this._workspaceRepo.delete({ workspaceId });
   }
 }

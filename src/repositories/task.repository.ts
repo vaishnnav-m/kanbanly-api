@@ -1,22 +1,22 @@
 import { injectable } from "tsyringe";
-import { taskModel } from "../models/task.model";
-import { ITask } from "../types/entities/ITask";
-import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository";
+import { workItemModel } from "../models/work-item.model";
+import { IWorkItem } from "../types/entities/IWorkItem";
+import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
 import { BaseRepository } from "./base.repository";
 import { FilterQuery } from "mongoose";
 import { TaskDetailRepoDto } from "../types/dtos/task/task.dto";
 
 @injectable()
-export class TaskRepository
-  extends BaseRepository<ITask>
-  implements ITaskRepository
+export class WorkItemRepository
+  extends BaseRepository<IWorkItem>
+  implements IWorkItemRepository
 {
   constructor() {
-    super(taskModel);
+    super(workItemModel);
   }
 
   async getTasksWithAssigness(
-    query: FilterQuery<ITask>
+    query: FilterQuery<IWorkItem>
   ): Promise<TaskDetailRepoDto> {
     const result = await this.model.aggregate([
       { $match: { ...query, isDeleted: false } },

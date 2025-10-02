@@ -2,13 +2,15 @@ import { inject, injectable } from "tsyringe";
 import { BaseRoute } from "../../base.routes";
 import { IProjectController } from "../../../types/controller-interfaces/IProjectController";
 import { TaskRoutes } from "./tasks/task.routes";
+import { EpicRoutes } from "./epics/epic.routes";
 
 @injectable()
 export class ProjectRoutes extends BaseRoute {
   constructor(
     @inject("IProjectController")
     private _projectController: IProjectController,
-    @inject(TaskRoutes) private _taskRoutes: TaskRoutes
+    @inject(TaskRoutes) private _taskRoutes: TaskRoutes,
+    @inject(EpicRoutes) private _epicRoutes: EpicRoutes
   ) {
     super({ mergeParams: true });
     this.initializeRoutes();
@@ -48,5 +50,6 @@ export class ProjectRoutes extends BaseRoute {
       this._projectController.removeMember.bind(this._projectController)
     );
     this._router.use("/:projectId/tasks", this._taskRoutes.router);
+    this._router.use("/:projectId/epics", this._epicRoutes.router);
   }
 }

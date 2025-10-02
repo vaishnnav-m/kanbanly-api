@@ -3,7 +3,7 @@ import { IEpicController } from "../types/controller-interfaces/IEpicController"
 import { IEpicService } from "../types/service-interface/IEpicService";
 import { Request, Response } from "express";
 import AppError from "../shared/utils/AppError";
-import { ERROR_MESSAGES } from "../shared/constants/messages";
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../shared/constants/messages";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { EpicCreationDto } from "../types/dtos/epic/epic.dto";
 
@@ -21,7 +21,9 @@ export class EpicController implements IEpicController {
     const epicData = req.body as Pick<EpicCreationDto, "title" | "description">;
     const workspaceId = req.params.workspaceId as string;
     const projectId = req.params.projectId as string;
-    
+
+    console.log("Epic Data: ", epicData, workspaceId, projectId);
+
     if (!workspaceId || !projectId) {
       throw new AppError(
         ERROR_MESSAGES.INPUT_VALIDATION_FAILED,
@@ -38,5 +40,9 @@ export class EpicController implements IEpicController {
     };
 
     await this._epicService.createEpic(newEpicData);
+
+    res
+      .status(HTTP_STATUS.CREATED)
+      .json({ message: SUCCESS_MESSAGES.DATA_CREATED });
   }
 }

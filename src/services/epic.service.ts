@@ -41,11 +41,12 @@ export class EpicService implements IEpicService {
       );
     }
 
-   //  save data
+    //  save data
     const newEpicData = {
       epicId: uuidv4(),
       title: epicData.title,
-      description: epicData.description,
+      normalized,
+      ...(epicData.description && { description: epicData.description }),
       workspaceId: epicData.workspaceId,
       projectId: epicData.projectId,
       createdBy: epicData.createdBy,
