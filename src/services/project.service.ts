@@ -18,7 +18,7 @@ import {
 } from "../types/dtos/workspaces/workspace-member.dto";
 import { IProject } from "../types/entities/IProject";
 import { projectStatus } from "../types/enums/project-status.enum";
-import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository";
+import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
 import { FilterQuery } from "mongoose";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 import { normalizeString } from "../shared/utils/stringNormalizer";
@@ -33,7 +33,7 @@ export class ProjectService implements IProjectService {
     private _workspaceRepo: IWorkspaceRepository,
     @inject("IWorkspaceMemberRepository")
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
-    @inject("ITaskRepository") private _taskRepo: ITaskRepository,
+    @inject("IWorkItemRepository") private _workItemRepo: IWorkItemRepository,
     @inject("ISubscriptionService")
     private _subscriptionService: ISubscriptionService
   ) {
@@ -241,7 +241,7 @@ export class ProjectService implements IProjectService {
       );
     }
 
-    await this._taskRepo.deleteMany({ projectId, workspaceId });
+    await this._workItemRepo.deleteMany({ projectId, workspaceId });
     await this._projectRepo.delete({ projectId, workspaceId });
   }
 

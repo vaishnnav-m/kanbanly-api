@@ -78,7 +78,7 @@ export default class Server {
     );
   }
 
-  // server start
+  // Start server 
   public start(): void {
     this._app.listen(this._port, () => {
       logger.info(`server started at port ${this._port}`);

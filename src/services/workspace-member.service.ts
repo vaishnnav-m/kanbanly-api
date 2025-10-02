@@ -22,7 +22,7 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
     @inject("IWorkspaceRepository")
     private _workspaceRepo: IWorkspaceRepository,
-    @inject("IUserRepository") private _userRepo: IUserRepository,
+    @inject("IUserRepository") private _userRepo: IUserRepository
   ) {}
 
   async addMember(data: WorkspaceMemberDto): Promise<void> {
@@ -101,7 +101,7 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
       workspaceId,
       skip,
       limit,
-      search
+      search = ""
     );
 
     const isOwner = member.role === "owner";

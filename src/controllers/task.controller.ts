@@ -21,8 +21,20 @@ export class TaskController implements ITaskController {
     const workspaceId = req.params.workspaceId;
     const projectId = req.params.projectId;
 
-    const { task, description, priority, assignedTo, dueDate } =
-      req.body as Omit<CreateTaskDto, "createdBy">;
+    const {
+      task,
+      description,
+      priority,
+      assignedTo,
+      dueDate,
+      workItemType,
+      epicId,
+      sprintId,
+      status,
+    } = req.body as Omit<
+      CreateTaskDto,
+      "createdBy" | "workspaceId" | "projectId"
+    >;
 
     if (!createdBy) {
       throw new AppError(
@@ -38,8 +50,12 @@ export class TaskController implements ITaskController {
       createdBy,
       dueDate,
       priority,
+      status: status,
       projectId,
       workspaceId,
+      workItemType,
+      epicId,
+      sprintId,
     });
 
     res

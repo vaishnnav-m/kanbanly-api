@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import { v4 as uuidv4 } from "uuid";
 import { ITaskService } from "../types/service-interface/ITaskService";
-import { ITaskRepository } from "../types/repository-interfaces/ITaskRepository";
+import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
 import {
   CreateTaskDto,
   EditTaskDto,
@@ -14,13 +14,13 @@ import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
 import { IProjectRepository } from "../types/repository-interfaces/IProjectRepository";
-import { ITask } from "../types/entities/ITask";
+import { IWorkItem } from "../types/entities/IWorkItem";
 import { IProjectService } from "../types/service-interface/IProjectService";
 
 @injectable()
 export class TaskService implements ITaskService {
   constructor(
-    @inject("ITaskRepository") private _taskRepo: ITaskRepository,
+    @inject("IWorkItemRepository") private _workItemRepo: IWorkItemRepository,
     @inject("IWorkspaceMemberRepository")
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
     @inject("IProjectRepository") private _projectRepo: IProjectRepository,
@@ -67,7 +67,7 @@ export class TaskService implements ITaskService {
       }
     }
 
-    const task: Omit<ITask, "isDeleted"> = {
+    const task: Omit<IWorkItem, "isDeleted"> = {
       taskId: uuidv4(),
       task: data.task.trim(),
       description: data.description,
@@ -77,17 +77,20 @@ export class TaskService implements ITaskService {
       assignedTo: data.assignedTo,
       createdBy: data.createdBy,
       dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
-      status: TaskStatus.Todo,
+      status: data.status ? data.status : TaskStatus.Todo,
+      workItemType: data.workItemType,
+      ...(data.epicId && { epicId: data.epicId }),
+      ...(data.sprintId && { sprintId: data.sprintId }),
     };
 
-    await this._taskRepo.create(task);
+    await this._workItemRepo.create(task);
   }
 
   async getAllTask(
     workspaceId: string,
     projectId: string,
     userId: string
-  ): Promise<ITask[]> {
+  ): Promise<IWorkItem[]> {
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       userId,
       workspaceId,
@@ -114,8 +117,12 @@ export class TaskService implements ITaskService {
       workspaceMember.role === workspaceRoles.projectManager;
 
     const tasks = isManager
-      ? await this._taskRepo.find({ workspaceId, projectId, isDeleted: false })
-      : await this._taskRepo.find({
+      ? await this._workItemRepo.find({
+          workspaceId,
+          projectId,
+          isDeleted: false,
+        })
+      : await this._workItemRepo.find({
           workspaceId,
           projectId,
           assignedTo: userId,
@@ -144,7 +151,7 @@ export class TaskService implements ITaskService {
     const query =
       workspaceMember.role === "member" ? { assignedTo: userId } : {};
 
-    const task = await this._taskRepo.getTasksWithAssigness({
+    const task = await this._workItemRepo.getTasksWithAssigness({
       taskId,
       projectId,
       ...query,
@@ -187,7 +194,7 @@ export class TaskService implements ITaskService {
       throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.FORBIDDEN);
     }
 
-    const task = await this._taskRepo.findOne({ taskId, isDeleted: false });
+    const task = await this._workItemRepo.findOne({ taskId, isDeleted: false });
     if (!task) {
       throw new AppError(ERROR_MESSAGES.TASK_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
     }
@@ -203,7 +210,7 @@ export class TaskService implements ITaskService {
       );
     }
 
-    await this._taskRepo.update({ taskId }, { status: newStatus });
+    await this._workItemRepo.update({ taskId }, { status: newStatus });
   }
 
   async editTask(
@@ -222,7 +229,7 @@ export class TaskService implements ITaskService {
       throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.FORBIDDEN);
     }
 
-    const task = await this._taskRepo.findOne({ taskId });
+    const task = await this._workItemRepo.findOne({ taskId });
     if (!task) {
       throw new AppError(ERROR_MESSAGES.TASK_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
     }
@@ -269,7 +276,7 @@ export class TaskService implements ITaskService {
       }
     }
 
-    const newTask: Partial<ITask> = {
+    const newTask: Partial<IWorkItem> = {
       ...(data.task && { task: data.task }),
       ...(data.description && { description: data.description }),
       ...(data.priority && { priority: data.priority }),
@@ -277,7 +284,7 @@ export class TaskService implements ITaskService {
       ...(data.assignedTo && assigneeId && { assignedTo: assigneeId }),
     };
 
-    await this._taskRepo.update({ taskId }, newTask);
+    await this._workItemRepo.update({ taskId }, newTask);
   }
 
   async removeTask(
@@ -302,6 +309,6 @@ export class TaskService implements ITaskService {
       throw new AppError(ERROR_MESSAGES.ACTION_DENIED, HTTP_STATUS.BAD_REQUEST);
     }
 
-    await this._taskRepo.update({ taskId }, { isDeleted: true });
+    await this._workItemRepo.update({ taskId }, { isDeleted: true });
   }
 }

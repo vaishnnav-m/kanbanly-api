@@ -4,7 +4,7 @@ import {
   TaskDetailsDto,
   TaskStatus,
 } from "../dtos/task/task.dto";
-import { ITask } from "../entities/ITask";
+import { IWorkItem } from "../entities/IWorkItem";
 
 export interface ITaskService {
   createTask(data: CreateTaskDto): Promise<void>;
@@ -12,7 +12,7 @@ export interface ITaskService {
     workspaceId: string,
     projectId: string,
     userId: string
-  ): Promise<ITask[]>;
+  ): Promise<IWorkItem[]>;
   getOneTask(
     workspaceId: string,
     projectId: string,

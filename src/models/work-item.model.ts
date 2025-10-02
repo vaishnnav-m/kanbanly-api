@@ -1,8 +1,12 @@
 import { model, Schema } from "mongoose";
-import { ITask } from "../types/entities/ITask";
-import { required } from "zod/v4/core/util.cjs";
+import { IWorkItem } from "../types/entities/IWorkItem";
+import {
+  TaskPriority,
+  TaskStatus,
+  WorkItemType,
+} from "../types/dtos/task/task.dto";
 
-const taskShcema = new Schema<ITask>(
+const workItemSchema = new Schema<IWorkItem>(
   {
     taskId: {
       type: String,
@@ -18,7 +22,21 @@ const taskShcema = new Schema<ITask>(
     },
     status: {
       type: String,
+      enum: Object.values(TaskStatus),
+      default: TaskStatus.Todo,
       required: true,
+    },
+    workItemType: {
+      type: String,
+      enum: Object.values(WorkItemType),
+      default: WorkItemType.Task,
+      required: true,
+    },
+    epicId: {
+      type: String,
+    },
+    sprintId: {
+      type: String,
     },
     projectId: {
       type: String,
@@ -30,6 +48,8 @@ const taskShcema = new Schema<ITask>(
     },
     priority: {
       type: String,
+      enum: Object.values(TaskPriority),
+      default: TaskPriority.Low,
       required: true,
     },
     assignedTo: {
@@ -51,4 +71,4 @@ const taskShcema = new Schema<ITask>(
   { timestamps: true }
 );
 
-export const taskModel = model<ITask>("task", taskShcema);
+export const workItemModel = model<IWorkItem>("workItem", workItemSchema);

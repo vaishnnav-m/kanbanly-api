@@ -3,9 +3,7 @@ import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWork
 import { BaseRepository } from "./base.repository";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 import { workspaceMemberModel } from "../models/workspaceMembers.model";
-import {
-  WorkspaceMemberRepoDto,
-} from "../types/dtos/workspaces/workspace-member.dto";
+import { WorkspaceMemberRepoDto } from "../types/dtos/workspaces/workspace-member.dto";
 
 @injectable()
 export class WorkspaceMemberRepository
@@ -18,12 +16,12 @@ export class WorkspaceMemberRepository
 
   async getMembers(
     workspaceId: string,
-    skip: number,
-    limit: number,
+    skip: number = 0,
+    limit: number = 10,
     search?: string
   ): Promise<WorkspaceMemberRepoDto> {
     const result = await this.model.aggregate([
-      { $match: { workspaceId,email: { $regex: search, $options: "i" } } },
+      { $match: { workspaceId, email: { $regex: search, $options: "i" } } },
       {
         $lookup: {
           from: "users",
@@ -40,7 +38,7 @@ export class WorkspaceMemberRepository
           "user.firstName": 1,
           "user.email": 1,
           "user.userId": 1,
-          "isActive": 1,
+          isActive: 1,
         },
       },
       {
