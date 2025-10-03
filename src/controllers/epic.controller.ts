@@ -22,8 +22,6 @@ export class EpicController implements IEpicController {
     const workspaceId = req.params.workspaceId as string;
     const projectId = req.params.projectId as string;
 
-    console.log("Epic Data: ", epicData, workspaceId, projectId);
-
     if (!workspaceId || !projectId) {
       throw new AppError(
         ERROR_MESSAGES.INPUT_VALIDATION_FAILED,
@@ -41,8 +39,40 @@ export class EpicController implements IEpicController {
 
     await this._epicService.createEpic(newEpicData);
 
-    res
-      .status(HTTP_STATUS.CREATED)
-      .json({ message: SUCCESS_MESSAGES.DATA_CREATED });
+    res.status(HTTP_STATUS.CREATED).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_CREATED,
+    });
+  }
+
+  async getAllEpics(req: Request, res: Response) {
+    const userId = req.user?.userid;
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+    const workspaceId = req.params.workspaceId as string;
+    const projectId = req.params.projectId as string;
+
+    if (!workspaceId || !projectId) {
+      throw new AppError(
+        ERROR_MESSAGES.INPUT_VALIDATION_FAILED,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const epics = await this._epicService.getAllEpics(
+      userId,
+      workspaceId,
+      projectId
+    );
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_FETCHED,
+      data: epics,
+    });
   }
 }

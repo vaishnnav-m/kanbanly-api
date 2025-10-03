@@ -6,4 +6,6 @@ export interface IEpic {
   projectId: string;
   workspaceId: string;
   createdBy: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
