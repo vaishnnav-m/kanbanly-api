@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import { IEpicService } from "../types/service-interface/IEpicService";
 import { IEpicRepository } from "../types/repository-interfaces/IEpicRepository";
-import { EpicCreationDto } from "../types/dtos/epic/epic.dto";
+import { EpicCreationDto, EpicResponseDto } from "../types/dtos/epic/epic.dto";
 import { normalizeString } from "../shared/utils/stringNormalizer";
 import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
@@ -52,5 +52,35 @@ export class EpicService implements IEpicService {
       createdBy: epicData.createdBy,
     };
     await this._epicRepo.create(newEpicData);
+  }
+
+  async getAllEpics(
+    userId: string,
+    workspaceId: string,
+    projectId: string
+  ): Promise<EpicResponseDto[]> {
+    // checking if the user is a member of the workspace
+    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+      workspaceId,
+      userId
+    );
+    if (!workspaceMember) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.FORBIDDEN
+      );
+    }
+
+    const epics = await this._epicRepo.find({ workspaceId, projectId });
+    const mappedEpics: EpicResponseDto[] = epics.map((epic) => ({
+      epicId: epic.epicId,
+      title: epic.title,
+      description: epic.description,
+      projectId: epic.projectId,
+      workspaceId: epic.workspaceId,
+      createdBy: epic.createdBy,
+    }));
+
+    return mappedEpics;
   }
 }
