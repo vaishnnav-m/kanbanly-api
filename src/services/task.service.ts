@@ -6,6 +6,7 @@ import {
   CreateTaskDto,
   EditTaskDto,
   TaskDetailsDto,
+  TaskListingDto,
   TaskStatus,
 } from "../types/dtos/task/task.dto";
 import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWorkspaceMember";
@@ -90,7 +91,7 @@ export class TaskService implements ITaskService {
     workspaceId: string,
     projectId: string,
     userId: string
-  ): Promise<IWorkItem[]> {
+  ): Promise<TaskListingDto[]> {
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       userId,
       workspaceId,
@@ -112,24 +113,30 @@ export class TaskService implements ITaskService {
       );
     }
 
-    const isManager =
-      workspaceMember.role === workspaceRoles.owner ||
-      workspaceMember.role === workspaceRoles.projectManager;
+    const tasks = await this._workItemRepo.getTasksWithAssigness({
+      workspaceId,
+      projectId,
+      isDeleted: false,
+    });
 
-    const tasks = isManager
-      ? await this._workItemRepo.find({
-          workspaceId,
-          projectId,
-          isDeleted: false,
-        })
-      : await this._workItemRepo.find({
-          workspaceId,
-          projectId,
-          assignedTo: userId,
-          isDeleted: false,
-        });
+    const mappedTasks = tasks.map((task) => ({
+      taskId: task.taskId,
+      task: task.task,
+      dueDate: task.dueDate,
+      priority: task.priority,
+      assignedTo: task?.assignedTo
+        ? {
+            name: task.assignedTo.name,
+            email: task.assignedTo.email,
+          }
+        : null,
+      status: task.status,
+      workItemType: task.workItemType,
+      epicId: task.epicId,
+      sprintId: task.sprintId,
+    }));
 
-    return tasks;
+    return mappedTasks;
   }
 
   async getOneTask(
@@ -151,11 +158,12 @@ export class TaskService implements ITaskService {
     const query =
       workspaceMember.role === "member" ? { assignedTo: userId } : {};
 
-    const task = await this._workItemRepo.getTasksWithAssigness({
+    const taskData = await this._workItemRepo.getTasksWithAssigness({
       taskId,
       projectId,
       ...query,
     });
+    const task = taskData[0];
 
     if (!task) {
       throw new AppError(

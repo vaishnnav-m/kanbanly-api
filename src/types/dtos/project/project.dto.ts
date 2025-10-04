@@ -1,9 +1,11 @@
-import { IProject } from "../../entities/IProject";
 import { projectStatus } from "../../enums/project-status.enum";
+import { ProjectTemplateEnum } from "../../enums/project-template.enum";
 
 export interface CreateProjectDto {
   name: string;
+  key: string;
   description: string;
+  template: ProjectTemplateEnum;
   workspaceId: string;
   createdBy: string;
 }

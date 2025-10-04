@@ -101,7 +101,7 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
       workspaceId,
       skip,
       limit,
-      search = ""
+      (search = "")
     );
 
     const isOwner = member.role === "owner";

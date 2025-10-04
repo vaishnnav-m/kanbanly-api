@@ -13,7 +13,7 @@ export class ProjectController implements IProjectController {
   ) {}
 
   async createProject(req: Request, res: Response): Promise<void> {
-    const { name, description } = req.body;
+    const { name, key, description, template } = req.body;
     const workspaceId = req.params.workspaceId;
     const userId = req.user?.userid;
 
@@ -26,7 +26,9 @@ export class ProjectController implements IProjectController {
 
     await this._projectService.addProject({
       name,
+      key,
       description,
+      template,
       workspaceId,
       createdBy: userId,
     });
@@ -175,7 +177,7 @@ export class ProjectController implements IProjectController {
       data: members,
     });
   }
-  
+
   async removeMember(req: Request, res: Response): Promise<void> {
     const projectId = req.params.projectId;
     const workspaceId = req.params.workspaceId;
