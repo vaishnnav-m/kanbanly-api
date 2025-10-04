@@ -145,7 +145,9 @@ export class ProjectService implements IProjectService {
       return {
         projectId: project.projectId,
         name: project.name,
+        key: project.key,
         description: project.description,
+        template: project.template,
         members: project.members,
         status: project.status,
         lastUpdated: project.updatedAt.toString(),
@@ -175,10 +177,13 @@ export class ProjectService implements IProjectService {
         HTTP_STATUS.NOT_FOUND
       );
     }
+    
     return {
       projectId: project.projectId,
       name: project.name,
       description: project.description,
+      template: project.template,
+      key: project.key,
       members: project.members,
       status: project.status,
       lastUpdated: project.updatedAt.toString(),
