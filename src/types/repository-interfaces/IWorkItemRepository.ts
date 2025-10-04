@@ -6,5 +6,5 @@ import { TaskDetailRepoDto } from "../dtos/task/task.dto";
 export interface IWorkItemRepository extends IBaseRepository<IWorkItem> {
   getTasksWithAssigness(
     query: FilterQuery<IWorkItem>
-  ): Promise<TaskDetailRepoDto>;
+  ): Promise<TaskDetailRepoDto[]>;
 }

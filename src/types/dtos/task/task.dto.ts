@@ -60,3 +60,16 @@ export interface TaskDetailsDto {
 export type TaskDetailRepoDto = Omit<IWorkItem, "assignedTo"> & {
   assignedTo: IWorkspaceMember;
 };
+
+export interface TaskListingDto {
+  taskId: string;
+  task: string;
+  description?: string;
+  status: TaskStatus;
+  assignedTo: {
+    email: string;
+    name: string;
+  } | null;
+  priority: TaskPriority;
+  dueDate?: Date;
+}

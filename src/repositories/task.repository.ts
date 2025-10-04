@@ -17,7 +17,7 @@ export class WorkItemRepository
 
   async getTasksWithAssigness(
     query: FilterQuery<IWorkItem>
-  ): Promise<TaskDetailRepoDto> {
+  ): Promise<TaskDetailRepoDto[]> {
     const result = await this.model.aggregate([
       { $match: { ...query, isDeleted: false } },
       {
@@ -42,15 +42,16 @@ export class WorkItemRepository
           description: 1,
           assignedTo: 1,
           status: 1,
+          workItemType: 1,
           priority: 1,
           dueDate: 1,
           createdBy: 1,
+          epicId: 1,
+          sprintId: 1,
         },
       },
     ]);
 
-    const data = result[0];
-
-    return data;
+    return result;
   }
 }

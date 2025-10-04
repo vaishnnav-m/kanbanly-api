@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
 import { IProject } from "../types/entities/IProject";
+import { ProjectTemplateEnum } from "../types/enums/project-template.enum";
 
 const projectSchema = new Schema<IProject>(
   {
@@ -13,13 +14,22 @@ const projectSchema = new Schema<IProject>(
       required: true,
       unique: true,
     },
-    description: {
-      type: String,
-    },
     normalizedName: {
       type: String,
       required: true,
       unique: true,
+    },
+    key: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+    },
+    template: {
+      type: String,
+      required: true,
+      enum: ProjectTemplateEnum,
     },
     workspaceId: {
       type: String,
