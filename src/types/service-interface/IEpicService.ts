@@ -1,4 +1,8 @@
-import { EpicCreationDto, EpicResponseDto } from "../dtos/epic/epic.dto";
+import {
+  EpicCreationDto,
+  EpicResponseDto,
+  EpicUpdationDto,
+} from "../dtos/epic/epic.dto";
 
 export interface IEpicService {
   createEpic(epicData: EpicCreationDto): Promise<void>;
@@ -7,4 +11,5 @@ export interface IEpicService {
     workspaceId: string,
     projectId: string
   ): Promise<EpicResponseDto[]>;
+  editEpic(userId: string, epicData: EpicUpdationDto): Promise<void>;
 }

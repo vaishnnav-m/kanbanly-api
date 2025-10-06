@@ -1,7 +1,11 @@
 import { inject, injectable } from "tsyringe";
 import { IEpicService } from "../types/service-interface/IEpicService";
 import { IEpicRepository } from "../types/repository-interfaces/IEpicRepository";
-import { EpicCreationDto, EpicResponseDto } from "../types/dtos/epic/epic.dto";
+import {
+  EpicCreationDto,
+  EpicResponseDto,
+  EpicUpdationDto,
+} from "../types/dtos/epic/epic.dto";
 import { normalizeString } from "../shared/utils/stringNormalizer";
 import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
@@ -9,6 +13,8 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 import { IWorkspaceMemberService } from "../types/service-interface/IWorkspaceMemberService";
 import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
 import { v4 as uuidv4 } from "uuid";
+import { IEpic } from "../types/entities/IEpic";
+import logger from "../logger/winston.logger";
 
 @injectable()
 export class EpicService implements IEpicService {
@@ -84,5 +90,44 @@ export class EpicService implements IEpicService {
     }));
 
     return mappedEpics;
+  }
+
+  async editEpic(userId: string, epicData: EpicUpdationDto): Promise<void> {
+    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+      epicData.workspaceId as string,
+      userId
+    );
+    if (!workspaceMember || workspaceMember.role === workspaceRoles.member) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    let normalized = "";
+
+    if (epicData.title) {
+      // checking if the epic already exists
+      normalized = normalizeString(epicData.title);
+      const exisitingEpic = await this._epicRepo.findOne({ normalized });
+      if (exisitingEpic) {
+        throw new AppError(
+          ERROR_MESSAGES.EPIC_ALREADY_EXISTS,
+          HTTP_STATUS.CONFLICT
+        );
+      }
+    }
+
+    const newEpicData: Partial<IEpic> = {
+      ...(normalized && { title: epicData.title, normalized }),
+      ...(epicData.description && { description: epicData.description }),
+      ...(epicData.color && { color: epicData.color }),
+    };
+
+    if (!Object.values(newEpicData).length) {
+      return;
+    }
+
+    await this._epicRepo.update({ epicId: epicData.epicId }, newEpicData);
   }
 }

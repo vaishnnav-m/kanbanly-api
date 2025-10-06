@@ -5,3 +5,11 @@ export type EpicCreationDto = Omit<
   "epicId" | "createdAt" | "updatedAt" | "normalized"
 >;
 export type EpicResponseDto = Omit<IEpic, "normalized">;
+
+export interface EpicUpdationDto {
+  epicId: string;
+  workspaceId: string;
+  title?: string;
+  description?: string;
+  color?: string;
+}
