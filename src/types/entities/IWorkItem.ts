@@ -6,11 +6,12 @@ export interface IWorkItem {
   projectId: string;
   workspaceId: string;
   description?: string;
-  workItemType: WorkItemType; // Task, Bug, Feature
+  workItemType: WorkItemType; // Task, Bug, Feature, Story
   status: TaskStatus; // Todo, InProgress, Completed
   priority: TaskPriority; // Low, Medium, High
   assignedTo?: string;
   epicId?: string;
+  epic?: { epicId: string; title: string; color: string };
   sprintId?: string;
   createdBy: string;
   dueDate?: Date;

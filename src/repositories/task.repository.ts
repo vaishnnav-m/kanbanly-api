@@ -20,6 +20,7 @@ export class WorkItemRepository
   ): Promise<TaskDetailRepoDto[]> {
     const result = await this.model.aggregate([
       { $match: { ...query, isDeleted: false } },
+      // Lookup for assignee (workspace member)
       {
         $lookup: {
           from: "workspacemembers",
@@ -35,6 +36,20 @@ export class WorkItemRepository
         },
       },
       {
+        $lookup: {
+          from: "epics",
+          localField: "epicId",
+          foreignField: "epicId",
+          as: "epic",
+        },
+      },
+      {
+        $unwind: {
+          path: "$epic",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $project: {
           _id: 0,
           taskId: 1,
@@ -46,8 +61,12 @@ export class WorkItemRepository
           priority: 1,
           dueDate: 1,
           createdBy: 1,
-          epicId: 1,
           sprintId: 1,
+          epic: {
+            epicId:1,
+            title: 1,
+            color: 1,
+          },
         },
       },
     ]);

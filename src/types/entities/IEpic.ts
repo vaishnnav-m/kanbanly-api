@@ -3,6 +3,7 @@ export interface IEpic {
   title: string;
   normalized: string;
   description?: string;
+  color: string;
   projectId: string;
   workspaceId: string;
   createdBy: string;

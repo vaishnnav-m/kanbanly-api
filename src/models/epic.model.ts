@@ -18,6 +18,10 @@ const epicSchema = new Schema<IEpic>(
     description: {
       type: String,
     },
+    color: {
+      type: String,
+      required: true,
+    },
     projectId: {
       type: String,
       reqiured: true,

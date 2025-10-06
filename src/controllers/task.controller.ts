@@ -173,6 +173,34 @@ export class TaskController implements ITaskController {
       .json({ success: true, message: SUCCESS_MESSAGES.DATA_EDITED });
   }
 
+  async attachParentItem(req: Request, res: Response) {
+    const userId = req.user?.userid;
+    const workspaceId = req.params.workspaceId;
+    const taskId = req.params.taskId;
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+    const { parentId, parentType } = req.body as {
+      parentId: string;
+      parentType: "epic" | "task";
+    };
+
+    await this._taskService.attachParentItem(
+      parentType,
+      parentId,
+      taskId,
+      userId,
+      workspaceId
+    );
+
+    res
+      .status(HTTP_STATUS.OK)
+      .json({ success: true, message: SUCCESS_MESSAGES.DATA_EDITED });
+  }
+
   async removeTask(req: Request, res: Response) {
     const userId = req.user?.userid;
     const workspaceId = req.params.workspaceId;

@@ -31,6 +31,13 @@ export interface ITaskService {
     userId: string,
     data: EditTaskDto
   ): Promise<void>;
+  attachParentItem(
+    parentType: "task" | "epic",
+    parentId: string,
+    taskId: string,
+    workspaceId: string,
+    userId: string
+  ): Promise<void>;
   removeTask(
     workspaceId: string,
     taskId: string,

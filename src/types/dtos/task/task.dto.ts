@@ -4,6 +4,7 @@ import { IWorkspaceMember } from "../../entities/IWorkspaceMember";
 export enum WorkItemType {
   Task = "task",
   Bug = "bug",
+  Story = "story",
   Feature = "feature",
 }
 

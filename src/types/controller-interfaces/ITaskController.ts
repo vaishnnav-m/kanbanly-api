@@ -6,5 +6,6 @@ export interface ITaskController {
   getOneTask: controllerMethod;
   changeTaskStatus: controllerMethod;
   editTask: controllerMethod;
+  attachParentItem: controllerMethod;
   removeTask: controllerMethod;
 }

@@ -18,7 +18,10 @@ export class EpicController implements IEpicController {
         HTTP_STATUS.UNAUTHORIZED
       );
     }
-    const epicData = req.body as Pick<EpicCreationDto, "title" | "description">;
+    const epicData = req.body as Pick<
+      EpicCreationDto,
+      "title" | "description" | "color"
+    >;
     const workspaceId = req.params.workspaceId as string;
     const projectId = req.params.projectId as string;
 
@@ -32,6 +35,7 @@ export class EpicController implements IEpicController {
     const newEpicData = {
       title: epicData.title,
       description: epicData.description,
+      color: epicData.color,
       workspaceId,
       projectId,
       createdBy: userId,
