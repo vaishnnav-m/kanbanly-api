@@ -74,3 +74,9 @@ export interface TaskListingDto {
   priority: TaskPriority;
   dueDate?: Date;
 }
+
+export interface TaskCountsForEpicDto {
+  epicId: string;
+  totalTasks: number;
+  completedTasks: number;
+}

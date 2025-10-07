@@ -4,6 +4,7 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { container } from "tsyringe";
 import { ITokenService } from "../types/service-interface/ITokenService";
+import logger from "../logger/winston.logger";
 
 export const authenticateToken = (
   req: Request,
@@ -35,7 +36,7 @@ export const authenticateToken = (
     req.user = decoded;
     next();
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: ERROR_MESSAGES.UNEXPECTED_SERVER_ERROR,

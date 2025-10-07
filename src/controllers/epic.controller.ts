@@ -6,7 +6,6 @@ import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../shared/constants/messages";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { EpicCreationDto } from "../types/dtos/epic/epic.dto";
-import logger from "../logger/winston.logger";
 
 @injectable()
 export class EpicController implements IEpicController {

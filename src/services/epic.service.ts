@@ -82,15 +82,42 @@ export class EpicService implements IEpicService {
     }
 
     const epics = await this._epicRepo.find({ workspaceId, projectId });
-    const mappedEpics: EpicResponseDto[] = epics.map((epic) => ({
-      epicId: epic.epicId,
-      title: epic.title,
-      description: epic.description,
-      color: epic.color,
-      projectId: epic.projectId,
-      workspaceId: epic.workspaceId,
-      createdBy: epic.createdBy,
-    }));
+
+    // geting the counts
+    const epicIds = epics.map((epic) => epic.epicId);
+    const taskCounts = await this._taskRepo.getTaskCountsForEpic(epicIds);
+
+    console.log("task counts", taskCounts);
+
+    // counts map mapped with epicIds
+    const countsMap = new Map<string, { total: number; completed: number }>();
+    taskCounts.forEach((count) => {
+      countsMap.set(count.epicId, {
+        total: count.totalTasks,
+        completed: count.completedTasks,
+      });
+    });
+
+    // map to the inteded result
+    const mappedEpics: EpicResponseDto[] = epics.map((epic) => {
+      // calculates percentage
+      const counts = countsMap.get(epic.epicId) || { total: 0, completed: 0 };
+      const percentageDone =
+        counts.total > 0
+          ? (counts.completed / counts.total) * 100
+          : 0;
+
+      return {
+        epicId: epic.epicId,
+        title: epic.title,
+        description: epic.description,
+        color: epic.color,
+        projectId: epic.projectId,
+        workspaceId: epic.workspaceId,
+        createdBy: epic.createdBy,
+        percentageDone,
+      };
+    });
 
     return mappedEpics;
   }

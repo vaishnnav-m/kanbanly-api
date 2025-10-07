@@ -119,8 +119,6 @@ export class TaskService implements ITaskService {
       isDeleted: false,
     });
 
-    console.log("tasks",tasks)
-
     const mappedTasks = tasks.map((task) => ({
       taskId: task.taskId,
       task: task.task,

@@ -4,7 +4,10 @@ import { IWorkItem } from "../types/entities/IWorkItem";
 import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
 import { BaseRepository } from "./base.repository";
 import { ClientSession, FilterQuery, UpdateWriteOpResult } from "mongoose";
-import { TaskDetailRepoDto } from "../types/dtos/task/task.dto";
+import {
+  TaskCountsForEpicDto,
+  TaskDetailRepoDto,
+} from "../types/dtos/task/task.dto";
 
 interface ITransactionOptions {
   session?: ClientSession;
@@ -85,5 +88,29 @@ export class WorkItemRepository
     return this.model
       .updateMany({ epicId }, { $set: { epicId: null } }, options)
       .exec();
+  }
+
+  async getTaskCountsForEpic(epicIds: string[]): Promise<TaskCountsForEpicDto[]> {
+    const results = await this.model.aggregate([
+      {
+        $match: { epicId: { $in: epicIds } },
+      },
+      {
+        $group: {
+          _id: "$epicId",
+          totalTasks: { $sum: 1 },
+          completedTasks: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "completed"] }, 1, 0],
+            },
+          },
+        },
+      },
+      {
+        $project: { _id: 0, epicId: "$_id", totalTasks: 1, completedTasks: 1 },
+      },
+    ]);
+    console.log("repo:",results)
+    return results;
   }
 }
