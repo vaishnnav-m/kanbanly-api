@@ -14,6 +14,8 @@ import { IWorkspaceMemberService } from "../types/service-interface/IWorkspaceMe
 import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
 import { v4 as uuidv4 } from "uuid";
 import { IEpic } from "../types/entities/IEpic";
+import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
+import mongoose from "mongoose";
 import logger from "../logger/winston.logger";
 
 @injectable()
@@ -21,7 +23,8 @@ export class EpicService implements IEpicService {
   constructor(
     @inject("IEpicRepository") private _epicRepo: IEpicRepository,
     @inject("IWorkspaceMemberService")
-    private _workspaceMemberService: IWorkspaceMemberService
+    private _workspaceMemberService: IWorkspaceMemberService,
+    @inject("IWorkItemRepository") private _taskRepo: IWorkItemRepository
   ) {}
 
   async createEpic(epicData: EpicCreationDto): Promise<void> {
@@ -94,7 +97,7 @@ export class EpicService implements IEpicService {
 
   async editEpic(userId: string, epicData: EpicUpdationDto): Promise<void> {
     const workspaceMember = await this._workspaceMemberService.getCurrentMember(
-      epicData.workspaceId as string,
+      epicData.workspaceId,
       userId
     );
     if (!workspaceMember || workspaceMember.role === workspaceRoles.member) {
@@ -129,5 +132,37 @@ export class EpicService implements IEpicService {
     }
 
     await this._epicRepo.update({ epicId: epicData.epicId }, newEpicData);
+  }
+
+  async deleteEpic(
+    userId: string,
+    epicId: string,
+    workspaceId: string
+  ): Promise<void> {
+    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+      workspaceId,
+      userId
+    );
+    if (!workspaceMember || workspaceMember.role === workspaceRoles.member) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const session = await mongoose.startSession();
+    try {
+      await session.withTransaction(async () => {
+        const transactionOptions = { session };
+        await this._taskRepo.detachByEpicId(epicId, transactionOptions);
+
+        await this._epicRepo.delete({ epicId });
+      });
+    } catch (error: any) {
+      logger.error("Transaction aborted due to an error:", error.message);
+      throw error;
+    } finally {
+      await session.endSession();
+    }
   }
 }

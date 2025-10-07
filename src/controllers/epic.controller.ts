@@ -118,4 +118,28 @@ export class EpicController implements IEpicController {
       message: SUCCESS_MESSAGES.DATA_EDITED,
     });
   }
+  async deleteEpic(req: Request, res: Response) {
+    const userId = req.user?.userid;
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+    const workspaceId = req.params.workspaceId as string;
+    const epicId = req.params.epicId as string;
+
+    if (!workspaceId || !epicId) {
+      throw new AppError(
+        ERROR_MESSAGES.INPUT_VALIDATION_FAILED,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    await this._epicService.deleteEpic(userId, epicId, workspaceId);
+
+    res
+      .status(HTTP_STATUS.OK)
+      .json({ success: true, message: SUCCESS_MESSAGES.DATA_DELETED });
+  }
 }

@@ -3,8 +3,12 @@ import { workItemModel } from "../models/work-item.model";
 import { IWorkItem } from "../types/entities/IWorkItem";
 import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
 import { BaseRepository } from "./base.repository";
-import { FilterQuery } from "mongoose";
+import { ClientSession, FilterQuery, UpdateWriteOpResult } from "mongoose";
 import { TaskDetailRepoDto } from "../types/dtos/task/task.dto";
+
+interface ITransactionOptions {
+  session?: ClientSession;
+}
 
 @injectable()
 export class WorkItemRepository
@@ -63,7 +67,7 @@ export class WorkItemRepository
           createdBy: 1,
           sprintId: 1,
           epic: {
-            epicId:1,
+            epicId: 1,
             title: 1,
             color: 1,
           },
@@ -72,5 +76,14 @@ export class WorkItemRepository
     ]);
 
     return result;
+  }
+
+  async detachByEpicId(
+    epicId: string,
+    options: ITransactionOptions
+  ): Promise<UpdateWriteOpResult> {
+    return this.model
+      .updateMany({ epicId }, { $set: { epicId: null } }, options)
+      .exec();
   }
 }

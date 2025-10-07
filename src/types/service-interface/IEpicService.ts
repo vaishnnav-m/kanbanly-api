@@ -12,4 +12,9 @@ export interface IEpicService {
     projectId: string
   ): Promise<EpicResponseDto[]>;
   editEpic(userId: string, epicData: EpicUpdationDto): Promise<void>;
+  deleteEpic(
+    userId: string,
+    epicId: string,
+    workspaceId: string
+  ): Promise<void>;
 }
