@@ -4,4 +4,14 @@ export type EpicCreationDto = Omit<
   IEpic,
   "epicId" | "createdAt" | "updatedAt" | "normalized"
 >;
-export type EpicResponseDto = Omit<IEpic, "normalized">;
+export type EpicResponseDto = Omit<IEpic, "normalized" | "status"> & {
+  percentageDone: number;
+};
+
+export interface EpicUpdationDto {
+  epicId: string;
+  workspaceId: string;
+  title?: string;
+  description?: string;
+  color?: string;
+}

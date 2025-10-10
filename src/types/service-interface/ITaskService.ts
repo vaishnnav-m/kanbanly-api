@@ -4,6 +4,7 @@ import {
   TaskDetailsDto,
   TaskListingDto,
   TaskStatus,
+  WorkItemType,
 } from "../dtos/task/task.dto";
 
 export interface ITaskService {
@@ -30,6 +31,13 @@ export interface ITaskService {
     taskId: string,
     userId: string,
     data: EditTaskDto
+  ): Promise<void>;
+  attachParentItem(
+    parentType: WorkItemType,
+    parentId: string,
+    taskId: string,
+    workspaceId: string,
+    userId: string
   ): Promise<void>;
   removeTask(
     workspaceId: string,

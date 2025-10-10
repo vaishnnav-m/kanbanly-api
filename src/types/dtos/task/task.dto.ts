@@ -4,7 +4,10 @@ import { IWorkspaceMember } from "../../entities/IWorkspaceMember";
 export enum WorkItemType {
   Task = "task",
   Bug = "bug",
+  Story = "story",
   Feature = "feature",
+  Epic = "epic",
+  Subtask = "subtask",
 }
 
 export enum TaskStatus {
@@ -54,6 +57,12 @@ export interface TaskDetailsDto {
     name: string;
   } | null;
   priority: TaskPriority;
+  parent?: {
+    parentId: string;
+    title: string;
+    type: WorkItemType;
+    color: string;
+  };
   dueDate?: Date;
 }
 
@@ -72,4 +81,10 @@ export interface TaskListingDto {
   } | null;
   priority: TaskPriority;
   dueDate?: Date;
+}
+
+export interface TaskCountsForEpicDto {
+  epicId: string;
+  totalTasks: number;
+  completedTasks: number;
 }

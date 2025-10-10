@@ -8,6 +8,7 @@ import {
   TaskDetailsDto,
   TaskListingDto,
   TaskStatus,
+  WorkItemType,
 } from "../types/dtos/task/task.dto";
 import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWorkspaceMember";
 import AppError from "../shared/utils/AppError";
@@ -132,7 +133,7 @@ export class TaskService implements ITaskService {
         : null,
       status: task.status,
       workItemType: task.workItemType,
-      epicId: task.epicId,
+      epic: task.epic,
       sprintId: task.sprintId,
     }));
 
@@ -185,6 +186,14 @@ export class TaskService implements ITaskService {
               name: task.assignedTo.name,
               email: task.assignedTo.email,
             },
+      ...(task.epic && {
+        parent: {
+          title: task.epic.title,
+          parentId: task.epic.epicId,
+          type: WorkItemType.Epic,
+          color: task.epic.color,
+        },
+      }),
       status: task.status,
     };
   }
@@ -293,6 +302,34 @@ export class TaskService implements ITaskService {
     };
 
     await this._workItemRepo.update({ taskId }, newTask);
+  }
+
+  async attachParentItem(
+    parentType: WorkItemType,
+    parentId: string,
+    taskId: string,
+    userId: string,
+    workspaceId: string
+  ): Promise<void> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      userId,
+      workspaceId,
+      isActive: true,
+    });
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
+    }
+
+    const task = await this._workItemRepo.findOne({ taskId });
+    if (!task) {
+      throw new AppError(ERROR_MESSAGES.TASK_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+    }
+
+    switch (parentType) {
+      case "epic":
+        await this._workItemRepo.update({ taskId }, { epicId: parentId });
+        break;
+    }
   }
 
   async removeTask(
