@@ -6,6 +6,8 @@ export enum WorkItemType {
   Bug = "bug",
   Story = "story",
   Feature = "feature",
+  Epic = "epic",
+  Subtask = "subtask",
 }
 
 export enum TaskStatus {
@@ -55,6 +57,12 @@ export interface TaskDetailsDto {
     name: string;
   } | null;
   priority: TaskPriority;
+  parent?: {
+    parentId: string;
+    title: string;
+    type: WorkItemType;
+    color: string;
+  };
   dueDate?: Date;
 }
 

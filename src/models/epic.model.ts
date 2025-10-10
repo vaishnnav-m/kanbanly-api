@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
 import { IEpic } from "../types/entities/IEpic";
+import { TaskStatus } from "../types/dtos/task/task.dto";
 
 const epicSchema = new Schema<IEpic>(
   {
@@ -13,6 +14,12 @@ const epicSchema = new Schema<IEpic>(
     },
     normalized: {
       type: String,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: TaskStatus,
+      default: TaskStatus.Todo,
       required: true,
     },
     description: {

@@ -4,6 +4,7 @@ import {
   TaskDetailsDto,
   TaskListingDto,
   TaskStatus,
+  WorkItemType,
 } from "../dtos/task/task.dto";
 
 export interface ITaskService {
@@ -32,7 +33,7 @@ export interface ITaskService {
     data: EditTaskDto
   ): Promise<void>;
   attachParentItem(
-    parentType: "task" | "epic",
+    parentType: WorkItemType,
     parentId: string,
     taskId: string,
     workspaceId: string,

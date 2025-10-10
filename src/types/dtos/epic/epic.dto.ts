@@ -4,7 +4,7 @@ export type EpicCreationDto = Omit<
   IEpic,
   "epicId" | "createdAt" | "updatedAt" | "normalized"
 >;
-export type EpicResponseDto = Omit<IEpic, "normalized"> & {
+export type EpicResponseDto = Omit<IEpic, "normalized" | "status"> & {
   percentageDone: number;
 };
 

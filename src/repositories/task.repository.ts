@@ -110,7 +110,6 @@ export class WorkItemRepository
         $project: { _id: 0, epicId: "$_id", totalTasks: 1, completedTasks: 1 },
       },
     ]);
-    console.log("repo:",results)
     return results;
   }
 }

@@ -1,4 +1,6 @@
 import { inject, injectable } from "tsyringe";
+import mongoose from "mongoose";
+import { v4 as uuidv4 } from "uuid";
 import { IEpicService } from "../types/service-interface/IEpicService";
 import { IEpicRepository } from "../types/repository-interfaces/IEpicRepository";
 import {
@@ -12,11 +14,10 @@ import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { IWorkspaceMemberService } from "../types/service-interface/IWorkspaceMemberService";
 import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
-import { v4 as uuidv4 } from "uuid";
 import { IEpic } from "../types/entities/IEpic";
 import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
-import mongoose from "mongoose";
 import logger from "../logger/winston.logger";
+import { TaskStatus } from "../types/dtos/task/task.dto";
 
 @injectable()
 export class EpicService implements IEpicService {
@@ -55,6 +56,7 @@ export class EpicService implements IEpicService {
       epicId: uuidv4(),
       title: epicData.title,
       normalized,
+      status: TaskStatus.Todo,
       color: epicData.color,
       ...(epicData.description && { description: epicData.description }),
       workspaceId: epicData.workspaceId,
@@ -87,8 +89,6 @@ export class EpicService implements IEpicService {
     const epicIds = epics.map((epic) => epic.epicId);
     const taskCounts = await this._taskRepo.getTaskCountsForEpic(epicIds);
 
-    console.log("task counts", taskCounts);
-
     // counts map mapped with epicIds
     const countsMap = new Map<string, { total: number; completed: number }>();
     taskCounts.forEach((count) => {
@@ -103,9 +103,7 @@ export class EpicService implements IEpicService {
       // calculates percentage
       const counts = countsMap.get(epic.epicId) || { total: 0, completed: 0 };
       const percentageDone =
-        counts.total > 0
-          ? (counts.completed / counts.total) * 100
-          : 0;
+        counts.total > 0 ? (counts.completed / counts.total) * 100 : 0;
 
       return {
         epicId: epic.epicId,

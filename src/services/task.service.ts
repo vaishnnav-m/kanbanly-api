@@ -8,6 +8,7 @@ import {
   TaskDetailsDto,
   TaskListingDto,
   TaskStatus,
+  WorkItemType,
 } from "../types/dtos/task/task.dto";
 import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWorkspaceMember";
 import AppError from "../shared/utils/AppError";
@@ -132,7 +133,7 @@ export class TaskService implements ITaskService {
         : null,
       status: task.status,
       workItemType: task.workItemType,
-      epic:task.epic,
+      epic: task.epic,
       sprintId: task.sprintId,
     }));
 
@@ -185,6 +186,14 @@ export class TaskService implements ITaskService {
               name: task.assignedTo.name,
               email: task.assignedTo.email,
             },
+      ...(task.epic && {
+        parent: {
+          title: task.epic.title,
+          parentId: task.epic.epicId,
+          type: WorkItemType.Epic,
+          color: task.epic.color,
+        },
+      }),
       status: task.status,
     };
   }
@@ -296,7 +305,7 @@ export class TaskService implements ITaskService {
   }
 
   async attachParentItem(
-    parentType: "task" | "epic",
+    parentType: WorkItemType,
     parentId: string,
     taskId: string,
     userId: string,

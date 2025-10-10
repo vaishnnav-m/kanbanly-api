@@ -7,6 +7,7 @@ import {
   EditTaskDto,
   TaskPriority,
   TaskStatus,
+  WorkItemType,
 } from "../types/dtos/task/task.dto";
 import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../shared/constants/messages";
@@ -185,7 +186,7 @@ export class TaskController implements ITaskController {
     }
     const { parentId, parentType } = req.body as {
       parentId: string;
-      parentType: "epic" | "task";
+      parentType: WorkItemType;
     };
 
     await this._taskService.attachParentItem(
