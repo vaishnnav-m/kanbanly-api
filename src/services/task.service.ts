@@ -6,6 +6,7 @@ import {
   CreateTaskDto,
   EditTaskDto,
   TaskDetailsDto,
+  TaskFilters,
   TaskListingDto,
   TaskStatus,
   WorkItemType,
@@ -91,7 +92,8 @@ export class TaskService implements ITaskService {
   async getAllTask(
     workspaceId: string,
     projectId: string,
-    userId: string
+    userId: string,
+    filters: TaskFilters
   ): Promise<TaskListingDto[]> {
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       userId,
@@ -117,6 +119,9 @@ export class TaskService implements ITaskService {
     const tasks = await this._workItemRepo.getTasksWithAssigness({
       workspaceId,
       projectId,
+      ...(filters.status && { status: filters.status }),
+      ...(filters.priority && { priority: filters.priority }),
+      ...(filters.assignedTo && { status: filters.assignedTo }),
       isDeleted: false,
     });
 

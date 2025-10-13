@@ -5,6 +5,7 @@ import { Request, Response } from "express";
 import {
   CreateTaskDto,
   EditTaskDto,
+  TaskFilters,
   TaskPriority,
   TaskStatus,
   WorkItemType,
@@ -68,6 +69,7 @@ export class TaskController implements ITaskController {
     const userId = req.user?.userid;
     const workspaceId = req.params.workspaceId;
     const projectId = req.params.projectId;
+    const filters = req.query as TaskFilters;
 
     if (!userId) {
       throw new AppError(
@@ -79,7 +81,8 @@ export class TaskController implements ITaskController {
     const tasks = await this._taskService.getAllTask(
       workspaceId,
       projectId,
-      userId
+      userId,
+      filters
     );
 
     res.status(HTTP_STATUS.OK).json({

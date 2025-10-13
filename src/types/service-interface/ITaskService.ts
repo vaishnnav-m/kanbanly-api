@@ -2,6 +2,7 @@ import {
   CreateTaskDto,
   EditTaskDto,
   TaskDetailsDto,
+  TaskFilters,
   TaskListingDto,
   TaskStatus,
   WorkItemType,
@@ -12,7 +13,8 @@ export interface ITaskService {
   getAllTask(
     workspaceId: string,
     projectId: string,
-    userId: string
+    userId: string,
+    filters: TaskFilters
   ): Promise<TaskListingDto[]>;
   getOneTask(
     workspaceId: string,

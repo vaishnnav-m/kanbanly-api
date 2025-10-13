@@ -41,6 +41,12 @@ const epicSchema = new Schema<IEpic>(
       type: String,
       required: true,
     },
+    assignedTo: {
+      type: String,
+    },
+    dueDate: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );
