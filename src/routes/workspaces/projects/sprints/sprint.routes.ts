@@ -16,5 +16,9 @@ export class SprintRoutes extends BaseRoute {
       "/",
       this._epicController.createSprint.bind(this._epicController)
     );
+    this._router.get(
+      "/",
+      this._epicController.getAllSprints.bind(this._epicController)
+    );
   }
 }

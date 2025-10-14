@@ -1,6 +1,10 @@
 import { inject, injectable } from "tsyringe";
 import { ISprintService } from "../types/service-interface/ISprintService";
-import { CreateSprintDto } from "../types/dtos/sprint/sprint.dto";
+import {
+  CreateSprintDto,
+  SprintResponseDto,
+  SprintStatus,
+} from "../types/dtos/sprint/sprint.dto";
 import { IWorkspaceMemberService } from "../types/service-interface/IWorkspaceMemberService";
 import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
 import AppError from "../shared/utils/AppError";
@@ -45,7 +49,8 @@ export class SprintService implements ISprintService {
       sprintId: uuidV4(),
       name: sprintData.name,
       normalizedName,
-      description: sprintData.description,
+      goal: sprintData.goal,
+      status: SprintStatus.Future,
       workspaceId,
       projectId,
       createdBy: userId,
@@ -54,5 +59,33 @@ export class SprintService implements ISprintService {
     };
 
     await this._sprintRepo.create(newSprint);
+  }
+
+  async getAllSprints(
+    userId: string,
+    workspaceId: string,
+    projectId: string
+  ): Promise<SprintResponseDto[]> {
+    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+      workspaceId,
+      userId
+    );
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.FORBIDDEN);
+    }
+
+    const sprints = await this._sprintRepo.find({
+      projectId,
+      status: { $ne: SprintStatus.Completed },
+    });
+
+    const mappedSprints: SprintResponseDto[] = sprints.map((sprint) => ({
+      sprintId: sprint.sprintId,
+      name: sprint.name,
+      startDate: sprint.startDate,
+      endDate: sprint.endDate,
+    }));
+
+    return mappedSprints;
   }
 }

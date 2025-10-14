@@ -1,4 +1,4 @@
-import { CreateSprintDto } from "../dtos/sprint/sprint.dto";
+import { CreateSprintDto, SprintResponseDto } from "../dtos/sprint/sprint.dto";
 
 export interface ISprintService {
   createSprint(
@@ -7,4 +7,9 @@ export interface ISprintService {
     projectId: string,
     sprintData: CreateSprintDto
   ): Promise<void>;
+  getAllSprints(
+    userId: string,
+    workspaceId: string,
+    projectId: string
+  ): Promise<SprintResponseDto[]>;
 }
