@@ -23,6 +23,8 @@ import { ISubscriptionController } from "../types/controller-interfaces/ISubscri
 import { SubscriptionController } from "../controllers/subscription.controller";
 import { IEpicController } from "../types/controller-interfaces/IEpicController";
 import { EpicController } from "../controllers/epic.controller";
+import { ISprintController } from "../types/controller-interfaces/ISprintController";
+import { SprintController } from "../controllers/sprint.controller";
 
 export class ControllerRegistry {
   static registerController(): void {
@@ -64,6 +66,9 @@ export class ControllerRegistry {
     });
     container.register<IEpicController>("IEpicController", {
       useClass: EpicController,
+    });
+    container.register<ISprintController>("ISprintController", {
+      useClass: SprintController,
     });
   }
 }

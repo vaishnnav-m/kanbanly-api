@@ -12,12 +12,10 @@ const projectSchema = new Schema<IProject>(
     name: {
       type: String,
       required: true,
-      unique: true,
     },
     normalizedName: {
       type: String,
       required: true,
-      unique: true,
     },
     key: {
       type: String,

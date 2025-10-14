@@ -75,4 +75,7 @@ export const ERROR_MESSAGES = {
   // EPIC
   EPIC_ALREADY_EXISTS: "An epic of the same name exists",
   EPIC_NOT_FOUND: "The epic not found",
+
+  // SPRINT
+  SPRINT_ALREADY_EXISTS: "A sprint of the same name exists",
 };
