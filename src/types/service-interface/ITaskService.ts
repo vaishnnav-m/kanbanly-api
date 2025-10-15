@@ -41,6 +41,13 @@ export interface ITaskService {
     workspaceId: string,
     userId: string
   ): Promise<void>;
+  attachSprint(
+    userId: string,
+    taskId: string,
+    sprintId: string,
+    workspaceId: string,
+    projectId: string
+  ): Promise<void>;
   removeTask(
     workspaceId: string,
     taskId: string,

@@ -205,6 +205,35 @@ export class TaskController implements ITaskController {
       .json({ success: true, message: SUCCESS_MESSAGES.DATA_EDITED });
   }
 
+  async attachSprint(req: Request, res: Response) {
+    const userId = req.user?.userid;
+    const workspaceId = req.params.workspaceId;
+    const projectId = req.params.projectId;
+    const taskId = req.params.taskId;
+
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+    const { sprintId } = req.body as {
+      sprintId: string;
+    };
+
+    await this._taskService.attachSprint(
+      userId,
+      taskId,
+      sprintId,
+      workspaceId,
+      projectId
+    );
+
+    res
+      .status(HTTP_STATUS.OK)
+      .json({ success: true, message: SUCCESS_MESSAGES.DATA_EDITED });
+  }
+
   async removeTask(req: Request, res: Response) {
     const userId = req.user?.userid;
     const workspaceId = req.params.workspaceId;

@@ -88,4 +88,43 @@ export class SprintService implements ISprintService {
 
     return mappedSprints;
   }
+
+  async getOneSprint(
+    userId: string,
+    sprintId: string,
+    workspaceId: string,
+    projectId: string
+  ): Promise<SprintResponseDto> {
+    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+      workspaceId,
+      userId
+    );
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.FORBIDDEN);
+    }
+
+    console.log(sprintId);
+
+    const sprint = await this._sprintRepo.findOne({
+      projectId,
+      sprintId,
+      status: { $ne: SprintStatus.Completed },
+    });
+
+    if (!sprint) {
+      throw new AppError(
+        ERROR_MESSAGES.SPRINT_NOT_EXISTS,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    const mappedSprint: SprintResponseDto = {
+      sprintId: sprint.sprintId,
+      name: sprint.name,
+      startDate: sprint.startDate,
+      endDate: sprint.endDate,
+    };
+
+    return mappedSprint;
+  }
 }

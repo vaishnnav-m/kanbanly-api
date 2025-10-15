@@ -78,4 +78,6 @@ export const ERROR_MESSAGES = {
 
   // SPRINT
   SPRINT_ALREADY_EXISTS: "A sprint of the same name exists",
+  SPRINT_NOT_EXISTS: "Sprint not found",
+  SPRINT_EXISTS_TASK: "The task is already a part of a sprint",
 };

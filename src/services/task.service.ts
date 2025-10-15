@@ -19,6 +19,8 @@ import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
 import { IProjectRepository } from "../types/repository-interfaces/IProjectRepository";
 import { IWorkItem } from "../types/entities/IWorkItem";
 import { IProjectService } from "../types/service-interface/IProjectService";
+import logger from "../logger/winston.logger";
+import { ISprintService } from "../types/service-interface/ISprintService";
 
 @injectable()
 export class TaskService implements ITaskService {
@@ -27,7 +29,8 @@ export class TaskService implements ITaskService {
     @inject("IWorkspaceMemberRepository")
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
     @inject("IProjectRepository") private _projectRepo: IProjectRepository,
-    @inject("IProjectService") private _projectService: IProjectService
+    @inject("IProjectService") private _projectService: IProjectService,
+    @inject("ISprintService") private _sprintService: ISprintService
   ) {}
 
   async createTask(data: CreateTaskDto): Promise<void> {
@@ -334,7 +337,61 @@ export class TaskService implements ITaskService {
       case "epic":
         await this._workItemRepo.update({ taskId }, { epicId: parentId });
         break;
+      default:
+        logger.error("An unhandled parent type in parent attach method :", {
+          type: parentType,
+        });
     }
+  }
+
+  async attachSprint(
+    userId: string,
+    taskId: string,
+    sprintId: string,
+    workspaceId: string,
+    projectId: string
+  ): Promise<void> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      userId,
+      workspaceId,
+      isActive: true,
+    });
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
+    }
+
+    const task = await this._workItemRepo.findOne({ taskId });
+    if (!task) {
+      throw new AppError(ERROR_MESSAGES.TASK_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+    }
+
+    if (!sprintId) {
+      await this._workItemRepo.update({ taskId }, { sprintId: null });
+      return;
+    }
+
+    if (task.sprintId) {
+      throw new AppError(
+        ERROR_MESSAGES.SPRINT_EXISTS_TASK,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const sprint = await this._sprintService.getOneSprint(
+      userId,
+      sprintId,
+      workspaceId,
+      projectId
+    );
+
+    if (!sprint) {
+      throw new AppError(
+        ERROR_MESSAGES.SPRINT_NOT_EXISTS,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    await this._workItemRepo.update({ taskId }, { sprintId });
   }
 
   async removeTask(

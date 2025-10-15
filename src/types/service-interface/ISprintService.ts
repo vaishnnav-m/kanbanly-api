@@ -12,4 +12,10 @@ export interface ISprintService {
     workspaceId: string,
     projectId: string
   ): Promise<SprintResponseDto[]>;
+  getOneSprint(
+    userId: string,
+    sprintId: string,
+    workspaceId: string,
+    projectId: string
+  ): Promise<SprintResponseDto>;
 }
