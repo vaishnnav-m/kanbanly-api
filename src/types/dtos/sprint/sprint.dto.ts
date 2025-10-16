@@ -14,6 +14,8 @@ export interface CreateSprintDto {
 export interface SprintResponseDto {
   sprintId: string;
   name: string;
+  goal?: string;
   startDate: Date;
   endDate: Date;
+  status: SprintStatus;
 }

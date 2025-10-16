@@ -47,6 +47,17 @@ export class SprintService implements ISprintService {
       projectId
     );
 
+    const activeSprint = await this._sprintRepo.findOne({
+      projectId,
+      status: SprintStatus.Active,
+    });
+    if (activeSprint) {
+      throw new AppError(
+        ERROR_MESSAGES.ACTIVE_SPRINT_EXISTS,
+        HTTP_STATUS.CONFLICT
+      );
+    }
+
     const projectSprints = await this._sprintRepo.find({ projectId });
     const projectKeyPrefix = project.key.split("-")[0];
 
@@ -103,6 +114,7 @@ export class SprintService implements ISprintService {
     const mappedSprints: SprintResponseDto[] = sprints.map((sprint) => ({
       sprintId: sprint.sprintId,
       name: sprint.name,
+      status: sprint.status,
       startDate: sprint.startDate,
       endDate: sprint.endDate,
     }));
@@ -140,8 +152,10 @@ export class SprintService implements ISprintService {
     const mappedSprint: SprintResponseDto = {
       sprintId: sprint.sprintId,
       name: sprint.name,
+      goal: sprint.goal,
       startDate: sprint.startDate,
       endDate: sprint.endDate,
+      status: sprint.status,
     };
 
     return mappedSprint;
@@ -160,6 +174,17 @@ export class SprintService implements ISprintService {
     );
     if (workspaceMember.role == workspaceRoles.member) {
       throw new AppError(ERROR_MESSAGES.ACTION_DENIED, HTTP_STATUS.FORBIDDEN);
+    }
+
+    const activeSprint = await this._sprintRepo.findOne({
+      projectId,
+      status: SprintStatus.Active,
+    });
+    if (activeSprint) {
+      throw new AppError(
+        ERROR_MESSAGES.ACTIVE_SPRINT_EXISTS,
+        HTTP_STATUS.CONFLICT
+      );
     }
 
     let normalizedName = "";
@@ -282,6 +307,7 @@ export class SprintService implements ISprintService {
       name: sprint.name,
       startDate: sprint.startDate,
       endDate: sprint.endDate,
+      status: sprint.status,
     };
 
     return mappedSprint;
