@@ -1,4 +1,6 @@
 import { ISprint } from "../entities/ISprint";
 import { IBaseRepository } from "./IBaseRepositroy";
 
-export interface ISprintRepository extends IBaseRepository<ISprint> {}
+export interface ISprintRepository extends IBaseRepository<ISprint> {
+  count(projectId: string): Promise<number>;
+}

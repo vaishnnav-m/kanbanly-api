@@ -187,7 +187,7 @@ export class EpicService implements IEpicService {
     if (!workspaceMember || workspaceMember.role === workspaceRoles.member) {
       throw new AppError(
         ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
-        HTTP_STATUS.BAD_REQUEST
+        HTTP_STATUS.FORBIDDEN
       );
     }
 

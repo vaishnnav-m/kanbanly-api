@@ -3,7 +3,7 @@ export const SUCCESS_MESSAGES = {
   LOGIN_SUCCESSFUL: "User logged in successfully.",
   DATA_FETCHED: "Data fetched successfully.",
   DATA_CREATED: "Data Created Successfully",
-  DATA_EDITED: "Data Edited Successfully",
+  DATA_EDITED: "Data Updated Successfully",
   DATA_DELETED: "Data Deleted Successfully",
   USER_UPDATED: "User updated successfully.",
   USER_LOGOUT: "User logout successfully.",
@@ -15,6 +15,8 @@ export const SUCCESS_MESSAGES = {
   PROJECT_CREATED: "Project Created Successfully",
   MEMBER_ADDED: "Member added successfully",
   MEMBER_REMOVED: "Member successfully removed",
+  // SPRINT
+  SPRINT_STARTED: "Sprint is now active! Time to get to work. Good luck, team!",
 };
 
 export const ERROR_MESSAGES = {
@@ -80,4 +82,8 @@ export const ERROR_MESSAGES = {
   SPRINT_ALREADY_EXISTS: "A sprint of the same name exists",
   SPRINT_NOT_EXISTS: "Sprint not found",
   SPRINT_EXISTS_TASK: "The task is already a part of a sprint",
+  ACTIVE_SPRINT_EXISTS: "Another sprint is already active.",
+  EMPTY_SPRINT:
+    "This sprint is empty. Please add issues from the backlog before starting.",
+  NO_ACTIVE_SPRINT: "There are no active sprints",
 };

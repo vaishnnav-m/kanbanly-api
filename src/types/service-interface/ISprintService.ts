@@ -18,4 +18,23 @@ export interface ISprintService {
     workspaceId: string,
     projectId: string
   ): Promise<SprintResponseDto>;
+  updateSprint(
+    userId: string,
+    workspaceId: string,
+    projectId: string,
+    sprintId: string,
+    sprintData: Partial<CreateSprintDto>
+  ): Promise<void>;
+  startSprint(
+    userId: string,
+    workspaceId: string,
+    projectId: string,
+    sprintId: string,
+    sprintData: Partial<CreateSprintDto>
+  ): Promise<void>;
+  getActiveSprint(
+    userId: string,
+    workspaceId: string,
+    projectId: string
+  ): Promise<SprintResponseDto>;
 }

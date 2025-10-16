@@ -10,4 +10,9 @@ export class SprintRepository
   constructor() {
     super(sprintModel);
   }
+
+  async count(projectId: string): Promise<number> {
+    const result = await this.model.countDocuments({ projectId });
+    return result;
+  }
 }
