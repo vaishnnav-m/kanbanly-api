@@ -1,54 +1,49 @@
 import { model, Schema } from "mongoose";
-import { IEpic } from "../types/entities/IEpic";
-import { TaskStatus } from "../types/dtos/task/task.dto";
+import { ISprint } from "../types/entities/ISprint";
+import { SprintStatus } from "../types/dtos/sprint/sprint.dto";
 
-const epicSchema = new Schema<IEpic>(
+const sprintSchema = new Schema<ISprint>(
   {
-    epicId: {
-      type: String,
-      required: true,
-    },
-    title: {
-      type: String,
-      required: true,
-    },
-    normalized: {
-      type: String,
-      required: true,
-    },
-    status: {
-      type: String,
-      enum: TaskStatus,
-      default: TaskStatus.Todo,
-      required: true,
-    },
-    description: {
-      type: String,
-    },
-    color: {
+    sprintId: {
       type: String,
       required: true,
     },
     projectId: {
       type: String,
-      reqiured: true,
+      required: true,
     },
     workspaceId: {
       type: String,
       required: true,
     },
+    name: {
+      type: String,
+      required: true,
+    },
+    normalizedName: {
+      type: String,
+      required: true,
+    },
+    goal: {
+      type: String,
+    },
+    status: {
+      type: String,
+      required: true,
+      enum: SprintStatus,
+    },
     createdBy: {
       type: String,
       required: true,
     },
-    assignedTo: {
-      type: String,
+    endDate: {
+      type: Date,
     },
-    dueDate: {
+    startDate: {
       type: Date,
     },
   },
   { timestamps: true }
 );
 
-export const epicModel = model("epic", epicSchema);
+export const sprintModel = model("sprint", sprintSchema);

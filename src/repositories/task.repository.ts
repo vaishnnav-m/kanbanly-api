@@ -90,7 +90,9 @@ export class WorkItemRepository
       .exec();
   }
 
-  async getTaskCountsForEpic(epicIds: string[]): Promise<TaskCountsForEpicDto[]> {
+  async getTaskCountsForEpic(
+    epicIds: string[]
+  ): Promise<TaskCountsForEpicDto[]> {
     const results = await this.model.aggregate([
       {
         $match: { epicId: { $in: epicIds } },
@@ -111,5 +113,14 @@ export class WorkItemRepository
       },
     ]);
     return results;
+  }
+
+  async count(query: FilterQuery<IWorkItem>): Promise<number> {
+    const result = await this.model.countDocuments(query);
+    return result;
+  }
+
+  async updateMany(query: FilterQuery<IWorkItem>, data: any) {
+    await this.model.updateMany(query, data);
   }
 }

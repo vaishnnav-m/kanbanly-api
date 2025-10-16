@@ -33,6 +33,8 @@ import { IWebhookService } from "../types/service-interface/IWebhookService";
 import { WebhookService } from "../services/webhook.service";
 import { IEpicService } from "../types/service-interface/IEpicService";
 import { EpicService } from "../services/epic.service";
+import { ISprintService } from "../types/service-interface/ISprintService";
+import { SprintService } from "../services/sprint.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -86,6 +88,9 @@ export class ServiceRegistry {
     });
     container.register<IEpicService>("IEpicService", {
       useClass: EpicService,
+    });
+    container.register<ISprintService>("ISprintService", {
+      useClass: SprintService,
     });
   }
 }

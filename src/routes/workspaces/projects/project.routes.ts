@@ -3,6 +3,7 @@ import { BaseRoute } from "../../base.routes";
 import { IProjectController } from "../../../types/controller-interfaces/IProjectController";
 import { TaskRoutes } from "./tasks/task.routes";
 import { EpicRoutes } from "./epics/epic.routes";
+import { SprintRoutes } from "./sprints/sprint.routes";
 
 @injectable()
 export class ProjectRoutes extends BaseRoute {
@@ -10,7 +11,8 @@ export class ProjectRoutes extends BaseRoute {
     @inject("IProjectController")
     private _projectController: IProjectController,
     @inject(TaskRoutes) private _taskRoutes: TaskRoutes,
-    @inject(EpicRoutes) private _epicRoutes: EpicRoutes
+    @inject(EpicRoutes) private _epicRoutes: EpicRoutes,
+    @inject(SprintRoutes) private _sprintRoutes: SprintRoutes
   ) {
     super({ mergeParams: true });
     this.initializeRoutes();
@@ -51,5 +53,6 @@ export class ProjectRoutes extends BaseRoute {
     );
     this._router.use("/:projectId/tasks", this._taskRoutes.router);
     this._router.use("/:projectId/epics", this._epicRoutes.router);
+    this._router.use("/:projectId/sprints", this._sprintRoutes.router);
   }
 }

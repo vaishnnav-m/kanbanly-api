@@ -35,6 +35,10 @@ export class TaskRoutes extends BaseRoute {
       "/:taskId/attach-parent",
       this._taskController.attachParentItem.bind(this._taskController)
     );
+    this._router.patch(
+      "/:taskId/attach-sprint",
+      this._taskController.attachSprint.bind(this._taskController)
+    );
     this._router.delete(
       "/:taskId",
       this._taskController.removeTask.bind(this._taskController)

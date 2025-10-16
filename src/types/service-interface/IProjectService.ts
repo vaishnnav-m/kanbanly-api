@@ -9,7 +9,15 @@ export interface IProjectService {
   addProject(data: CreateProjectDto): Promise<void>;
   getAllProjects(
     workspaceId: string,
-    userId: string
+    userId: string,
+    filters: {
+      search?: string;
+      memberFilter?: string;
+    },
+    sorting: {
+      sortBy?: string;
+      order?: string;
+    }
   ): Promise<ProjectListDto[] | null>;
   getOneProject(
     workspaceId: string,
@@ -32,7 +40,7 @@ export interface IProjectService {
     workspaceId: string,
     userId: string,
     projectId: string
-  ): Promise<Omit<WorkspaceMemberResponseDto,"isActive">[]>;
+  ): Promise<Omit<WorkspaceMemberResponseDto, "isActive">[]>;
   removeMember(
     workspaceId: string,
     projectId: string,

@@ -5,6 +5,7 @@ import { Request, Response } from "express";
 import {
   CreateTaskDto,
   EditTaskDto,
+  TaskFilters,
   TaskPriority,
   TaskStatus,
   WorkItemType,
@@ -68,6 +69,7 @@ export class TaskController implements ITaskController {
     const userId = req.user?.userid;
     const workspaceId = req.params.workspaceId;
     const projectId = req.params.projectId;
+    const filters = req.query as TaskFilters;
 
     if (!userId) {
       throw new AppError(
@@ -79,7 +81,8 @@ export class TaskController implements ITaskController {
     const tasks = await this._taskService.getAllTask(
       workspaceId,
       projectId,
-      userId
+      userId,
+      filters
     );
 
     res.status(HTTP_STATUS.OK).json({
@@ -195,6 +198,35 @@ export class TaskController implements ITaskController {
       taskId,
       userId,
       workspaceId
+    );
+
+    res
+      .status(HTTP_STATUS.OK)
+      .json({ success: true, message: SUCCESS_MESSAGES.DATA_EDITED });
+  }
+
+  async attachSprint(req: Request, res: Response) {
+    const userId = req.user?.userid;
+    const workspaceId = req.params.workspaceId;
+    const projectId = req.params.projectId;
+    const taskId = req.params.taskId;
+
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+    const { sprintId } = req.body as {
+      sprintId: string;
+    };
+
+    await this._taskService.attachSprint(
+      userId,
+      taskId,
+      sprintId,
+      workspaceId,
+      projectId
     );
 
     res

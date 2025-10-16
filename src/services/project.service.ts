@@ -121,7 +121,15 @@ export class ProjectService implements IProjectService {
 
   async getAllProjects(
     workspaceId: string,
-    userId: string
+    userId: string,
+    filters: {
+      search?: string;
+      memberFilter?: string;
+    },
+    sorting: {
+      sortBy?: string;
+      order?: string;
+    }
   ): Promise<ProjectListDto[] | null> {
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       userId,
@@ -140,7 +148,49 @@ export class ProjectService implements IProjectService {
       query.members = { $in: [userId] };
     }
 
-    const projectsData = await this._projectRepo.find(query);
+    // seraching
+    if (filters.search) {
+      const searchRegex = new RegExp(filters.search, "i");
+      query.$or = [{ name: searchRegex }, { description: searchRegex }];
+    }
+
+    // member filtering
+    if (filters.memberFilter && filters.memberFilter !== "any") {
+      const [minStr, maxStr] = filters.memberFilter.replace("+", "").split("-");
+      const min = parseInt(minStr, 10);
+      const max = maxStr ? parseInt(maxStr, 10) : null;
+
+      const conditions = [];
+      conditions.push({ $gte: ["$$members_count", min] });
+
+      if (max) {
+        conditions.push({ $lte: ["$$members_count", max] });
+      }
+
+      query.$expr = {
+        $let: {
+          vars: { members_count: { $size: "$members" } },
+          in: { $and: conditions },
+        },
+      };
+    }
+
+    // sorting
+    const sortOptions: { [key: string]: 1 | -1 } = {};
+    if (sorting.sortBy && sorting.order) {
+      const sortField =
+        sorting.sortBy === "lastUpdated" ? "updatedAt" : sorting.sortBy;
+      sortOptions[sortField] = sorting.order === "asc" ? 1 : -1;
+    } else {
+      sortOptions["updatedAt"] = -1;
+    }
+
+    console.log(sortOptions);
+
+    const projectsData = await this._projectRepo.find(query, {
+      sort: sortOptions,
+    });
+
     const projects = projectsData.map((project) => {
       return {
         projectId: project.projectId,
@@ -177,7 +227,7 @@ export class ProjectService implements IProjectService {
         HTTP_STATUS.NOT_FOUND
       );
     }
-    
+
     return {
       projectId: project.projectId,
       name: project.name,

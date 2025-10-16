@@ -10,6 +10,8 @@ export interface IEpic {
   projectId: string;
   workspaceId: string;
   createdBy: string;
+  assignedTo?: string | { name: string; email: string };
+  dueDate?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }

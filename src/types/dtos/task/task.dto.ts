@@ -88,3 +88,10 @@ export interface TaskCountsForEpicDto {
   totalTasks: number;
   completedTasks: number;
 }
+
+export interface TaskFilters {
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  assignedTo?: string;
+  workItemType?: WorkItemType;
+}

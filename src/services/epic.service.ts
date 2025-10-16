@@ -5,6 +5,7 @@ import { IEpicService } from "../types/service-interface/IEpicService";
 import { IEpicRepository } from "../types/repository-interfaces/IEpicRepository";
 import {
   EpicCreationDto,
+  EpicDetailsDto,
   EpicResponseDto,
   EpicUpdationDto,
 } from "../types/dtos/epic/epic.dto";
@@ -103,7 +104,9 @@ export class EpicService implements IEpicService {
       // calculates percentage
       const counts = countsMap.get(epic.epicId) || { total: 0, completed: 0 };
       const percentageDone =
-        counts.total > 0 ? (counts.completed / counts.total) * 100 : 0;
+        counts.total > 0
+          ? Math.round((counts.completed / counts.total) * 100)
+          : 0;
 
       return {
         epicId: epic.epicId,
@@ -120,6 +123,62 @@ export class EpicService implements IEpicService {
     return mappedEpics;
   }
 
+  async getEpicById(
+    userId: string,
+    epicId: string,
+    workspaceId: string
+  ): Promise<EpicDetailsDto> {
+    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+      workspaceId,
+      userId
+    );
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
+    }
+
+    const epic = await this._epicRepo.findOne({ epicId, workspaceId });
+    if (!epic) {
+      throw new AppError(ERROR_MESSAGES.EPIC_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+    }
+
+    const tasks = await this._taskRepo.getTasksWithAssigness({ epicId });
+    const mappedChildren = tasks.map((task) => ({
+      taskId: task.taskId,
+      task: task.task,
+      dueDate: task.dueDate,
+      priority: task.priority,
+      assignedTo: task?.assignedTo
+        ? {
+            name: task.assignedTo.name,
+            email: task.assignedTo.email,
+          }
+        : null,
+      status: task.status,
+      workItemType: task.workItemType,
+    }));
+
+    const taskCounts = await this._taskRepo.getTaskCountsForEpic([epicId]);
+    const counts = taskCounts[0] || { totalTasks: 0, completedTasks: 0 };
+    const percentageDone =
+      counts.totalTasks > 0
+        ? Math.round((counts.completedTasks / counts.totalTasks) * 100)
+        : 0;
+
+    return {
+      epicId: epic.epicId,
+      title: epic.title,
+      status: epic.status,
+      description: epic.description,
+      color: epic.color,
+      children: mappedChildren,
+      projectId: epic.projectId,
+      workspaceId: epic.workspaceId,
+      createdBy: epic.createdBy,
+      dueDate: epic.dueDate,
+      percentageDone,
+    };
+  }
+
   async editEpic(userId: string, epicData: EpicUpdationDto): Promise<void> {
     const workspaceMember = await this._workspaceMemberService.getCurrentMember(
       epicData.workspaceId,
@@ -128,7 +187,7 @@ export class EpicService implements IEpicService {
     if (!workspaceMember || workspaceMember.role === workspaceRoles.member) {
       throw new AppError(
         ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
-        HTTP_STATUS.BAD_REQUEST
+        HTTP_STATUS.FORBIDDEN
       );
     }
 
@@ -150,6 +209,7 @@ export class EpicService implements IEpicService {
       ...(normalized && { title: epicData.title, normalized }),
       ...(epicData.description && { description: epicData.description }),
       ...(epicData.color && { color: epicData.color }),
+      ...(epicData.dueDate && { dueDate: epicData.dueDate }),
     };
 
     if (!Object.values(newEpicData).length) {

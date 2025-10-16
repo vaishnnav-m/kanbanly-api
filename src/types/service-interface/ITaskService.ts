@@ -2,6 +2,7 @@ import {
   CreateTaskDto,
   EditTaskDto,
   TaskDetailsDto,
+  TaskFilters,
   TaskListingDto,
   TaskStatus,
   WorkItemType,
@@ -12,7 +13,8 @@ export interface ITaskService {
   getAllTask(
     workspaceId: string,
     projectId: string,
-    userId: string
+    userId: string,
+    filters: TaskFilters
   ): Promise<TaskListingDto[]>;
   getOneTask(
     workspaceId: string,
@@ -38,6 +40,13 @@ export interface ITaskService {
     taskId: string,
     workspaceId: string,
     userId: string
+  ): Promise<void>;
+  attachSprint(
+    userId: string,
+    taskId: string,
+    sprintId: string,
+    workspaceId: string,
+    projectId: string
   ): Promise<void>;
   removeTask(
     workspaceId: string,

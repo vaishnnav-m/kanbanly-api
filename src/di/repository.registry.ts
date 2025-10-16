@@ -17,6 +17,8 @@ import { ISubscriptionRepository } from "../types/repository-interfaces/ISubscri
 import { SubscriptionRepository } from "../repositories/subscription.repository";
 import { IEpicRepository } from "../types/repository-interfaces/IEpicRepository";
 import { EpicRepository } from "../repositories/epic.repository";
+import { ISprintRepository } from "../types/repository-interfaces/ISprintRepository";
+import { SprintRepository } from "../repositories/sprint.repository";
 
 export class RepositoryRegistry {
   static registerRepositories(): void {
@@ -49,6 +51,9 @@ export class RepositoryRegistry {
     });
     container.register<IEpicRepository>("IEpicRepository", {
       useClass: EpicRepository,
+    });
+    container.register<ISprintRepository>("ISprintRepository", {
+      useClass: SprintRepository,
     });
   }
 }

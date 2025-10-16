@@ -6,7 +6,8 @@ import { InvitationRoutes } from "../routes/invitations/invitation.routes";
 import { UserRoutes } from "../routes/user/user.routes";
 import { PlanRoutes } from "../routes/plan/plan.routes";
 import { SubscriptionRoutes } from "../routes/subscription/subscription.routes";
-import { EpicRoutes } from "../routes/epic/epic.routes";
+import { SprintRoutes } from "../routes/workspaces/projects/sprints/sprint.routes";
+import { EpicRoutes } from "../routes/workspaces/projects/epics/epic.routes";
 
 export class RoutesRegistry {
   static registerRoutes(): void {
@@ -33,6 +34,9 @@ export class RoutesRegistry {
     });
     container.register(EpicRoutes, {
       useClass: EpicRoutes,
+    });
+    container.register(SprintRoutes, {
+      useClass: SprintRoutes,
     });
   }
 }

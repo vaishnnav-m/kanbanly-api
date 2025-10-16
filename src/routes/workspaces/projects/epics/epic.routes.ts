@@ -23,6 +23,11 @@ export class EpicRoutes extends BaseRoute {
       authenticateToken,
       this._epicController.getAllEpics.bind(this._epicController)
     );
+    this._router.get(
+      "/:epicId",
+      authenticateToken,
+      this._epicController.getEpicById.bind(this._epicController)
+    );
     this._router.put(
       "/:epicId",
       authenticateToken,

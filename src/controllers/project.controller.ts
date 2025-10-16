@@ -42,6 +42,8 @@ export class ProjectController implements IProjectController {
     const workspaceId = req.params.workspaceId;
     const userId = req.user?.userid;
 
+    const { search, memberFilter, sortBy, order } = req.query;
+
     if (!userId) {
       throw new AppError(
         ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
@@ -49,9 +51,21 @@ export class ProjectController implements IProjectController {
       );
     }
 
+    const filters = {
+      search: search as string | undefined,
+      memberFilter: memberFilter as string | undefined,
+    };
+
+    const sorting = {
+      sortBy: sortBy as string | undefined,
+      order: order as string | undefined,
+    };
+
     const projects = await this._projectService.getAllProjects(
       workspaceId,
-      userId
+      userId,
+      filters,
+      sorting
     );
 
     res.status(HTTP_STATUS.OK).json({

@@ -9,4 +9,6 @@ export interface IWorkItemRepository extends IBaseRepository<IWorkItem> {
   ): Promise<TaskDetailRepoDto[]>;
   detachByEpicId(epicId: string, options: any): Promise<UpdateWriteOpResult>;
   getTaskCountsForEpic(epicIds: string[]): Promise<TaskCountsForEpicDto[]>;
+  count(query: FilterQuery<IWorkItem>): Promise<number>;
+  updateMany(query: FilterQuery<IWorkItem>, data: any): Promise<void>;
 }
