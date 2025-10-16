@@ -16,6 +16,7 @@ import { v4 as uuidV4 } from "uuid";
 import { IProjectService } from "../types/service-interface/IProjectService";
 import { ITaskService } from "../types/service-interface/ITaskService";
 import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
+import { TaskStatus } from "../types/dtos/task/task.dto";
 
 @injectable()
 export class SprintService implements ISprintService {
@@ -311,5 +312,51 @@ export class SprintService implements ISprintService {
     };
 
     return mappedSprint;
+  }
+
+  async completeSprint(
+    userId: string,
+    workspaceId: string,
+    projectId: string,
+    sprintId: string
+  ): Promise<void> {
+    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+      workspaceId,
+      userId
+    );
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.FORBIDDEN);
+    }
+
+    const activeSprint = await this._sprintRepo.findOne({
+      projectId,
+      status: "active",
+    });
+
+    if (!activeSprint) {
+      throw new AppError(
+        ERROR_MESSAGES.NO_ACTIVE_SPRINT,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    const incompleteworkItemsIds = (
+      await this._workItemRepo.find({
+        sprintId: activeSprint.sprintId,
+        status: { $ne: TaskStatus.Completed },
+      })
+    ).map((issue) => issue.taskId);
+
+    if (incompleteworkItemsIds.length) {
+      await this._workItemRepo.updateMany(
+        { taskId: { $in: incompleteworkItemsIds } },
+        { $set: { sprintId: null } }
+      );
+    }
+
+    await this._sprintRepo.update(
+      { sprintId },
+      { status: SprintStatus.Completed }
+    );
   }
 }

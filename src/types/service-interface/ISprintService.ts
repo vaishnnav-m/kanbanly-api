@@ -37,4 +37,10 @@ export interface ISprintService {
     workspaceId: string,
     projectId: string
   ): Promise<SprintResponseDto>;
+  completeSprint(
+    userId: string,
+    workspaceId: string,
+    projectId: string,
+    sprintId: string
+  ): Promise<void>;
 }

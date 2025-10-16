@@ -210,4 +210,36 @@ export class SprintController implements ISprintController {
       data: sprint,
     });
   }
+
+  async completeSprint(req: Request, res: Response): Promise<void> {
+    const userId = req.user?.userid;
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+    const workspaceId = req.params.workspaceId as string;
+    const projectId = req.params.projectId as string;
+    const sprintId = req.params.sprintId as string;
+
+    if (!workspaceId || !projectId || !sprintId) {
+      throw new AppError(
+        ERROR_MESSAGES.INPUT_VALIDATION_FAILED,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    await this._sprintService.completeSprint(
+      userId,
+      workspaceId,
+      projectId,
+      sprintId
+    );
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_EDITED,
+    });
+  }
 }

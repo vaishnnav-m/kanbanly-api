@@ -36,5 +36,9 @@ export class SprintRoutes extends BaseRoute {
       "/:sprintId/start",
       this._sprintController.startSprint.bind(this._sprintController)
     );
+    this._router.patch(
+      "/:sprintId/complete",
+      this._sprintController.completeSprint.bind(this._sprintController)
+    );
   }
 }

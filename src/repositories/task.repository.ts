@@ -119,4 +119,8 @@ export class WorkItemRepository
     const result = await this.model.countDocuments(query);
     return result;
   }
+
+  async updateMany(query: FilterQuery<IWorkItem>, data: any) {
+    await this.model.updateMany(query, data);
+  }
 }
