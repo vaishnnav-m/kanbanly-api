@@ -33,6 +33,7 @@ export class TaskController implements ITaskController {
       epicId,
       sprintId,
       status,
+      parentId,
     } = req.body as Omit<
       CreateTaskDto,
       "createdBy" | "workspaceId" | "projectId"
@@ -58,6 +59,7 @@ export class TaskController implements ITaskController {
       workItemType,
       epicId,
       sprintId,
+      parentId,
     });
 
     res
@@ -116,6 +118,33 @@ export class TaskController implements ITaskController {
       success: true,
       message: SUCCESS_MESSAGES.DATA_FETCHED,
       data: task,
+    });
+  }
+
+  async getAllSubTasks(req: Request, res: Response) {
+    const userId = req.user?.userid;
+    const workspaceId = req.params.workspaceId;
+    const projectId = req.params.projectId;
+    const taskId = req.params.taskId;
+
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    const tasks = await this._taskService.getAllSubTasks(
+      workspaceId,
+      projectId,
+      userId,
+      taskId
+    );
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_FETCHED,
+      data: tasks,
     });
   }
 

@@ -14,7 +14,6 @@ import { normalizeString } from "../shared/utils/stringNormalizer";
 import { ISprintRepository } from "../types/repository-interfaces/ISprintRepository";
 import { v4 as uuidV4 } from "uuid";
 import { IProjectService } from "../types/service-interface/IProjectService";
-import { ITaskService } from "../types/service-interface/ITaskService";
 import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
 import { TaskStatus } from "../types/dtos/task/task.dto";
 
@@ -28,11 +27,26 @@ export class SprintService implements ISprintService {
     @inject("IWorkItemRepository") private _workItemRepo: IWorkItemRepository
   ) {}
 
+  private async _handleSprintCompletion(sprintId: string) {
+    const incompleteworkItemsIds = (
+      await this._workItemRepo.find({
+        sprintId: sprintId,
+        status: { $ne: TaskStatus.Completed },
+      })
+    ).map((issue) => issue.taskId);
+
+    if (incompleteworkItemsIds.length) {
+      await this._workItemRepo.updateMany(
+        { taskId: { $in: incompleteworkItemsIds } },
+        { $set: { sprintId: null } }
+      );
+    }
+  }
+
   async createSprint(
     userId: string,
     workspaceId: string,
     projectId: string,
-    sprintData: CreateSprintDto
   ): Promise<void> {
     const workspaceMember = await this._workspaceMemberService.getCurrentMember(
       workspaceId,
@@ -303,6 +317,20 @@ export class SprintService implements ISprintService {
       );
     }
 
+    if (new Date() >= sprint.endDate) {
+      this._sprintRepo.update(
+        { sprintId: sprint.sprintId, projectId },
+        { status: SprintStatus.Completed }
+      );
+
+      this._handleSprintCompletion(sprint.sprintId);
+
+      throw new AppError(
+        ERROR_MESSAGES.NO_ACTIVE_SPRINT,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
     const mappedSprint: SprintResponseDto = {
       sprintId: sprint.sprintId,
       name: sprint.name,
@@ -340,19 +368,7 @@ export class SprintService implements ISprintService {
       );
     }
 
-    const incompleteworkItemsIds = (
-      await this._workItemRepo.find({
-        sprintId: activeSprint.sprintId,
-        status: { $ne: TaskStatus.Completed },
-      })
-    ).map((issue) => issue.taskId);
-
-    if (incompleteworkItemsIds.length) {
-      await this._workItemRepo.updateMany(
-        { taskId: { $in: incompleteworkItemsIds } },
-        { $set: { sprintId: null } }
-      );
-    }
+    this._handleSprintCompletion(activeSprint.sprintId);
 
     await this._sprintRepo.update(
       { sprintId },

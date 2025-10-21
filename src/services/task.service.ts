@@ -5,6 +5,7 @@ import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRep
 import {
   CreateTaskDto,
   EditTaskDto,
+  SubTaskListingDto,
   TaskDetailsDto,
   TaskFilters,
   TaskListingDto,
@@ -21,6 +22,7 @@ import { IWorkItem } from "../types/entities/IWorkItem";
 import { IProjectService } from "../types/service-interface/IProjectService";
 import logger from "../logger/winston.logger";
 import { ISprintService } from "../types/service-interface/ISprintService";
+import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 
 @injectable()
 export class TaskService implements ITaskService {
@@ -87,6 +89,7 @@ export class TaskService implements ITaskService {
       workItemType: data.workItemType,
       ...(data.epicId && { epicId: data.epicId }),
       ...(data.sprintId && { sprintId: data.sprintId }),
+      ...(data.parentId && { parent: data.parentId }),
     };
 
     await this._workItemRepo.create(task);
@@ -122,28 +125,38 @@ export class TaskService implements ITaskService {
     const tasks = await this._workItemRepo.getTasksWithAssigness({
       workspaceId,
       projectId,
+      workItemType: { $ne: WorkItemType.Subtask },
       ...(filters.status && { status: filters.status }),
       ...(filters.priority && { priority: filters.priority }),
       ...(filters.assignedTo && { status: filters.assignedTo }),
       isDeleted: false,
     });
 
-    const mappedTasks = tasks.map((task) => ({
-      taskId: task.taskId,
-      task: task.task,
-      dueDate: task.dueDate,
-      priority: task.priority,
-      assignedTo: task?.assignedTo
-        ? {
-            name: task.assignedTo.name,
-            email: task.assignedTo.email,
-          }
-        : null,
-      status: task.status,
-      workItemType: task.workItemType,
-      epic: task.epic,
-      sprintId: task.sprintId,
-    }));
+    const mappedTasks = tasks.map((task) => {
+      const assignedTo = task.assignedTo as IWorkspaceMember;
+      const createdBy = task.createdBy as IWorkspaceMember;
+
+      return {
+        taskId: task.taskId,
+        task: task.task,
+        dueDate: task.dueDate,
+        priority: task.priority,
+        assignedTo: assignedTo
+          ? {
+              name: assignedTo.name,
+              email: assignedTo.email,
+            }
+          : null,
+        status: task.status,
+        workItemType: task.workItemType,
+        epic: task.epic,
+        sprintId: task.sprintId,
+        createdBy: {
+          name: createdBy.name,
+          email: createdBy.email,
+        },
+      };
+    });
 
     return mappedTasks;
   }
@@ -180,6 +193,7 @@ export class TaskService implements ITaskService {
         HTTP_STATUS.NOT_FOUND
       );
     }
+    const assignedTo = task.assignedTo as IWorkspaceMember;
 
     return {
       taskId: task.taskId,
@@ -187,13 +201,12 @@ export class TaskService implements ITaskService {
       description: task.description,
       dueDate: task.dueDate,
       priority: task.priority,
-      assignedTo:
-        !task?.assignedTo || Array.isArray(task?.assignedTo)
-          ? null
-          : {
-              name: task.assignedTo.name,
-              email: task.assignedTo.email,
-            },
+      assignedTo: assignedTo
+        ? {
+            name: assignedTo.name,
+            email: assignedTo.email,
+          }
+        : null,
       ...(task.epic && {
         parent: {
           title: task.epic.title,
@@ -204,6 +217,58 @@ export class TaskService implements ITaskService {
       }),
       status: task.status,
     };
+  }
+
+  async getAllSubTasks(
+    workspaceId: string,
+    projectId: string,
+    userId: string,
+    taskId: string
+  ): Promise<SubTaskListingDto[]> {
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      userId,
+      workspaceId,
+      isActive: true,
+    });
+
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
+    }
+
+    const project = await this._projectRepo.findOne({
+      projectId,
+    });
+
+    if (!project || project.workspaceId !== workspaceId) {
+      throw new AppError(
+        ERROR_MESSAGES.PROJECT_NOT_FOUND,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const tasks = await this._workItemRepo.getTasksWithAssigness({
+      projectId,
+      parent: taskId,
+      workItemType: WorkItemType.Subtask,
+    });
+
+    const mappedTasks = tasks.map((task) => {
+      const createdBy = task.createdBy as IWorkspaceMember;
+
+      return {
+        taskId: task.taskId,
+        task: task.task,
+        dueDate: task.dueDate,
+        priority: task.priority,
+        status: task.status,
+        createdBy: {
+          name: createdBy.name,
+          email: createdBy.email,
+        },
+      };
+    });
+
+    return mappedTasks;
   }
 
   async changeTaskStatus(
@@ -337,6 +402,8 @@ export class TaskService implements ITaskService {
       case "epic":
         await this._workItemRepo.update({ taskId }, { epicId: parentId });
         break;
+      case "story":
+        await this._workItemRepo.update({ taskId }, { epicId: parentId });
       default:
         logger.error("An unhandled parent type in parent attach method :", {
           type: parentType,

@@ -24,7 +24,7 @@ export class WorkItemRepository
 
   async getTasksWithAssigness(
     query: FilterQuery<IWorkItem>
-  ): Promise<TaskDetailRepoDto[]> {
+  ): Promise<IWorkItem[]> {
     const result = await this.model.aggregate([
       { $match: { ...query, isDeleted: false } },
       // Lookup for assignee (workspace member)
@@ -39,6 +39,20 @@ export class WorkItemRepository
       {
         $unwind: {
           path: "$assignedTo",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "workspacemembers",
+          localField: "createdBy",
+          foreignField: "userId",
+          as: "createdBy",
+        },
+      },
+      {
+        $unwind: {
+          path: "$createdBy",
           preserveNullAndEmptyArrays: true,
         },
       },

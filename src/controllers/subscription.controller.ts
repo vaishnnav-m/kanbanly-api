@@ -45,9 +45,7 @@ export class SubscriptionController implements ISubscriptionController {
 
   async handleStripeWebhook(req: Request, res: Response): Promise<void> {
     const sig = req.headers["stripe-signature"] as string;
-    let event: any;
-
-    event = stripe.webhooks.constructEvent(
+    const event = stripe.webhooks.constructEvent(
       req.body,
       sig,
       config.stripe.WEBHOOK_SECRET
@@ -93,5 +91,4 @@ export class SubscriptionController implements ISubscriptionController {
       data: subscription,
     });
   }
-  
 }

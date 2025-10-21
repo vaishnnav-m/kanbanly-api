@@ -4,8 +4,7 @@ export interface ISprintService {
   createSprint(
     userId: string,
     workspaceId: string,
-    projectId: string,
-    sprintData: CreateSprintDto
+    projectId: string
   ): Promise<void>;
   getAllSprints(
     userId: string,

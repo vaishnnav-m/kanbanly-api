@@ -1,6 +1,7 @@
 import {
   CreateTaskDto,
   EditTaskDto,
+  SubTaskListingDto,
   TaskDetailsDto,
   TaskFilters,
   TaskListingDto,
@@ -22,6 +23,12 @@ export interface ITaskService {
     userId: string,
     taskId: string
   ): Promise<TaskDetailsDto>;
+  getAllSubTasks(
+    workspaceId: string,
+    projectId: string,
+    userId: string,
+    taskId: string
+  ): Promise<SubTaskListingDto[]>;
   changeTaskStatus(
     taskId: string,
     userId: string,
