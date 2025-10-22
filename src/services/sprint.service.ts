@@ -14,7 +14,6 @@ import { normalizeString } from "../shared/utils/stringNormalizer";
 import { ISprintRepository } from "../types/repository-interfaces/ISprintRepository";
 import { v4 as uuidV4 } from "uuid";
 import { IProjectService } from "../types/service-interface/IProjectService";
-import { ITaskService } from "../types/service-interface/ITaskService";
 import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
 import { TaskStatus } from "../types/dtos/task/task.dto";
 
@@ -28,11 +27,26 @@ export class SprintService implements ISprintService {
     @inject("IWorkItemRepository") private _workItemRepo: IWorkItemRepository
   ) {}
 
+  private async _handleIncompleteItems(sprintId: string) {
+    const incompleteworkItemsIds = (
+      await this._workItemRepo.find({
+        sprintId: sprintId,
+        status: { $ne: TaskStatus.Completed },
+      })
+    ).map((issue) => issue.taskId);
+
+    if (incompleteworkItemsIds.length) {
+      await this._workItemRepo.updateMany(
+        { taskId: { $in: incompleteworkItemsIds } },
+        { $set: { sprintId: null } }
+      );
+    }
+  }
+
   async createSprint(
     userId: string,
     workspaceId: string,
-    projectId: string,
-    sprintData: CreateSprintDto
+    projectId: string
   ): Promise<void> {
     const workspaceMember = await this._workspaceMemberService.getCurrentMember(
       workspaceId,
@@ -303,6 +317,20 @@ export class SprintService implements ISprintService {
       );
     }
 
+    if (new Date() >= sprint.endDate) {
+      this._sprintRepo.update(
+        { sprintId: sprint.sprintId, projectId },
+        { status: SprintStatus.Completed }
+      );
+
+      await this._handleIncompleteItems(sprint.sprintId);
+
+      throw new AppError(
+        ERROR_MESSAGES.NO_ACTIVE_SPRINT,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
     const mappedSprint: SprintResponseDto = {
       sprintId: sprint.sprintId,
       name: sprint.name,
@@ -340,23 +368,30 @@ export class SprintService implements ISprintService {
       );
     }
 
-    const incompleteworkItemsIds = (
-      await this._workItemRepo.find({
-        sprintId: activeSprint.sprintId,
-        status: { $ne: TaskStatus.Completed },
-      })
-    ).map((issue) => issue.taskId);
-
-    if (incompleteworkItemsIds.length) {
-      await this._workItemRepo.updateMany(
-        { taskId: { $in: incompleteworkItemsIds } },
-        { $set: { sprintId: null } }
-      );
-    }
+    await this._handleIncompleteItems(activeSprint.sprintId);
 
     await this._sprintRepo.update(
       { sprintId },
       { status: SprintStatus.Completed }
     );
+  }
+
+  async deleteSprint(
+    userId: string,
+    workspaceId: string,
+    projectId: string,
+    sprintId: string
+  ): Promise<void> {
+    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+      workspaceId,
+      userId
+    );
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.FORBIDDEN);
+    }
+
+    await this._handleIncompleteItems(sprintId);
+
+    await this._sprintRepo.delete({ workspaceId, projectId, sprintId });
   }
 }

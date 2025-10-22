@@ -32,6 +32,10 @@ export class SprintRoutes extends BaseRoute {
       "/:sprintId",
       this._sprintController.updateSprint.bind(this._sprintController)
     );
+    this._router.delete(
+      "/:sprintId",
+      this._sprintController.deleteSprint.bind(this._sprintController)
+    );
     this._router.put(
       "/:sprintId/start",
       this._sprintController.startSprint.bind(this._sprintController)

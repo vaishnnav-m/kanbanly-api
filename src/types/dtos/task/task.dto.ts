@@ -33,6 +33,19 @@ export interface CreateTaskDto {
   epicId?: string;
   sprintId?: string;
   assignedTo: string;
+  parentId?: string;
+  createdBy: string;
+  dueDate: Date;
+}
+
+export interface CreateChildDto {
+  task: string;
+  description?: string;
+  projectId: string;
+  workspaceId: string;
+  priority: TaskPriority;
+  workItemType: WorkItemType;
+  status?: TaskStatus;
   createdBy: string;
   dueDate: Date;
 }
@@ -64,6 +77,12 @@ export interface TaskDetailsDto {
     color: string;
   };
   dueDate?: Date;
+  createdBy: {
+    email: string;
+    name: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type TaskDetailRepoDto = Omit<IWorkItem, "assignedTo"> & {
@@ -81,6 +100,22 @@ export interface TaskListingDto {
   } | null;
   priority: TaskPriority;
   dueDate?: Date;
+  createdBy: {
+    email: string;
+    name: string;
+  };
+}
+
+export interface SubTaskListingDto {
+  taskId: string;
+  task: string;
+  priority: TaskPriority;
+  status: TaskStatus;
+  dueDate?: Date;
+  createdBy: {
+    email: string;
+    name: string;
+  };
 }
 
 export interface TaskCountsForEpicDto {

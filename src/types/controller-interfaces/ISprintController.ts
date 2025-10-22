@@ -8,4 +8,5 @@ export interface ISprintController {
   startSprint: controllerMethod;
   getActiveSprint: controllerMethod;
   completeSprint: controllerMethod;
+  deleteSprint: controllerMethod;
 }

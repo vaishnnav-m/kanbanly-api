@@ -4,8 +4,7 @@ export interface ISprintService {
   createSprint(
     userId: string,
     workspaceId: string,
-    projectId: string,
-    sprintData: CreateSprintDto
+    projectId: string
   ): Promise<void>;
   getAllSprints(
     userId: string,
@@ -38,6 +37,12 @@ export interface ISprintService {
     projectId: string
   ): Promise<SprintResponseDto>;
   completeSprint(
+    userId: string,
+    workspaceId: string,
+    projectId: string,
+    sprintId: string
+  ): Promise<void>;
+  deleteSprint(
     userId: string,
     workspaceId: string,
     projectId: string,

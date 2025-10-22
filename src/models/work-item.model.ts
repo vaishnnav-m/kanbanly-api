@@ -52,6 +52,9 @@ const workItemSchema = new Schema<IWorkItem>(
       default: TaskPriority.Low,
       required: true,
     },
+    parent: {
+      type: String,
+    },
     assignedTo: {
       type: String,
     },

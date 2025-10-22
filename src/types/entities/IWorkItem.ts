@@ -1,4 +1,5 @@
 import { TaskPriority, TaskStatus, WorkItemType } from "../dtos/task/task.dto";
+import { IWorkspaceMember } from "./IWorkspaceMember";
 
 export interface IWorkItem {
   taskId: string;
@@ -6,14 +7,17 @@ export interface IWorkItem {
   projectId: string;
   workspaceId: string;
   description?: string;
-  workItemType: WorkItemType; // Task, Bug, Feature, Story
-  status: TaskStatus; // Todo, InProgress, Completed
-  priority: TaskPriority; // Low, Medium, High
-  assignedTo?: string;
+  workItemType: WorkItemType;
+  status: TaskStatus;
+  priority: TaskPriority;
+  assignedTo?: string | IWorkspaceMember;
   epicId?: string;
   epic?: { epicId: string; title: string; color: string };
+  parent?: string;
   sprintId?: string;
-  createdBy: string;
+  createdBy: string | IWorkspaceMember;
   dueDate?: Date;
   isDeleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
