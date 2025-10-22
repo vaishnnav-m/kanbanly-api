@@ -77,6 +77,12 @@ export interface TaskDetailsDto {
     color: string;
   };
   dueDate?: Date;
+  createdBy: {
+    email: string;
+    name: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type TaskDetailRepoDto = Omit<IWorkItem, "assignedTo"> & {

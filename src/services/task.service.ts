@@ -75,7 +75,7 @@ export class TaskService implements ITaskService {
       }
     }
 
-    const task: Omit<IWorkItem, "isDeleted"> = {
+    const task: Omit<IWorkItem, "isDeleted" | "createdAt" | "updatedAt"> = {
       taskId: uuidv4(),
       task: data.task.trim(),
       description: data.description,
@@ -193,7 +193,9 @@ export class TaskService implements ITaskService {
         HTTP_STATUS.NOT_FOUND
       );
     }
+
     const assignedTo = task.assignedTo as IWorkspaceMember;
+    const createdBy = task.createdBy as IWorkspaceMember;
 
     return {
       taskId: task.taskId,
@@ -216,6 +218,9 @@ export class TaskService implements ITaskService {
         },
       }),
       status: task.status,
+      createdBy: { name: createdBy.name, email: createdBy.email },
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
     };
   }
 

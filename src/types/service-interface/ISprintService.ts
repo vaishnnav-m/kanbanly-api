@@ -42,4 +42,10 @@ export interface ISprintService {
     projectId: string,
     sprintId: string
   ): Promise<void>;
+  deleteSprint(
+    userId: string,
+    workspaceId: string,
+    projectId: string,
+    sprintId: string
+  ): Promise<void>;
 }

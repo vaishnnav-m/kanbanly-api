@@ -18,4 +18,6 @@ export interface IWorkItem {
   createdBy: string | IWorkspaceMember;
   dueDate?: Date;
   isDeleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }

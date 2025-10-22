@@ -27,7 +27,7 @@ export class SprintService implements ISprintService {
     @inject("IWorkItemRepository") private _workItemRepo: IWorkItemRepository
   ) {}
 
-  private async _handleSprintCompletion(sprintId: string) {
+  private async _handleIncompleteItems(sprintId: string) {
     const incompleteworkItemsIds = (
       await this._workItemRepo.find({
         sprintId: sprintId,
@@ -46,7 +46,7 @@ export class SprintService implements ISprintService {
   async createSprint(
     userId: string,
     workspaceId: string,
-    projectId: string,
+    projectId: string
   ): Promise<void> {
     const workspaceMember = await this._workspaceMemberService.getCurrentMember(
       workspaceId,
@@ -323,7 +323,7 @@ export class SprintService implements ISprintService {
         { status: SprintStatus.Completed }
       );
 
-      this._handleSprintCompletion(sprint.sprintId);
+      await this._handleIncompleteItems(sprint.sprintId);
 
       throw new AppError(
         ERROR_MESSAGES.NO_ACTIVE_SPRINT,
@@ -368,11 +368,30 @@ export class SprintService implements ISprintService {
       );
     }
 
-    this._handleSprintCompletion(activeSprint.sprintId);
+    await this._handleIncompleteItems(activeSprint.sprintId);
 
     await this._sprintRepo.update(
       { sprintId },
       { status: SprintStatus.Completed }
     );
+  }
+
+  async deleteSprint(
+    userId: string,
+    workspaceId: string,
+    projectId: string,
+    sprintId: string
+  ): Promise<void> {
+    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+      workspaceId,
+      userId
+    );
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.FORBIDDEN);
+    }
+
+    await this._handleIncompleteItems(sprintId);
+
+    await this._sprintRepo.delete({ workspaceId, projectId, sprintId });
   }
 }

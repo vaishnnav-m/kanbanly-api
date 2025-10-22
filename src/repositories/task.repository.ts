@@ -88,6 +88,8 @@ export class WorkItemRepository
             title: 1,
             color: 1,
           },
+          createdAt: 1,
+          updatedAt: 1,
         },
       },
     ]);
