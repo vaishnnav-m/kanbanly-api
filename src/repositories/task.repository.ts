@@ -4,10 +4,7 @@ import { IWorkItem } from "../types/entities/IWorkItem";
 import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
 import { BaseRepository } from "./base.repository";
 import { ClientSession, FilterQuery, UpdateWriteOpResult } from "mongoose";
-import {
-  TaskCountsForEpicDto,
-  TaskDetailRepoDto,
-} from "../types/dtos/task/task.dto";
+import { TaskCountsForEpicDto } from "../types/dtos/task/task.dto";
 
 interface ITransactionOptions {
   session?: ClientSession;
@@ -71,6 +68,20 @@ export class WorkItemRepository
         },
       },
       {
+        $lookup: {
+          from: "workItems",
+          localField: "parent",
+          foreignField: "taskId",
+          as: "parent",
+        },
+      },
+      {
+        $unwind: {
+          path: "$parent",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $project: {
           _id: 0,
           taskId: 1,
@@ -88,6 +99,11 @@ export class WorkItemRepository
             title: 1,
             color: 1,
           },
+          parent: {
+            taskId: 1,
+            task: 1,
+          },
+          storypoint: 1,
           createdAt: 1,
           updatedAt: 1,
         },
@@ -136,7 +152,7 @@ export class WorkItemRepository
     return result;
   }
 
-  async updateMany(query: FilterQuery<IWorkItem>, data: any) {
+  async updateMany(query: FilterQuery<IWorkItem>, data: Partial<IWorkItem>) {
     await this.model.updateMany(query, data);
   }
 }

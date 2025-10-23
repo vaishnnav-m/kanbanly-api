@@ -90,6 +90,7 @@ export class TaskService implements ITaskService {
       ...(data.epicId && { epicId: data.epicId }),
       ...(data.sprintId && { sprintId: data.sprintId }),
       ...(data.parentId && { parent: data.parentId }),
+      ...(data.storyPoint && { storyPoint: data.storyPoint }),
     };
 
     await this._workItemRepo.create(task);
@@ -219,6 +220,8 @@ export class TaskService implements ITaskService {
       }),
       status: task.status,
       createdBy: { name: createdBy.name, email: createdBy.email },
+      storyPoint: task.storyPoint,
+      workItemType: task.workItemType,
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
     };
