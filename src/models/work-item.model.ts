@@ -65,6 +65,9 @@ const workItemSchema = new Schema<IWorkItem>(
     dueDate: {
       type: Date,
     },
+    storyPoint: {
+      type: Number,
+    },
     isDeleted: {
       type: Boolean,
       required: true,

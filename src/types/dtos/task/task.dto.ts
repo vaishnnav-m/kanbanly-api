@@ -34,6 +34,7 @@ export interface CreateTaskDto {
   sprintId?: string;
   assignedTo: string;
   parentId?: string;
+  storyPoint?: number;
   createdBy: string;
   dueDate: Date;
 }
@@ -81,6 +82,8 @@ export interface TaskDetailsDto {
     email: string;
     name: string;
   };
+  storyPoint?: number;
+  workItemType: WorkItemType;
   createdAt: Date;
   updatedAt: Date;
 }

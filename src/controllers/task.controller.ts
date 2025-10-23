@@ -34,6 +34,7 @@ export class TaskController implements ITaskController {
       sprintId,
       status,
       parentId,
+      storyPoint,
     } = req.body as Omit<
       CreateTaskDto,
       "createdBy" | "workspaceId" | "projectId"
@@ -60,6 +61,7 @@ export class TaskController implements ITaskController {
       epicId,
       sprintId,
       parentId,
+      storyPoint,
     });
 
     res

@@ -13,10 +13,11 @@ export interface IWorkItem {
   assignedTo?: string | IWorkspaceMember;
   epicId?: string;
   epic?: { epicId: string; title: string; color: string };
-  parent?: string;
+  parent?: string | IWorkItem;
   sprintId?: string;
   createdBy: string | IWorkspaceMember;
   dueDate?: Date;
+  storyPoint?: number;
   isDeleted: boolean;
   createdAt: Date;
   updatedAt: Date;
