@@ -30,7 +30,10 @@ export class PlanService implements IPlanService {
 
   async createPlan(plan: CreatePlanDto): Promise<void> {
     const normalizedName = this._normalizeName(plan.name);
-    const existingPlan = await this._planRepo.findOne({ normalizedName });
+    const existingPlan = await this._planRepo.findOne({
+      normalizedName,
+      isDeleted: false,
+    });
     if (existingPlan) {
       throw new AppError(
         ERROR_MESSAGES.RESOURCE_ALREADY_EXISTS,
@@ -42,7 +45,7 @@ export class PlanService implements IPlanService {
       throw new AppError("Price cannot be negative", HTTP_STATUS.BAD_REQUEST);
     }
 
-    const newPlan: IPlan = {
+    const newPlan: Omit<IPlan, "isDeleted"> = {
       planId: uuidv4(),
       name: plan.name,
       normalizedName: normalizedName,
@@ -88,7 +91,10 @@ export class PlanService implements IPlanService {
   }
 
   async getAllPlans(): Promise<PlanListDto[]> {
-    const plans = await this._planRepo.find({}, { sort: { monthlyPrice: 1 } });
+    const plans = await this._planRepo.find(
+      { isDeleted: false },
+      { sort: { monthlyPrice: 1 } }
+    );
     if (!plans) {
       throw new AppError("No plans found", HTTP_STATUS.NOT_FOUND);
     }
@@ -110,7 +116,7 @@ export class PlanService implements IPlanService {
   }
 
   async getPlanById(planId: string): Promise<PlanResponseDto | null> {
-    const plan = await this._planRepo.findOne({ planId });
+    const plan = await this._planRepo.findOne({ planId, isDeleted: false });
     if (!plan) {
       return null;
     }
@@ -131,6 +137,7 @@ export class PlanService implements IPlanService {
   async editPlan(newPlan: EditPlanDto): Promise<void> {
     const existingPlan = await this._planRepo.findOne({
       planId: newPlan.planId,
+      isDeleted: false,
     });
     if (!existingPlan) {
       throw new AppError(ERROR_MESSAGES.PLAN_NOT_EXISTS, HTTP_STATUS.NOT_FOUND);
@@ -143,6 +150,7 @@ export class PlanService implements IPlanService {
       normalizedName = this._normalizeName(newPlan.name);
       const anotherPlanExists = await this._planRepo.findOne({
         normalizedName,
+        isDeleted: false,
       });
       if (anotherPlanExists) {
         throw new AppError(
@@ -240,18 +248,10 @@ export class PlanService implements IPlanService {
   async deletePlan(planId: string): Promise<void> {
     const existingPlan = await this._planRepo.findOne({
       planId,
+      isDeleted: false,
     });
     if (!existingPlan) {
       throw new AppError(ERROR_MESSAGES.PLAN_NOT_EXISTS, HTTP_STATUS.NOT_FOUND);
-    }
-
-    const subscriptions = await this._subscriptionRepo.find({ planId });
-
-    if (subscriptions.length) {
-      throw new AppError(
-        "There are active subscriptions with this plan",
-        HTTP_STATUS.BAD_REQUEST
-      );
     }
 
     if (existingPlan.stripeMonthlyPriceId) {
@@ -272,6 +272,6 @@ export class PlanService implements IPlanService {
       });
     }
 
-    await this._planRepo.delete({ planId });
+    await this._planRepo.update({ planId }, { isDeleted: true });
   }
 }

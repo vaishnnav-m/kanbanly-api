@@ -73,6 +73,8 @@ export const ERROR_MESSAGES = {
 
   // SUBSCRIPTION
   ACTIVE_SUBSCRIPTION: "User already have an active subscription",
+  NO_ACTIVE_SUBSCRIPTION: "User don't have any active subscription",
+  MISSING_PAYMENT_INFO: "The subscription have some missing items",
 
   // EPIC
   EPIC_ALREADY_EXISTS: "An epic of the same name exists",

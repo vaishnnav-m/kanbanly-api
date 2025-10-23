@@ -9,12 +9,15 @@ import Stripe from "stripe";
 import { stripe } from "../shared/utils/stripeClient";
 import { SubscriptionStatus } from "../types/enums/subscription-status.enum";
 import { ISubscription } from "../types/entities/ISubscription";
+import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
 
 @injectable()
 export class WebhookService implements IWebhookService {
   constructor(
     @inject("ISubscriptionRepository")
-    private _subscriptionRepo: ISubscriptionRepository
+    private _subscriptionRepo: ISubscriptionRepository,
+    @inject("ISubscriptionService")
+    private _subscriptionService: ISubscriptionService
   ) {}
 
   private _getCurrentPeriodEnd(currentPeriodStart: Date, interval: string) {
@@ -36,8 +39,7 @@ export class WebhookService implements IWebhookService {
     return currentPeriodEnd;
   }
 
-  async handleStripeWebhookEvent(event: any): Promise<void> {
-    logger.log("event:", event);
+  async handleStripeWebhookEvent(event: Stripe.Event): Promise<void> {
     switch (event.type) {
       case "checkout.session.completed":
         await this._handleCheckoutCompleted(event.data.object);
@@ -59,9 +61,14 @@ export class WebhookService implements IWebhookService {
     }
   }
 
-  private async _handleCheckoutCompleted(session: any): Promise<void> {
-    const { userId, planId, billingCycle } = session.metadata;
-    const subscriptionId = session.subscription;
+  private async _handleCheckoutCompleted(
+    session: Stripe.Checkout.Session
+  ): Promise<void> {
+    const { userId, planId } = session.metadata as {
+      userId: string;
+      planId: string;
+    };
+    const subscriptionId = session.subscription as string;
 
     const stripeSubscription = (await stripe.subscriptions.retrieve(
       subscriptionId
@@ -79,14 +86,14 @@ export class WebhookService implements IWebhookService {
         HTTP_STATUS.INTERNAL_SERVER_ERROR
       );
     }
-    let currentPeriodEnd = this._getCurrentPeriodEnd(
+    const currentPeriodEnd = this._getCurrentPeriodEnd(
       currentPeriodStart,
       interval
     );
 
     const subscriptionData = {
       planId,
-      stripeCustomerId: session.customer,
+      stripeCustomerId: session.customer as string,
       stripeSubscriptionId: subscriptionId,
       stripePriceId: stripeSubscription.items.data[0].price.id,
       status: SubscriptionStatus.pending,
@@ -114,11 +121,8 @@ export class WebhookService implements IWebhookService {
   private async _handleInvoiceSucceded(invoice: Stripe.Invoice): Promise<void> {
     const subscriptionId = invoice.parent?.subscription_details?.subscription;
 
-    const subscription = await this._subscriptionRepo.findOne({
-      stripeSubscriptionId: subscriptionId,
-    });
-
     if (subscriptionId) {
+      console.log("going to update");
       await this._subscriptionRepo.update(
         {
           stripeSubscriptionId: subscriptionId,
@@ -184,10 +188,16 @@ export class WebhookService implements IWebhookService {
     );
   }
 
-  private async _handleSubscriptionDeleted(subscription: any): Promise<void> {
+  private async _handleSubscriptionDeleted(
+    subscription: Stripe.Subscription
+  ): Promise<void> {
     await this._subscriptionRepo.update(
       { stripeSubscriptionId: subscription.id },
       { status: SubscriptionStatus.canceled }
+    );
+
+    await this._subscriptionService.createFreeSubscription(
+      subscription.metadata.userId
     );
   }
 }

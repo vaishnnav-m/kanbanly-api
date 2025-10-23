@@ -409,6 +409,7 @@ export class TaskService implements ITaskService {
         break;
       case "story":
         await this._workItemRepo.update({ taskId }, { epicId: parentId });
+        break;
       default:
         logger.error("An unhandled parent type in parent attach method :", {
           type: parentType,
