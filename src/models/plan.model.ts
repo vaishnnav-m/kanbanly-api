@@ -56,6 +56,11 @@ const planSchema = new Schema<IPlan>(
     stripeYearlyPriceId: {
       type: String,
     },
+    isDeleted: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
   },
   { timestamps: true }
 );

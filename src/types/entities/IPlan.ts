@@ -13,4 +13,5 @@ export interface IPlan {
   stripeProductId?: string;
   stripeMonthlyPriceId?: string;
   stripeYearlyPriceId?: string;
+  isDeleted: boolean;
 }

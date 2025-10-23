@@ -13,4 +13,5 @@ export interface ISubscriptionService {
   ): Promise<VerifyCheckoutSessionResponseDto>;
   getUserSubscription(userId: string): Promise<SubscriptionResponseDto | null>;
   createFreeSubscription(userId: string): Promise<void>;
+  createPortal(userId: string): Promise<{ url: string; sessionId: string }>;
 }

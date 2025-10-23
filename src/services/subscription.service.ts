@@ -1,6 +1,5 @@
 import { inject, injectable } from "tsyringe";
 import { v4 as uuidv4 } from "uuid";
-import Stripe from "stripe";
 import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
 import { ISubscriptionRepository } from "../types/repository-interfaces/ISubscriptionRepository";
 import { stripe } from "../shared/utils/stripeClient";
@@ -15,7 +14,6 @@ import { IPlanRepository } from "../types/repository-interfaces/IPlanRepository"
 import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { HTTP_STATUS } from "../shared/constants/http.status";
-import logger from "../logger/winston.logger";
 
 @injectable()
 export class SubscriptionService implements ISubscriptionService {
@@ -53,7 +51,7 @@ export class SubscriptionService implements ISubscriptionService {
     ) {
       const portalSession = await stripe.billingPortal.sessions.create({
         customer: existingSubscription.stripeCustomerId,
-        return_url: `${config.stripe.STRIPE_FRONTEND_URL}/settings/billing`,
+        return_url: `${config.stripe.STRIPE_FRONTEND_URL}/user`,
       });
 
       return { url: portalSession.url, sessionId: portalSession.id };
@@ -163,7 +161,6 @@ export class SubscriptionService implements ISubscriptionService {
     });
 
     if (!subscription) {
-      logger.debug("inside free subscription");
       const freePlan = await this._planRepo.findOne({ monthlyPrice: 0 });
       if (!freePlan) {
         throw new AppError("Plan not found", HTTP_STATUS.NOT_FOUND);
@@ -171,12 +168,15 @@ export class SubscriptionService implements ISubscriptionService {
       return {
         planName: freePlan.name,
         currentPeriodEnd: null,
+        createdAt: new Date(),
         limits: {
           workspaces: freePlan.workspaceLimit,
           members: freePlan.memberLimit,
           projects: freePlan.projectLimit,
           tasks: freePlan.taskLimit,
         },
+        price: freePlan.monthlyPrice,
+        billingCycle: "monthly",
       };
     }
 
@@ -185,15 +185,26 @@ export class SubscriptionService implements ISubscriptionService {
       throw new AppError("Plan not found", HTTP_STATUS.NOT_FOUND);
     }
 
+    let billingCycle: "monthly" | "yearly" = "monthly";
+    let price = plan.monthlyPrice;
+
+    if (subscription.stripePriceId === plan.stripeYearlyPriceId) {
+      billingCycle = "yearly";
+      price = plan.yearlyPrice;
+    }
+
     return {
       planName: plan.name,
       currentPeriodEnd: subscription.currentPeriodEnd!,
+      createdAt: subscription.createdAt,
       limits: {
         workspaces: plan.workspaceLimit,
         members: plan.memberLimit,
         projects: plan.projectLimit,
         tasks: plan.taskLimit,
       },
+      price,
+      billingCycle,
     };
   }
 
@@ -215,5 +226,25 @@ export class SubscriptionService implements ISubscriptionService {
     };
 
     await this._subscriptionRepo.create(subscriptionData);
+  }
+
+  async createPortal(userId: string): Promise<{ url: string, sessionId: string }> {
+    const subscription = await this._subscriptionRepo.findOne({
+      userId,
+      status: SubscriptionStatus.active,
+    });
+    if (!subscription || !subscription.stripeCustomerId) {
+      throw new AppError(
+        ERROR_MESSAGES.NO_ACTIVE_SUBSCRIPTION,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: subscription.stripeCustomerId,
+      return_url: `${config.stripe.STRIPE_FRONTEND_URL}/user`,
+    });
+
+    return { url: portalSession.url, sessionId: portalSession.id };
   }
 }

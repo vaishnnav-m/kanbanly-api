@@ -42,7 +42,7 @@ export class PlanService implements IPlanService {
       throw new AppError("Price cannot be negative", HTTP_STATUS.BAD_REQUEST);
     }
 
-    const newPlan: IPlan = {
+    const newPlan: Omit<IPlan, "isDeleted"> = {
       planId: uuidv4(),
       name: plan.name,
       normalizedName: normalizedName,
@@ -272,6 +272,6 @@ export class PlanService implements IPlanService {
       });
     }
 
-    await this._planRepo.delete({ planId });
+    await this._planRepo.update({ planId }, { isDeleted: true });
   }
 }

@@ -91,4 +91,24 @@ export class SubscriptionController implements ISubscriptionController {
       data: subscription,
     });
   }
+
+  async createPortal(req: Request, res: Response): Promise<void> {
+    const userId = req.user?.userid;
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.AUTH_INVALID_TOKEN,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    const subscription = await this._subscriptionService.createPortal(
+      userId
+    );
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_DELETED,
+      data: subscription,
+    });
+  }
 }

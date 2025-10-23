@@ -42,5 +42,12 @@ export class SubscriptionRoutes extends BaseRoute {
         this._subscriptionController
       )
     );
+    this._router.post(
+      "/create-portal",
+      authenticateToken,
+      this._subscriptionController.createPortal.bind(
+        this._subscriptionController
+      )
+    );
   }
 }
