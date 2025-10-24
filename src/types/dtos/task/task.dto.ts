@@ -73,9 +73,9 @@ export interface TaskDetailsDto {
   priority: TaskPriority;
   parent?: {
     parentId: string;
-    title: string;
+    name: string;
     type: WorkItemType;
-    color: string;
+    color?: string;
   };
   dueDate?: Date;
   createdBy: {

@@ -198,6 +198,30 @@ export class TaskService implements ITaskService {
     const assignedTo = task.assignedTo as IWorkspaceMember;
     const createdBy = task.createdBy as IWorkspaceMember;
 
+    let parent: {
+      name: string;
+      parentId: string;
+      type: WorkItemType;
+      color?: string;
+    } | null = null;
+
+    if (task.parent && typeof task.parent === "object") {
+      parent = {
+        parentId: task.parent.taskId,
+        name: task.parent.task,
+        type: task.parent.workItemType,
+      };
+    }
+
+    if (task.epic) {
+      parent = {
+        name: task.epic.title,
+        parentId: task.epic.epicId,
+        type: WorkItemType.Epic,
+        color: task.epic.color,
+      };
+    }
+
     return {
       taskId: task.taskId,
       task: task.task,
@@ -210,13 +234,8 @@ export class TaskService implements ITaskService {
             email: assignedTo.email,
           }
         : null,
-      ...(task.epic && {
-        parent: {
-          title: task.epic.title,
-          parentId: task.epic.epicId,
-          type: WorkItemType.Epic,
-          color: task.epic.color,
-        },
+      ...(parent && {
+        parent,
       }),
       status: task.status,
       createdBy: { name: createdBy.name, email: createdBy.email },

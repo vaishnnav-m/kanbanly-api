@@ -12,13 +12,15 @@ export class AdminService implements IAdminService {
     @inject("IUserRepository") private _userRepository: IUserRepository
   ) {}
 
-  async getAllUsers(page: number): Promise<UserAdminTableDto> {
+  async getAllUsers(page: number, search: string): Promise<UserAdminTableDto> {
     const limit = 10;
     const skip = (page - 1) * limit;
+    const searchRegex = new RegExp(search, "i");
 
     const { data: users, totalPages } =
       await this._userRepository.findWithPagination(
         {
+          $or: [{ firstName: { $regex: searchRegex } },{ email: { $regex: searchRegex } }],
           isAdmin: false,
         },
         { limit, skip }

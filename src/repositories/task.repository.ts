@@ -69,7 +69,7 @@ export class WorkItemRepository
       },
       {
         $lookup: {
-          from: "workItems",
+          from: "workitems",
           localField: "parent",
           foreignField: "taskId",
           as: "parent",
@@ -99,10 +99,7 @@ export class WorkItemRepository
             title: 1,
             color: 1,
           },
-          parent: {
-            taskId: 1,
-            task: 1,
-          },
+          parent: 1,
           storypoint: 1,
           createdAt: 1,
           updatedAt: 1,
