@@ -19,23 +19,14 @@ export interface WorkspaceMemberResponseDto {
   _id?: string;
   name: string;
   email: string;
+  profile?: string;
   role: workspaceRoles;
   isActive: boolean;
 }
 
-interface WorkspaceMemberListUser {
-  email: string;
-  firstName: string;
-  userId: string;
-}
-
 // repository dto
 export interface WorkspaceMemberRepoDto {
-  data: {
-    user: WorkspaceMemberListUser;
-    isActive: boolean;
-    role: workspaceRoles;
-  }[];
+  data: IWorkspaceMember[];
   count: number;
 }
 

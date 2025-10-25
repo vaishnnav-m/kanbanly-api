@@ -6,7 +6,7 @@ export const setAuthCookies = (
   res: Response,
   key: string,
   value: string,
-  maxAge: number
+  maxAge?: number
 ) => {
   res.cookie(key, value, {
     httpOnly: true,

@@ -1,4 +1,4 @@
-import { FilterQuery, ObjectId } from "mongoose";
+import { FilterQuery } from "mongoose";
 
 export interface IBaseRepository<T> {
   findOne(query: FilterQuery<T>): Promise<T | null>;
@@ -6,12 +6,12 @@ export interface IBaseRepository<T> {
     query?: FilterQuery<T>,
     options?: { skip?: number; limit?: number; sort?: any }
   ): Promise<T[]>;
-  create(data: Partial<T>): Promise<T>;
+  create(data: FilterQuery<T>): Promise<T>;
   update(query: any, data: any): Promise<T | null>;
   findWithPagination(
-    query: Partial<T>,
+    query: FilterQuery<T>,
     options: { skip?: number; limit?: number; sort?: any }
   ): Promise<{ data: T[]; totalPages: number }>;
-  delete(query: Partial<T>): Promise<void>;
-  deleteMany(query: Partial<T>): Promise<void>;
+  delete(query: FilterQuery<T>): Promise<void>;
+  deleteMany(query: FilterQuery<T>): Promise<void>;
 }

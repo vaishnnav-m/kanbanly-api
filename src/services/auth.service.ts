@@ -1,10 +1,8 @@
 import { inject, injectable } from "tsyringe";
 import { v4 as uuidv4 } from "uuid";
-import { responseDataDto, userDto } from "../types/dtos/auth/createUser.dto";
 import { IAuthService } from "../types/service-interface/IAuthService";
 import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
 import { IBcryptUtils } from "../types/common/IBcryptUtils";
-import { IUser } from "../types/entities/IUser";
 import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
@@ -14,6 +12,11 @@ import { IEmailService } from "../types/service-interface/IEmailService";
 import { ICacheService } from "../types/service-interface/ICacheService";
 import { config } from "../config";
 import { AuthEvent, authEvents } from "../events/auth.events";
+import {
+  AuthUserResponseDto,
+  responseDataDto,
+  userDto,
+} from "../types/dtos/auth/auth.dto";
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -26,7 +29,7 @@ export class AuthService implements IAuthService {
     @inject("ICacheService") private _cache: ICacheService
   ) {}
 
-  async register(user: userDto): Promise<IUser> {
+  async register(user: userDto): Promise<AuthUserResponseDto> {
     const { firstName, lastName, email, phone, password } = user;
     const emailExists = await this._userRepository.findByEmail(email);
 
@@ -46,10 +49,16 @@ export class AuthService implements IAuthService {
 
     authEvents.emit(AuthEvent.UserRegistered, { userEmail: email });
 
-    return newUser;
+    return {
+      userId: newUser.userId,
+      email: newUser.email,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      profile: newUser.profile,
+    };
   }
 
-  async login(user: userDto): Promise<responseDataDto<IUser>> {
+  async login(user: userDto): Promise<responseDataDto<AuthUserResponseDto>> {
     const { email, password } = user;
     const userData = await this._userRepository.findByEmail(email);
 
@@ -91,7 +100,17 @@ export class AuthService implements IAuthService {
       role: "user",
     });
 
-    return { accessToken, refreshToken, user: userData };
+    return {
+      accessToken,
+      refreshToken,
+      user: {
+        userId: userData.userId,
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        profile: userData.profile,
+      },
+    };
   }
 
   async sendForgotPassword(email: string): Promise<void> {
@@ -136,10 +155,10 @@ export class AuthService implements IAuthService {
     await this._cache.del(`forgotToken:${token}`);
   }
 
-  async googleAuthentication(token: string): Promise<IUser> {
+  async googleAuthentication(token: string): Promise<AuthUserResponseDto> {
     const payload = await this._googleService.getUserInfoFromAccessToken(token);
 
-    const { googleId, email, firstName = "", lastName = "" } = payload;
+    const { googleId, email, firstName = "", lastName = "", picture } = payload;
 
     let user = await this._userRepository.findByEmail(email);
 
@@ -151,21 +170,31 @@ export class AuthService implements IAuthService {
         email,
         googleId,
         isEmailVerified: true,
+        profile: picture,
       });
     } else if (!user.googleId) {
-      await this._userRepository.update({ userId: user.userId }, { googleId });
+      await this._userRepository.update(
+        { userId: user.userId },
+        { googleId, ...(picture && !user.profile && { profile: picture }) }
+      );
     }
 
     if (!user?.isActive) {
       throw new AppError(ERROR_MESSAGES.USER_BLOCKED, HTTP_STATUS.FORBIDDEN);
     }
 
-    return user;
+    return {
+      userId: user.userId,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      profile: user.profile,
+    };
   }
 
   async adminLogin(
     user: Omit<userDto, "firstName">
-  ): Promise<responseDataDto<IUser>> {
+  ): Promise<responseDataDto<AuthUserResponseDto>> {
     const { email, password } = user;
     const userData = await this._userRepository.findByEmail(email);
 
@@ -207,7 +236,12 @@ export class AuthService implements IAuthService {
     const response = {
       accessToken,
       refreshToken,
-      user: userData,
+      user: {
+        userId: userData.userId,
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+      },
     };
 
     return response;

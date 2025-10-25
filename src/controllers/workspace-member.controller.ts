@@ -51,7 +51,10 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
     // get page from query
     const page =
       parseInt(typeof pageParam === "string" ? pageParam : "1", 10) || 1;
-    const search = (req.query.search as string) || "";
+    const search =
+      req.query.search !== "undefined" ? String(req.query.search) : "";
+
+    console.log("search is", req.query.search);
     // get limit from query
     const paramLimit = parseInt(req.query.limit as string, 10);
     const limit =

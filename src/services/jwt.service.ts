@@ -29,44 +29,32 @@ export class TokenService implements ITokenService {
   }
 
   verifyEmailToken(token: string): { email: string } | null {
-    try {
-      const decoded = jwt.verify(token, this._verificationSecret);
+    const decoded = jwt.verify(token, this._verificationSecret);
 
-      if (!decoded || typeof decoded === "string") {
-        return null;
-      }
-
-      return decoded as ITokenPayload;
-    } catch (error) {
+    if (!decoded || typeof decoded === "string") {
       return null;
     }
+
+    return decoded as ITokenPayload;
   }
 
   verifyAccessToken(token: string): ITokenPayload | null {
-    try {
-      const decoded = jwt.verify(token, this._accessSecret);
+    const decoded = jwt.verify(token, this._accessSecret);
 
-      if (!decoded || typeof decoded === "string") {
-        return null;
-      }
-
-      return decoded as ITokenPayload;
-    } catch (error) {
+    if (!decoded || typeof decoded === "string") {
       return null;
     }
+
+    return decoded as ITokenPayload;
   }
 
   verifyRefereshToken(token: string): ITokenPayload | null {
-    try {
-      const decoded = jwt.verify(token, this._refreshSecret);
+    const decoded = jwt.verify(token, this._refreshSecret);
 
-      if (!decoded || typeof decoded === "string") {
-        return null;
-      }
-
-      return decoded as ITokenPayload;
-    } catch (error) {
+    if (!decoded || typeof decoded === "string") {
       return null;
     }
+
+    return decoded as ITokenPayload;
   }
 }

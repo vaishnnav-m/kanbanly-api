@@ -4,7 +4,7 @@ import { IBaseRepository } from "../types/repository-interfaces/IBaseRepositroy"
 export class BaseRepository<T> implements IBaseRepository<T> {
   constructor(protected model: Model<T>) {}
 
-  async findOne(query: Partial<T>): Promise<T | null> {
+  async findOne(query: FilterQuery<T>): Promise<T | null> {
     return this.model.findOne(query, { _id: 0, __v: 0 });
   }
 
@@ -12,7 +12,7 @@ export class BaseRepository<T> implements IBaseRepository<T> {
     query: FilterQuery<T>,
     options: { skip?: number; limit?: number; sort?: any } = {}
   ): Promise<T[]> {
-    let q = this.model.find(query, { _id: 0, __v: 0 });
+    const q = this.model.find(query, { _id: 0, __v: 0 });
 
     if (options.skip) {
       q.skip(options.skip);
@@ -31,7 +31,7 @@ export class BaseRepository<T> implements IBaseRepository<T> {
     return q.exec();
   }
 
-  async create(data: Partial<T>): Promise<T> {
+  async create(data: FilterQuery<T>): Promise<T> {
     return this.model.create(data);
   }
 
@@ -40,7 +40,7 @@ export class BaseRepository<T> implements IBaseRepository<T> {
   }
 
   async findWithPagination(
-    query: Partial<T>,
+    query: FilterQuery<T>,
     options: { skip?: number; limit?: number; sort?: any }
   ): Promise<{ data: T[]; totalPages: number }> {
     const { skip = 0, limit = 10, sort = { createdAt: -1 } } = options;
@@ -60,11 +60,11 @@ export class BaseRepository<T> implements IBaseRepository<T> {
     return { data, totalPages };
   }
 
-  async delete(query: Partial<T>): Promise<void> {
+  async delete(query: FilterQuery<T>): Promise<void> {
     await this.model.deleteOne(query);
   }
 
-  async deleteMany(query: Partial<T>): Promise<void> {
+  async deleteMany(query: FilterQuery<T>): Promise<void> {
     await this.model.deleteMany(query);
   }
 }

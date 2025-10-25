@@ -59,6 +59,7 @@ export interface EditTaskDto {
   priority?: TaskPriority;
   assignedTo?: string;
   dueDate?: Date;
+  storyPoint?: number;
 }
 
 export interface TaskDetailsDto {
@@ -69,18 +70,20 @@ export interface TaskDetailsDto {
   assignedTo: {
     email: string;
     name: string;
+    profile?: string;
   } | null;
   priority: TaskPriority;
   parent?: {
     parentId: string;
-    title: string;
+    name: string;
     type: WorkItemType;
-    color: string;
+    color?: string;
   };
   dueDate?: Date;
   createdBy: {
     email: string;
     name: string;
+    profile?: string;
   };
   storyPoint?: number;
   workItemType: WorkItemType;
@@ -100,12 +103,14 @@ export interface TaskListingDto {
   assignedTo: {
     email: string;
     name: string;
+    profile?: string;
   } | null;
   priority: TaskPriority;
   dueDate?: Date;
   createdBy: {
     email: string;
     name: string;
+    profile?: string;
   };
 }
 

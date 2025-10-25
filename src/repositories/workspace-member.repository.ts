@@ -18,29 +18,10 @@ export class WorkspaceMemberRepository
     workspaceId: string,
     skip: number = 0,
     limit: number = 10,
-    search?: string
+    search = ""
   ): Promise<WorkspaceMemberRepoDto> {
     const result = await this.model.aggregate([
       { $match: { workspaceId, email: { $regex: search, $options: "i" } } },
-      {
-        $lookup: {
-          from: "users",
-          localField: "userId",
-          foreignField: "userId",
-          as: "user",
-        },
-      },
-      { $unwind: "$user" },
-      {
-        $project: {
-          _id: 0,
-          role: 1,
-          "user.firstName": 1,
-          "user.email": 1,
-          "user.userId": 1,
-          isActive: 1,
-        },
-      },
       {
         $facet: {
           data: [{ $skip: skip }, { $limit: limit }],

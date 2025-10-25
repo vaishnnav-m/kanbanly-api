@@ -3,7 +3,6 @@ import { projectModel } from "../models/project.model";
 import { IProject } from "../types/entities/IProject";
 import { IProjectRepository } from "../types/repository-interfaces/IProjectRepository";
 import { BaseRepository } from "./base.repository";
-import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 
 @injectable()
 export class ProjectRepository

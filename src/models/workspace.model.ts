@@ -1,4 +1,4 @@
-import { model, Schema, Types } from "mongoose";
+import { model, Schema } from "mongoose";
 import { IWorkspace } from "../types/entities/IWrokspace";
 const workspaceSchema = new Schema<IWorkspace>(
   {
