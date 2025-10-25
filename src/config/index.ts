@@ -6,6 +6,10 @@ export const config = {
     HOST: process.env.SERVER_HOST || "localhost",
     PORT: parseInt(process.env.PORT || "5000", 10),
   },
+  cookies: {
+    REFRESH_COOKIE_MAXAGE: process.env.REFRESH_COOKIE_MAXAGE || 604800000,
+    ACCESS_COOKIE_MAXAGE: process.env.ACCESS_COOKIE_MAXAGE || 300000,
+  },
 
   database: {
     URI: process.env.DATABASE_URI || "mongodb://localhost:27017/kanbanly",

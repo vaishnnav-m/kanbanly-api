@@ -11,7 +11,7 @@ export class ErrorMiddleware {
     err: any,
     req: Request,
     res: Response,
-    next: NextFunction
+    _next: NextFunction
   ) {
     let statusCode = HTTP_STATUS.INTERNAL_SERVER_ERROR;
     let message = ERROR_MESSAGES.UNEXPECTED_SERVER_ERROR;

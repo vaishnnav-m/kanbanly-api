@@ -3,7 +3,6 @@ import { IWorkspaceController } from "../types/controller-interfaces/IWorkspaceC
 import { inject, injectable } from "tsyringe";
 import { IWorkspaceService } from "../types/service-interface/IWorkspaceService";
 import { HTTP_STATUS } from "../shared/constants/http.status";
-import { IWorkspace } from "../types/entities/IWrokspace";
 import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../shared/constants/messages";
 

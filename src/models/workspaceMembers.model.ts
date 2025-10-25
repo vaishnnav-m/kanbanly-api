@@ -1,4 +1,4 @@
-import { model, Schema, Types } from "mongoose";
+import { model, Schema } from "mongoose";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
 
@@ -21,6 +21,9 @@ const workspaceMemberSchema = new Schema<IWorkspaceMember>(
     name: {
       type: String,
       required: true,
+    },
+    profile: {
+      type: String,
     },
     role: {
       type: String,

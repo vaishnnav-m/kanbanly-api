@@ -7,6 +7,7 @@ import { IVerificationService } from "../types/service-interface/IVerificationSe
 import { ITokenService } from "../types/service-interface/ITokenService";
 import { setAuthCookies } from "../shared/utils/cookieHelper.utils";
 import { SUCCESS_MESSAGES } from "../shared/constants/messages";
+import { config } from "../config";
 
 @injectable()
 export class VerificationController implements IVerificationController {
@@ -38,12 +39,17 @@ export class VerificationController implements IVerificationController {
       role: user.isAdmin ? "admin" : "user",
     });
 
-    setAuthCookies(res, "accessToken", accessToken, 60 * 60 * 1000);
+    setAuthCookies(
+      res,
+      "accessToken",
+      accessToken,
+      config.cookies.ACCESS_COOKIE_MAXAGE as number
+    );
     setAuthCookies(
       res,
       "refreshToken",
       refreshToken,
-      7 * 24 * 60 * 60 * 1000
+      config.cookies.REFRESH_COOKIE_MAXAGE as number
     );
 
     res.status(HTTP_STATUS.OK).json({
@@ -54,8 +60,9 @@ export class VerificationController implements IVerificationController {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
+          profile: user.profile,
         },
-        role:user.isAdmin ? "admin":'user'
+        role: user.isAdmin ? "admin" : "user",
       },
     });
   }

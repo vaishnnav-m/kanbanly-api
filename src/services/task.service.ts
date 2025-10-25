@@ -146,6 +146,7 @@ export class TaskService implements ITaskService {
           ? {
               name: assignedTo.name,
               email: assignedTo.email,
+              profile: assignedTo.profile,
             }
           : null,
         status: task.status,
@@ -155,6 +156,7 @@ export class TaskService implements ITaskService {
         createdBy: {
           name: createdBy.name,
           email: createdBy.email,
+          profile: createdBy.profile,
         },
       };
     });
@@ -212,7 +214,6 @@ export class TaskService implements ITaskService {
         type: task.parent.workItemType,
       };
     }
-
     if (task.epic) {
       parent = {
         name: task.epic.title,
@@ -232,13 +233,18 @@ export class TaskService implements ITaskService {
         ? {
             name: assignedTo.name,
             email: assignedTo.email,
+            profile: assignedTo.profile,
           }
         : null,
       ...(parent && {
         parent,
       }),
       status: task.status,
-      createdBy: { name: createdBy.name, email: createdBy.email },
+      createdBy: {
+        name: createdBy.name,
+        email: createdBy.email,
+        profile: createdBy.profile,
+      },
       storyPoint: task.storyPoint,
       workItemType: task.workItemType,
       createdAt: task.createdAt,
@@ -399,6 +405,7 @@ export class TaskService implements ITaskService {
       ...(data.priority && { priority: data.priority }),
       ...(data.dueDate && { dueDate: data.dueDate }),
       ...(data.assignedTo && assigneeId && { assignedTo: assigneeId }),
+      ...(data.storyPoint && { storyPoint: data.storyPoint }),
     };
 
     await this._workItemRepo.update({ taskId }, newTask);

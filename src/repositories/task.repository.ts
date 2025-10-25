@@ -100,7 +100,7 @@ export class WorkItemRepository
             color: 1,
           },
           parent: 1,
-          storypoint: 1,
+          storyPoint: 1,
           createdAt: 1,
           updatedAt: 1,
         },

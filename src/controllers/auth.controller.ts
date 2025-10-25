@@ -4,7 +4,6 @@ import { inject, injectable } from "tsyringe";
 import { IAuthService } from "../types/service-interface/IAuthService";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { ApiResponse } from "../types/common/IApiResponse";
-import { IUser } from "../types/entities/IUser";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../shared/constants/messages";
 import { ITokenService } from "../types/service-interface/ITokenService";
 import {
@@ -12,7 +11,8 @@ import {
   setAuthCookies,
 } from "../shared/utils/cookieHelper.utils";
 import AppError from "../shared/utils/AppError";
-import { userDto } from "../types/dtos/auth/createUser.dto";
+import { config } from "../config";
+import { AuthUserResponseDto, userDto } from "../types/dtos/auth/auth.dto";
 
 @injectable()
 export class AuthController implements IAuthController {
@@ -22,15 +22,17 @@ export class AuthController implements IAuthController {
   ) {}
 
   async registerUser(req: Request, res: Response) {
-    const user: IUser = await this._authService.register(req.body);
+    const user = await this._authService.register(req.body);
 
-    const response: ApiResponse<Partial<IUser>> = {
+    const response: ApiResponse<AuthUserResponseDto> = {
       success: true,
       message: SUCCESS_MESSAGES.REGISTRATION_SUCCESSFUL,
       data: {
+        userId: user.userId,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        profile: user.profile,
       },
     };
 
@@ -45,22 +47,24 @@ export class AuthController implements IAuthController {
       res,
       "accessToken",
       responseData.accessToken,
-      60 * 60 * 1000
+      config.cookies.ACCESS_COOKIE_MAXAGE as number
     );
     setAuthCookies(
       res,
       "refreshToken",
       responseData.refreshToken,
-      7 * 24 * 60 * 60 * 1000
+      config.cookies.REFRESH_COOKIE_MAXAGE as number
     );
 
-    const response: ApiResponse<Partial<IUser>> = {
+    const response: ApiResponse<AuthUserResponseDto> = {
       success: true,
       message: SUCCESS_MESSAGES.LOGIN_SUCCESSFUL,
       data: {
+        userId: responseData.user.userId,
         firstName: responseData.user.firstName,
         lastName: responseData.user.lastName,
         email: responseData.user.email,
+        profile: responseData.user.profile,
       },
     };
 
@@ -121,16 +125,28 @@ export class AuthController implements IAuthController {
       role: "user",
     });
 
-    setAuthCookies(res, "accessToken", accessToken, 5 * 60 * 1000);
-    setAuthCookies(res, "refreshToken", refreshToken, 7 * 24 * 60 * 60 * 1000);
+    setAuthCookies(
+      res,
+      "accessToken",
+      accessToken,
+      config.cookies.ACCESS_COOKIE_MAXAGE as number
+    );
+    setAuthCookies(
+      res,
+      "refreshToken",
+      refreshToken,
+      config.cookies.REFRESH_COOKIE_MAXAGE as number
+    );
 
-    const response: ApiResponse<Partial<IUser>> = {
+    const response: ApiResponse<AuthUserResponseDto> = {
       success: true,
       message: SUCCESS_MESSAGES.LOGIN_SUCCESSFUL,
       data: {
+        userId: user.userId,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        profile: user.profile,
       },
     };
 
@@ -161,7 +177,12 @@ export class AuthController implements IAuthController {
     });
 
     clearAuthCookies(res, "accessToken");
-    setAuthCookies(res, "accessToken", accessToken, 60 * 60 * 1000);
+    setAuthCookies(
+      res,
+      "accessToken",
+      accessToken,
+      config.cookies.ACCESS_COOKIE_MAXAGE as number
+    );
 
     res.status(HTTP_STATUS.OK).json({
       success: true,
@@ -190,19 +211,20 @@ export class AuthController implements IAuthController {
       res,
       "accessToken",
       responseData.accessToken,
-      60 * 60 * 1000
+      config.cookies.ACCESS_COOKIE_MAXAGE as number
     );
     setAuthCookies(
       res,
       "refreshToken",
       responseData.refreshToken,
-      7 * 24 * 60 * 60 * 1000
+      config.cookies.REFRESH_COOKIE_MAXAGE as number
     );
 
-    const response: ApiResponse<Partial<IUser>> = {
+    const response: ApiResponse<AuthUserResponseDto> = {
       success: true,
       message: SUCCESS_MESSAGES.LOGIN_SUCCESSFUL,
       data: {
+        userId: responseData.user.userId,
         firstName: responseData.user.firstName,
         lastName: responseData.user.lastName,
         email: responseData.user.email,

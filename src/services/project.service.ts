@@ -141,10 +141,10 @@ export class ProjectService implements IProjectService {
 
     // getting the role to get projects user have access
     const role = workspaceMember.role;
-    let query: any = {
+    const query: FilterQuery<IProject> = {
       workspaceId,
     };
-    if (role === workspaceRoles.member) {
+    if (role !== workspaceRoles.owner) {
       query.members = { $in: [userId] };
     }
 
@@ -184,8 +184,6 @@ export class ProjectService implements IProjectService {
     } else {
       sortOptions["updatedAt"] = -1;
     }
-
-    console.log(sortOptions);
 
     const projectsData = await this._projectRepo.find(query, {
       sort: sortOptions,

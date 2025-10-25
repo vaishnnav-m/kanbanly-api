@@ -1,4 +1,4 @@
-import { container, FactoryProvider } from "tsyringe";
+import { container } from "tsyringe";
 import { IBcryptUtils } from "../types/common/IBcryptUtils";
 import { BcryptUtils } from "../shared/utils/password.utils";
 import { ErrorMiddleware } from "../middlewares/error.middleware";

@@ -81,7 +81,7 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     userId: string,
     page: number,
     limit: number,
-    search?: string
+    search: string
   ): Promise<PaginatedResponseDto<WorkspaceMemberResponseDto[]>> {
     const skip = (page - 1) * limit;
 
@@ -101,7 +101,7 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
       workspaceId,
       skip,
       limit,
-      (search = "")
+      search
     );
 
     const isOwner = member.role === "owner";
@@ -112,10 +112,11 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
 
     const members = filteredData.map((member) => {
       return {
-        name: member.user.firstName,
-        email: member.user.email,
+        _id: member.userId,
+        name: member.name,
+        email: member.email,
+        profile: member.profile,
         role: member.role,
-        _id: member.user.userId,
         isActive: member.isActive,
       };
     });
