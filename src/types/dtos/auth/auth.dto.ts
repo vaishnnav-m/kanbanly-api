@@ -12,6 +12,7 @@ export interface userDto {
   email: string;
   phone?: string;
   password: string;
+  profile?: string;
 }
 
 export interface responseDataDto<T> {

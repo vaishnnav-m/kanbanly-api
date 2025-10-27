@@ -17,6 +17,7 @@ import { PlanRoutes } from "./routes/plan/plan.routes";
 import { SubscriptionRoutes } from "./routes/subscription/subscription.routes";
 import { WebhookRoutes } from "./routes/webhook/webhook.routes";
 import logger from "./logger/winston.logger";
+import { CloudinaryRoutes } from "./routes/cloudinary/cloudinary.routes";
 
 export default class Server {
   private _app: Application;
@@ -64,6 +65,10 @@ export default class Server {
     this._app.use("/api/v1/admin", container.resolve(AdminRoutes).router);
     this._app.use("/api/v1/user", container.resolve(UserRoutes).router);
     this._app.use(
+      "/api/v1/cloudinary",
+      container.resolve(CloudinaryRoutes).router
+    );
+    this._app.use(
       "/api/v1/workspace",
       container.resolve(WorkspaceRoutes).router
     );
@@ -78,7 +83,7 @@ export default class Server {
     );
   }
 
-  // Start server 
+  // Start server
   public start(): void {
     this._app.listen(this._port, () => {
       logger.info(`server started at port ${this._port}`);
