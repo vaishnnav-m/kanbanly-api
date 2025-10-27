@@ -35,6 +35,8 @@ import { IEpicService } from "../types/service-interface/IEpicService";
 import { EpicService } from "../services/epic.service";
 import { ISprintService } from "../types/service-interface/ISprintService";
 import { SprintService } from "../services/sprint.service";
+import { ICloudinaryService } from "../types/service-interface/ICloudinaryService";
+import { CloudinaryService } from "../services/cloudinary.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -91,6 +93,9 @@ export class ServiceRegistry {
     });
     container.register<ISprintService>("ISprintService", {
       useClass: SprintService,
+    });
+    container.register<ICloudinaryService>("ICloudinaryService", {
+      useClass: CloudinaryService,
     });
   }
 }

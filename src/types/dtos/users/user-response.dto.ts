@@ -15,6 +15,7 @@ export interface EditUserDto {
   userId: string;
   firstName?: string;
   lastName?: string;
+  profile?: string;
 }
 
 export interface EditUserPasswordDto {

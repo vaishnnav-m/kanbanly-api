@@ -6,9 +6,16 @@ export const config = {
     HOST: process.env.SERVER_HOST || "localhost",
     PORT: parseInt(process.env.PORT || "5000", 10),
   },
+  
   cookies: {
     REFRESH_COOKIE_MAXAGE: process.env.REFRESH_COOKIE_MAXAGE || 604800000,
     ACCESS_COOKIE_MAXAGE: process.env.ACCESS_COOKIE_MAXAGE || 300000,
+  },
+
+  cloudinary: {
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || "",
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || "",
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || "",
   },
 
   database: {

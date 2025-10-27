@@ -30,7 +30,7 @@ export class AuthService implements IAuthService {
   ) {}
 
   async register(user: userDto): Promise<AuthUserResponseDto> {
-    const { firstName, lastName, email, phone, password } = user;
+    const { firstName, lastName, email, phone, password, profile } = user;
     const emailExists = await this._userRepository.findByEmail(email);
 
     if (emailExists) {
@@ -45,6 +45,7 @@ export class AuthService implements IAuthService {
       email,
       phone,
       password: hashedPassword,
+      profile,
     });
 
     authEvents.emit(AuthEvent.UserRegistered, { userEmail: email });

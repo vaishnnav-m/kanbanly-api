@@ -30,7 +30,7 @@ export class UserController implements IUserController {
 
   async updateUserData(req: Request, res: Response): Promise<void> {
     const userId = req.user?.userid;
-    const { firstName, lastName } = req.body;
+    const { firstName, lastName, profile } = req.body;
     if (!userId) {
       throw new AppError(
         ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
@@ -38,7 +38,12 @@ export class UserController implements IUserController {
       );
     }
 
-    await this._userService.editUserData({ firstName, lastName, userId });
+    await this._userService.editUserData({
+      firstName,
+      lastName,
+      profile,
+      userId,
+    });
 
     res
       .status(HTTP_STATUS.OK)
