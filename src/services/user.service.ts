@@ -46,6 +46,7 @@ export class UserService implements IUserService {
     const newUser: Omit<EditUserDto, "userId"> = {
       ...(data.firstName && { firstName: data.firstName }),
       ...(data.lastName && { lastName: data.lastName }),
+      ...(data.profile && { profile: data.profile }),
     };
 
     await this._userRepo.update({ userId: data.userId }, newUser);
