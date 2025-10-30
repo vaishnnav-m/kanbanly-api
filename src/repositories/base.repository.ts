@@ -1,4 +1,4 @@
-import { FilterQuery, Model } from "mongoose";
+import { FilterQuery, Model, SortOrder } from "mongoose";
 import { IBaseRepository } from "../types/repository-interfaces/IBaseRepositroy";
 
 export class BaseRepository<T> implements IBaseRepository<T> {
@@ -10,7 +10,11 @@ export class BaseRepository<T> implements IBaseRepository<T> {
 
   async find(
     query: FilterQuery<T>,
-    options: { skip?: number; limit?: number; sort?: any } = {}
+    options: {
+      skip?: number;
+      limit?: number;
+      sort?: Record<string, SortOrder>;
+    } = {}
   ): Promise<T[]> {
     const q = this.model.find(query, { _id: 0, __v: 0 });
 
@@ -35,13 +39,13 @@ export class BaseRepository<T> implements IBaseRepository<T> {
     return this.model.create(data);
   }
 
-  async update(query: any, data: any): Promise<T | null> {
+  async update(query: FilterQuery<T>, data: Partial<T>): Promise<T | null> {
     return this.model.findOneAndUpdate(query, data);
   }
 
   async findWithPagination(
     query: FilterQuery<T>,
-    options: { skip?: number; limit?: number; sort?: any }
+    options: { skip?: number; limit?: number; sort?: Record<string, SortOrder> }
   ): Promise<{ data: T[]; totalPages: number }> {
     const { skip = 0, limit = 10, sort = { createdAt: -1 } } = options;
 

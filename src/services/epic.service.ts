@@ -19,6 +19,7 @@ import { IEpic } from "../types/entities/IEpic";
 import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
 import logger from "../logger/winston.logger";
 import { TaskStatus } from "../types/dtos/task/task.dto";
+import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 
 @injectable()
 export class EpicService implements IEpicService {
@@ -142,20 +143,23 @@ export class EpicService implements IEpicService {
     }
 
     const tasks = await this._taskRepo.getTasksWithAssigness({ epicId });
-    const mappedChildren = tasks.map((task) => ({
-      taskId: task.taskId,
-      task: task.task,
-      dueDate: task.dueDate,
-      priority: task.priority,
-      assignedTo: task?.assignedTo
-        ? {
-            name: task.assignedTo.name,
-            email: task.assignedTo.email,
-          }
-        : null,
-      status: task.status,
-      workItemType: task.workItemType,
-    }));
+    const mappedChildren = tasks.map((task) => {
+      const assignedTo = task.assignedTo as IWorkspaceMember;
+      return {
+        taskId: task.taskId,
+        task: task.task,
+        dueDate: task.dueDate,
+        priority: task.priority,
+        assignedTo: assignedTo
+          ? {
+              name: assignedTo.name,
+              email: assignedTo.email,
+            }
+          : null,
+        status: task.status,
+        workItemType: task.workItemType,
+      };
+    });
 
     const taskCounts = await this._taskRepo.getTaskCountsForEpic([epicId]);
     const counts = taskCounts[0] || { totalTasks: 0, completedTasks: 0 };
@@ -243,8 +247,10 @@ export class EpicService implements IEpicService {
 
         await this._epicRepo.delete({ epicId });
       });
-    } catch (error: any) {
-      logger.error("Transaction aborted due to an error:", error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        logger.error("Transaction aborted due to an error:", error.message);
+      }
       throw error;
     } finally {
       await session.endSession();

@@ -468,7 +468,7 @@ export class TaskService implements ITaskService {
     }
 
     if (!sprintId) {
-      await this._workItemRepo.update({ taskId }, { sprintId: null });
+      await this._workItemRepo.update({ taskId }, { sprintId: '' });
       return;
     }
 
