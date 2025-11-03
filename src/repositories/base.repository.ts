@@ -39,7 +39,7 @@ export class BaseRepository<T> implements IBaseRepository<T> {
     return this.model.create(data);
   }
 
-  async update(query: FilterQuery<T>, data: Partial<T>): Promise<T | null> {
+  async update(query: FilterQuery<T>, data: FilterQuery<T>): Promise<T | null> {
     return this.model.findOneAndUpdate(query, data);
   }
 

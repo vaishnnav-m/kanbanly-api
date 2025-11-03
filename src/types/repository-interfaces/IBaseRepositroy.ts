@@ -11,7 +11,7 @@ export interface IBaseRepository<T> {
     }
   ): Promise<T[]>;
   create(data: Partial<T>): Promise<T>;
-  update(query: FilterQuery<T>, data: Partial<T>): Promise<T | null>;
+  update(query: FilterQuery<T>, data: FilterQuery<T>): Promise<T | null>;
   findWithPagination(
     query: FilterQuery<T>,
     options: { skip?: number; limit?: number; sort?: Record<string, SortOrder> }

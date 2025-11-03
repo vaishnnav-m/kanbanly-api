@@ -17,7 +17,9 @@ export interface IProjectService {
     sorting: {
       sortBy?: string;
       order?: string;
-    }
+    },
+    limit?: number,
+    skip?: number
   ): Promise<ProjectListDto[] | null>;
   getOneProject(
     workspaceId: string,

@@ -129,7 +129,9 @@ export class ProjectService implements IProjectService {
     sorting: {
       sortBy?: string;
       order?: string;
-    }
+    },
+    limit?: number,
+    skip?: number
   ): Promise<ProjectListDto[] | null> {
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       userId,
@@ -148,7 +150,7 @@ export class ProjectService implements IProjectService {
       query.members = { $in: [userId] };
     }
 
-    // seraching
+    // searching
     if (filters.search) {
       const searchRegex = new RegExp(filters.search, "i");
       query.$or = [{ name: searchRegex }, { description: searchRegex }];
@@ -185,11 +187,13 @@ export class ProjectService implements IProjectService {
       sortOptions["updatedAt"] = -1;
     }
 
-    const projectsData = await this._projectRepo.find(query, {
+    const projectsData = await this._projectRepo.findWithPagination(query, {
       sort: sortOptions,
+      limit: limit || 10,
+      skip: skip || 0,
     });
 
-    const projects = projectsData.map((project) => {
+    const projects = projectsData.data.map((project) => {
       return {
         projectId: project.projectId,
         name: project.name,
