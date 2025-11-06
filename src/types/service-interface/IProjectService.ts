@@ -10,11 +10,11 @@ export interface IProjectService {
   getAllProjects(
     workspaceId: string,
     userId: string,
-    filters: {
+    filters?: {
       search?: string;
       memberFilter?: string;
     },
-    sorting: {
+    sorting?: {
       sortBy?: string;
       order?: string;
     },
