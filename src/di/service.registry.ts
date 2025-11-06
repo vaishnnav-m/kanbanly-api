@@ -37,6 +37,10 @@ import { ISprintService } from "../types/service-interface/ISprintService";
 import { SprintService } from "../services/sprint.service";
 import { ICloudinaryService } from "../types/service-interface/ICloudinaryService";
 import { CloudinaryService } from "../services/cloudinary.service";
+import { IChatService } from "../types/service-interface/IChatService";
+import { ChatService } from "../services/chat.service";
+import { IMessageService } from "../types/service-interface/IMessageService";
+import { MessageService } from "../services/message.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -96,6 +100,12 @@ export class ServiceRegistry {
     });
     container.register<ICloudinaryService>("ICloudinaryService", {
       useClass: CloudinaryService,
+    });
+    container.register<IChatService>("IChatService", {
+      useClass: ChatService,
+    });
+    container.register<IMessageService>("IMessageService", {
+      useClass: MessageService,
     });
   }
 }

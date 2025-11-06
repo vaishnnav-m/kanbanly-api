@@ -18,14 +18,25 @@ import { SubscriptionRoutes } from "./routes/subscription/subscription.routes";
 import { WebhookRoutes } from "./routes/webhook/webhook.routes";
 import logger from "./logger/winston.logger";
 import { CloudinaryRoutes } from "./routes/cloudinary/cloudinary.routes";
+import http from "http";
+import { Server as SocketServer } from "socket.io";
+import { SocketHandler } from "./socket/socket.handler";
 
 export default class Server {
   private _app: Application;
   private _port: number;
+  private _httpServer: http.Server;
+  private _io: SocketServer;
 
   constructor() {
     this._app = express();
+    this._httpServer = http.createServer(this._app);
     this._port = config.server.PORT;
+    this._io = new SocketServer(this._httpServer, {
+      cors: {
+        origin: [config.cors.ALLOWED_ORIGIN],
+      },
+    });
     this.initialize();
   }
 
@@ -36,6 +47,7 @@ export default class Server {
     this.configureMiddlewares();
     this.configureRoutes();
     this.configureErrorMiddlewares();
+    this.configureSocket();
   }
 
   // Middlewares
@@ -83,9 +95,15 @@ export default class Server {
     );
   }
 
+  // Socket.io setup
+  private configureSocket(): void {
+    const socketHandler = container.resolve(SocketHandler);
+    socketHandler.initialize(this._io);
+  }
+
   // Start server
   public start(): void {
-    this._app.listen(this._port, () => {
+    this._httpServer.listen(this._port, () => {
       logger.info(`server started at port ${this._port}`);
     });
   }
