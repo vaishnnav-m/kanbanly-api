@@ -27,6 +27,8 @@ import { ISprintController } from "../types/controller-interfaces/ISprintControl
 import { SprintController } from "../controllers/sprint.controller";
 import { ICloudinaryController } from "../types/controller-interfaces/ICloudinaryController";
 import { CloudinaryController } from "../controllers/cloudinary.controller";
+import { ChatController } from "../controllers/chat.controller";
+import { IChatController } from "../types/controller-interfaces/IChatController";
 
 export class ControllerRegistry {
   static registerController(): void {
@@ -74,6 +76,9 @@ export class ControllerRegistry {
     });
     container.register<ICloudinaryController>("ICloudinaryController", {
       useClass: CloudinaryController,
+    });
+     container.register<IChatController>("IChatController", {
+      useClass: ChatController,
     });
   }
 }

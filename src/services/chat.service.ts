@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { v4 as uuidV4 } from "uuid";
-import { CreateChatDto } from "../types/dtos/chat/chat.dto";
+import { ChatListingDto, CreateChatDto } from "../types/dtos/chat/chat.dto";
 import { IChatService } from "../types/service-interface/IChatService";
 import { IChatRepository } from "../types/repository-interfaces/IChatRepository";
 import AppError from "../shared/utils/AppError";
@@ -22,6 +22,13 @@ export class ChatService implements IChatService {
       if (data.participants.length !== 2) {
         throw new AppError(
           ERROR_MESSAGES.CHAT_DIRECT_MEMBER_LIMIT,
+          HTTP_STATUS.BAD_REQUEST
+        );
+      }
+
+      if (data.participants[0] === data.participants[1]) {
+        throw new AppError(
+          ERROR_MESSAGES.CAN_NOT_CHAT_YOURSELF,
           HTTP_STATUS.BAD_REQUEST
         );
       }
@@ -55,6 +62,7 @@ export class ChatService implements IChatService {
 
     await this._chatRepo.create({
       chatId: uuidV4(),
+      workspaceId: data.workspaceId,
       type: data.type,
       participants: data.participants,
       projectId: data.projectId,
@@ -64,4 +72,22 @@ export class ChatService implements IChatService {
       createdAt: new Date(),
     });
   }
+
+  async getUserChats(
+    userId: string,
+    workspaceId: string
+  ): Promise<ChatListingDto[]> {
+    const chats = await this._chatRepo.getChats(workspaceId, userId);
+
+    console.log("chats", chats);
+
+    return chats.map((chat) => ({
+      chatId: chat.chatId,
+      name: chat.name as string,
+      type: chat.type,
+      icon: chat.icon,
+    }));
+  }
+
+  async getOneChat(workspaceId: string, chatId: string): Promise<void> {}
 }

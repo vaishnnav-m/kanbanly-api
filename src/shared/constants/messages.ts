@@ -93,5 +93,6 @@ export const ERROR_MESSAGES = {
   CHAT_NO_PARTICIPANTS: "At least one participant is required",
   CHAT_DIRECT_MEMBER_LIMIT: "A direct chat must have exactly 2 participants",
   CHAT_ID_REQUIRED: "Chat ID is required.",
+  CAN_NOT_CHAT_YOURSELF: "You can't chat your self",
   // MESSAGE
 };

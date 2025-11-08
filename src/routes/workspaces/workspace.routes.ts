@@ -5,6 +5,7 @@ import { BaseRoute } from "../base.routes";
 import { IInvitationController } from "../../types/controller-interfaces/IInvitationController";
 import { ProjectRoutes } from "./projects/project.routes";
 import { WorkspaceMembersRoutes } from "./members/members.routes";
+import { ChatRoutes } from "./chats/chat.routes";
 
 @injectable()
 export class WorkspaceRoutes extends BaseRoute {
@@ -15,7 +16,8 @@ export class WorkspaceRoutes extends BaseRoute {
     private _invitationController: IInvitationController,
     @inject(WorkspaceMembersRoutes)
     private _membersRoutes: WorkspaceMembersRoutes,
-    @inject(ProjectRoutes) private _projectRoutes: ProjectRoutes
+    @inject(ProjectRoutes) private _projectRoutes: ProjectRoutes,
+    @inject(ChatRoutes) private _chatRoutes: ChatRoutes
   ) {
     super();
     this.initializeRoutes();
@@ -63,6 +65,11 @@ export class WorkspaceRoutes extends BaseRoute {
       "/:workspaceId/projects",
       authenticateToken,
       this._projectRoutes.router
+    );
+    this._router.use(
+      "/:workspaceId/chats",
+      authenticateToken,
+      this._chatRoutes.router
     );
   }
 }

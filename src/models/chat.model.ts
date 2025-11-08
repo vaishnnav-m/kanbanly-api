@@ -11,6 +11,10 @@ const chatSchema = new Schema<IChat>(
     type: {
       type: String,
     },
+    workspaceId: {
+      type: String,
+      required: true,
+    },
     projectId: {
       type: String,
     },
