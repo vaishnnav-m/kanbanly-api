@@ -1,0 +1,46 @@
+import { Server, Socket } from "socket.io";
+import logger from "../logger/winston.logger";
+import { inject, injectable } from "tsyringe";
+import { IMessageService } from "../types/service-interface/IMessageService";
+import { IProjectService } from "../types/service-interface/IProjectService";
+
+@injectable()
+export class SocketHandler {
+  private _io!: Server;
+  constructor(
+    @inject("IMessageService") private _messageService: IMessageService,
+    @inject("IProjectService") private _projectService: IProjectService
+  ) {}
+
+  initialize(io: Server) {
+    this._io = io;
+
+    this._io.on("connection", (socket) => {
+      logger.info(`Socket connected: ${socket.id}`);
+
+      this.registerEventHandlers(socket);
+
+      socket.on("disconnect", () => {
+        logger.info(`Socket disconnected: ${socket.id}`);
+      });
+    });
+  }
+
+  private registerEventHandlers(socket: Socket) {
+    const userId = socket.data.userId;
+    socket.on("joinRooms", async (payload: { workSpaceId: string }) => {
+      const { workSpaceId } = payload;
+      if (workSpaceId) {
+        socket.join(userId);
+        const projects = await this._projectService.getAllProjects(
+          workSpaceId,
+          userId
+        );
+        if (projects?.length) {
+          projects.forEach((project) => socket.join(`project_${project.projectId}`));
+          logger.info(`User ${userId} joined ${projects.length} projects`);
+        }
+      }
+    });
+  }
+}

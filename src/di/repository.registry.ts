@@ -19,6 +19,10 @@ import { IEpicRepository } from "../types/repository-interfaces/IEpicRepository"
 import { EpicRepository } from "../repositories/epic.repository";
 import { ISprintRepository } from "../types/repository-interfaces/ISprintRepository";
 import { SprintRepository } from "../repositories/sprint.repository";
+import { IChatRepository } from "../types/repository-interfaces/IChatRepository";
+import { ChatRepository } from "../repositories/chat.repository";
+import { IMessageRepository } from "../types/repository-interfaces/IMessageRepository";
+import { MessageRepository } from "../repositories/message.repository";
 
 export class RepositoryRegistry {
   static registerRepositories(): void {
@@ -54,6 +58,12 @@ export class RepositoryRegistry {
     });
     container.register<ISprintRepository>("ISprintRepository", {
       useClass: SprintRepository,
+    });
+    container.register<IChatRepository>("IChatRepository", {
+      useClass: ChatRepository,
+    });
+    container.register<IMessageRepository>("IMessageRepository", {
+      useClass: MessageRepository,
     });
   }
 }

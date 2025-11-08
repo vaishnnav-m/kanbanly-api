@@ -184,6 +184,7 @@ export class TaskService implements ITaskService {
       workspaceMember.role === "member" ? { assignedTo: userId } : {};
 
     const taskData = await this._workItemRepo.getTasksWithAssigness({
+      workspaceId,
       taskId,
       projectId,
       ...query,
@@ -280,6 +281,7 @@ export class TaskService implements ITaskService {
     }
 
     const tasks = await this._workItemRepo.getTasksWithAssigness({
+      workspaceId,
       projectId,
       parent: taskId,
       workItemType: WorkItemType.Subtask,
@@ -468,7 +470,7 @@ export class TaskService implements ITaskService {
     }
 
     if (!sprintId) {
-      await this._workItemRepo.update({ taskId }, { sprintId: '' });
+      await this._workItemRepo.update({ taskId }, { sprintId: "" });
       return;
     }
 

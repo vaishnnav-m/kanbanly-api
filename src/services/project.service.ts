@@ -122,14 +122,16 @@ export class ProjectService implements IProjectService {
   async getAllProjects(
     workspaceId: string,
     userId: string,
-    filters: {
+    filters?: {
       search?: string;
       memberFilter?: string;
     },
-    sorting: {
+    sorting?: {
       sortBy?: string;
       order?: string;
-    }
+    },
+    limit?: number,
+    skip?: number
   ): Promise<ProjectListDto[] | null> {
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       userId,
@@ -148,14 +150,14 @@ export class ProjectService implements IProjectService {
       query.members = { $in: [userId] };
     }
 
-    // seraching
-    if (filters.search) {
+    // searching
+    if (filters && filters.search) {
       const searchRegex = new RegExp(filters.search, "i");
       query.$or = [{ name: searchRegex }, { description: searchRegex }];
     }
 
     // member filtering
-    if (filters.memberFilter && filters.memberFilter !== "any") {
+    if (filters && filters.memberFilter && filters.memberFilter !== "any") {
       const [minStr, maxStr] = filters.memberFilter.replace("+", "").split("-");
       const min = parseInt(minStr, 10);
       const max = maxStr ? parseInt(maxStr, 10) : null;
@@ -177,7 +179,7 @@ export class ProjectService implements IProjectService {
 
     // sorting
     const sortOptions: { [key: string]: 1 | -1 } = {};
-    if (sorting.sortBy && sorting.order) {
+    if (sorting && sorting.sortBy && sorting.order) {
       const sortField =
         sorting.sortBy === "lastUpdated" ? "updatedAt" : sorting.sortBy;
       sortOptions[sortField] = sorting.order === "asc" ? 1 : -1;
@@ -185,11 +187,13 @@ export class ProjectService implements IProjectService {
       sortOptions["updatedAt"] = -1;
     }
 
-    const projectsData = await this._projectRepo.find(query, {
+    const projectsData = await this._projectRepo.findWithPagination(query, {
       sort: sortOptions,
+      limit: limit || 10,
+      skip: skip || 0,
     });
 
-    const projects = projectsData.map((project) => {
+    const projects = projectsData.data.map((project) => {
       return {
         projectId: project.projectId,
         name: project.name,

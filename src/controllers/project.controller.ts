@@ -42,7 +42,7 @@ export class ProjectController implements IProjectController {
     const workspaceId = req.params.workspaceId;
     const userId = req.user?.userid;
 
-    const { search, memberFilter, sortBy, order } = req.query;
+    const { search, memberFilter, sortBy, order, limit, skip } = req.query;
 
     if (!userId) {
       throw new AppError(
@@ -65,7 +65,9 @@ export class ProjectController implements IProjectController {
       workspaceId,
       userId,
       filters,
-      sorting
+      sorting,
+      Number(limit),
+      Number(skip)
     );
 
     res.status(HTTP_STATUS.OK).json({

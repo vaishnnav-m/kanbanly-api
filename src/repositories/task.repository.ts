@@ -24,12 +24,22 @@ export class WorkItemRepository
   ): Promise<IWorkItem[]> {
     const result = await this.model.aggregate([
       { $match: { ...query, isDeleted: false } },
-      // Lookup for assignee (workspace member)
       {
         $lookup: {
           from: "workspacemembers",
-          localField: "assignedTo",
-          foreignField: "userId",
+          let: { assignedTo: "$assignedTo" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$userId", "$$assignedTo"] },
+                    { $eq: ["$workspaceId", query.workspaceId] },
+                  ],
+                },
+              },
+            },
+          ],
           as: "assignedTo",
         },
       },
@@ -42,8 +52,19 @@ export class WorkItemRepository
       {
         $lookup: {
           from: "workspacemembers",
-          localField: "createdBy",
-          foreignField: "userId",
+          let: { createdBy: "$createdBy" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$userId", "$$createdBy"] },
+                    { $eq: ["$workspaceId", query.workspaceId] },
+                  ],
+                },
+              },
+            },
+          ],
           as: "createdBy",
         },
       },

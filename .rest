@@ -1,9 +1,0 @@
-### Login Request
-POST http://localhost:5000/api/v1/workspace/create
-Content-Type: application/json
-
-{
-  "name": "My Workspace",
-  "description":"some description",
-  "logo":"logo.png"
-}

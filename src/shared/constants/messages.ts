@@ -61,7 +61,7 @@ export const ERROR_MESSAGES = {
     "Invalid project or project doesn't belong to the specified workspace",
   PROJECT_LIMIT_EXCEED:
     "Project limit in a workspace exceeded.Upgrade the plan to continue",
-
+  PROJECTID_REQUIRED: "Project ID is required",
   // TASK
   TASK_NOT_FOUND: "The task not found",
 
@@ -88,4 +88,11 @@ export const ERROR_MESSAGES = {
   EMPTY_SPRINT:
     "This sprint is empty. Please add issues from the backlog before starting.",
   NO_ACTIVE_SPRINT: "There are no active sprints",
+
+  // CHAT
+  CHAT_NO_PARTICIPANTS: "At least one participant is required",
+  CHAT_DIRECT_MEMBER_LIMIT: "A direct chat must have exactly 2 participants",
+  CHAT_ID_REQUIRED: "Chat ID is required.",
+  CAN_NOT_CHAT_YOURSELF: "You can't chat your self",
+  // MESSAGE
 };

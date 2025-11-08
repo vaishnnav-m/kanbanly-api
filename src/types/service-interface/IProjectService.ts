@@ -10,14 +10,16 @@ export interface IProjectService {
   getAllProjects(
     workspaceId: string,
     userId: string,
-    filters: {
+    filters?: {
       search?: string;
       memberFilter?: string;
     },
-    sorting: {
+    sorting?: {
       sortBy?: string;
       order?: string;
-    }
+    },
+    limit?: number,
+    skip?: number
   ): Promise<ProjectListDto[] | null>;
   getOneProject(
     workspaceId: string,
