@@ -13,9 +13,19 @@ export class ChatRepository
     super(chatModel);
   }
 
-  async getChats(workspaceId: string, userId: string): Promise<IChat[]> {
+  async getChats(
+    workspaceId: string,
+    userId: string,
+    chatId?: string
+  ): Promise<IChat[]> {
     const result = await this.model.aggregate([
-      { $match: { workspaceId, participants: { $in: [userId] } } },
+      {
+        $match: {
+          workspaceId,
+          participants: { $in: [userId] },
+          ...(chatId && { chatId }),
+        },
+      },
       {
         $addFields: {
           otherUser: {

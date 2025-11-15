@@ -30,7 +30,11 @@ export class MessageService implements IMessageService {
       text: data.text,
       senderId: data.senderId,
     };
-    
+
     await this._messageRepo.create(newMessage);
+  }
+
+  async getChatMessages(chatId: string): Promise<void> {
+
   }
 }

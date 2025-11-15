@@ -20,5 +20,9 @@ export class ChatRoutes extends BaseRoute {
       "/",
       this._chatController.getUserChats.bind(this._chatController)
     );
+    this._router.get(
+      "/:chatId",
+      this._chatController.getOneChat.bind(this._chatController)
+    );
   }
 }

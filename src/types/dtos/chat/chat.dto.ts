@@ -21,5 +21,5 @@ export interface ChatDetailsDto {
   type: "direct" | "project";
   icon?: string;
   description?: string;
-  createdAt: string;
+  createdAt: Date;
 }

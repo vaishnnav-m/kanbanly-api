@@ -44,12 +44,34 @@ export class ChatController implements IChatController {
 
     const chats = await this._chatService.getUserChats(userId, workspaceId);
 
-    res
-      .status(HTTP_STATUS.CREATED)
-      .json({
-        success: true,
-        message: SUCCESS_MESSAGES.DATA_FETCHED,
-        data: chats,
-      });
+    res.status(HTTP_STATUS.CREATED).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_FETCHED,
+      data: chats,
+    });
+  }
+
+  async getOneChat(req: Request, res: Response) {
+    const workspaceId = req.params.workspaceId;
+    const userId = req.user?.userid;
+    const chatId = req.params.chatId;
+    if (!userId) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    const chat = await this._chatService.getOneChat(
+      userId,
+      workspaceId,
+      chatId
+    );
+
+    res.status(HTTP_STATUS.CREATED).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_FETCHED,
+      data: chat,
+    });
   }
 }

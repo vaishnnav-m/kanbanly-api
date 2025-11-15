@@ -1,6 +1,10 @@
 import { inject, injectable } from "tsyringe";
 import { v4 as uuidV4 } from "uuid";
-import { ChatListingDto, CreateChatDto } from "../types/dtos/chat/chat.dto";
+import {
+  ChatDetailsDto,
+  ChatListingDto,
+  CreateChatDto,
+} from "../types/dtos/chat/chat.dto";
 import { IChatService } from "../types/service-interface/IChatService";
 import { IChatRepository } from "../types/repository-interfaces/IChatRepository";
 import AppError from "../shared/utils/AppError";
@@ -10,6 +14,7 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 @injectable()
 export class ChatService implements IChatService {
   constructor(@inject("IChatRepository") private _chatRepo: IChatRepository) {}
+
   async createChat(data: CreateChatDto): Promise<void> {
     if (!data.participants || data.participants.length === 0) {
       throw new AppError(
@@ -79,8 +84,6 @@ export class ChatService implements IChatService {
   ): Promise<ChatListingDto[]> {
     const chats = await this._chatRepo.getChats(workspaceId, userId);
 
-    console.log("chats", chats);
-
     return chats.map((chat) => ({
       chatId: chat.chatId,
       name: chat.name as string,
@@ -89,5 +92,21 @@ export class ChatService implements IChatService {
     }));
   }
 
-  async getOneChat(workspaceId: string, chatId: string): Promise<void> {}
+  async getOneChat(
+    userId: string,
+    workspaceId: string,
+    chatId: string
+  ): Promise<ChatDetailsDto> {
+    const chatData = await this._chatRepo.getChats(workspaceId, userId, chatId);
+    const chat = chatData[0];
+
+    return {
+      chatId: chat.chatId,
+      name: chat.name as string,
+      type: chat.type,
+      description: chat.description,
+      icon: chat.icon,
+      createdAt: chat.createdAt,
+    };
+  }
 }
