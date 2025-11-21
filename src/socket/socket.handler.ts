@@ -1,15 +1,13 @@
 import { Server, Socket } from "socket.io";
-import logger from "../logger/winston.logger";
 import { inject, injectable } from "tsyringe";
+import logger from "../logger/winston.logger";
 import { IMessageService } from "../types/service-interface/IMessageService";
-import { IProjectService } from "../types/service-interface/IProjectService";
 
 @injectable()
 export class SocketHandler {
   private _io!: Server;
   constructor(
-    @inject("IMessageService") private _messageService: IMessageService,
-    @inject("IProjectService") private _projectService: IProjectService
+    @inject("IMessageService") private _messageService: IMessageService
   ) {}
 
   initialize(io: Server) {
@@ -32,23 +30,10 @@ export class SocketHandler {
     socket.on(
       "joinRooms",
       async (payload: { workSpaceId: string; chatId: string }) => {
-        const { workSpaceId, chatId } = payload;
-        // join workspce rooms
-        if (workSpaceId) {
-          socket.join(userId);
-          const projects = await this._projectService.getAllProjects(
-            workSpaceId,
-            userId
-          );
-          if (projects?.length) {
-            projects.forEach((project) =>
-              socket.join(`project_${project.projectId}`)
-            );
-            logger.info(`User ${userId} joined ${projects.length} projects`);
-          }
-        }
+        const { chatId } = payload;
+
         // join chat room
-        socket.join(`chat_${chatId}`);
+        socket.join(chatId);
         logger.info(`User ${userId} joined ${chatId} chat`);
       }
     );
@@ -65,8 +50,9 @@ export class SocketHandler {
           text,
         });
 
+        console.log(`${text} message sending...`);
         socket
-          .to(`chat_${chatId}`)
+          .to(chatId)
           .emit("messageReceived", { chatId, senderId: userId, text });
       }
     );

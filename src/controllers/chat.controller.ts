@@ -21,7 +21,7 @@ export class ChatController implements IChatController {
       );
     }
 
-    await this._chatService.createChat({
+    const chatData = await this._chatService.createChat({
       type: "direct",
       participants: [data.memberId, userId],
       workspaceId,
@@ -29,7 +29,11 @@ export class ChatController implements IChatController {
 
     res
       .status(HTTP_STATUS.CREATED)
-      .json({ success: true, message: SUCCESS_MESSAGES.DATA_CREATED });
+      .json({
+        success: true,
+        message: SUCCESS_MESSAGES.DATA_CREATED,
+        data: chatData,
+      });
   }
 
   async getUserChats(req: Request, res: Response) {

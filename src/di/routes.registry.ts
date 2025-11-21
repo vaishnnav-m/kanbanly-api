@@ -8,7 +8,8 @@ import { PlanRoutes } from "../routes/plan/plan.routes";
 import { SubscriptionRoutes } from "../routes/subscription/subscription.routes";
 import { SprintRoutes } from "../routes/workspaces/projects/sprints/sprint.routes";
 import { EpicRoutes } from "../routes/workspaces/projects/epics/epic.routes";
-import { CloudinaryController } from "../controllers/cloudinary.controller";
+import { CloudinaryRoutes } from "../routes/cloudinary/cloudinary.routes";
+import { ChatRoutes } from "../routes/workspaces/chats/chat.routes";
 
 export class RoutesRegistry {
   static registerRoutes(): void {
@@ -39,8 +40,11 @@ export class RoutesRegistry {
     container.register(SprintRoutes, {
       useClass: SprintRoutes,
     });
-    container.register(CloudinaryController, {
-      useClass: CloudinaryController,
+    container.register(CloudinaryRoutes, {
+      useClass: CloudinaryRoutes,
+    });
+    container.register(ChatRoutes, {
+      useClass: ChatRoutes,
     });
   }
 }

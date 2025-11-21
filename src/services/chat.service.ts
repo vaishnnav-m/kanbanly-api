@@ -15,7 +15,9 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 export class ChatService implements IChatService {
   constructor(@inject("IChatRepository") private _chatRepo: IChatRepository) {}
 
-  async createChat(data: CreateChatDto): Promise<void> {
+  async createChat(
+    data: CreateChatDto
+  ): Promise<{ chatId: string } | undefined> {
     if (!data.participants || data.participants.length === 0) {
       throw new AppError(
         ERROR_MESSAGES.CHAT_NO_PARTICIPANTS,
@@ -65,7 +67,7 @@ export class ChatService implements IChatService {
       }
     }
 
-    await this._chatRepo.create({
+    const newChat = await this._chatRepo.create({
       chatId: uuidV4(),
       workspaceId: data.workspaceId,
       type: data.type,
@@ -76,6 +78,8 @@ export class ChatService implements IChatService {
       icon: data.icon,
       createdAt: new Date(),
     });
+
+    return { chatId: newChat.chatId };
   }
 
   async getUserChats(

@@ -29,6 +29,8 @@ import { ICloudinaryController } from "../types/controller-interfaces/ICloudinar
 import { CloudinaryController } from "../controllers/cloudinary.controller";
 import { ChatController } from "../controllers/chat.controller";
 import { IChatController } from "../types/controller-interfaces/IChatController";
+import { IMessageController } from "../types/controller-interfaces/IMessageController";
+import { MessageController } from "../controllers/message.controller";
 
 export class ControllerRegistry {
   static registerController(): void {
@@ -77,8 +79,11 @@ export class ControllerRegistry {
     container.register<ICloudinaryController>("ICloudinaryController", {
       useClass: CloudinaryController,
     });
-     container.register<IChatController>("IChatController", {
+    container.register<IChatController>("IChatController", {
       useClass: ChatController,
+    });
+    container.register<IMessageController>("IMessageController", {
+      useClass: MessageController,
     });
   }
 }
