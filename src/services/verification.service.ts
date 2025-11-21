@@ -9,6 +9,7 @@ import { config } from "../config";
 import { IEmailService } from "../types/service-interface/IEmailService";
 import { AuthEvent, authEvents } from "../events/auth.events";
 import { ProcessVerificationResponseDto } from "../types/dtos/users/user-response.dto";
+import { IPreferenceService } from "../types/service-interface/IPreferenceService";
 
 @injectable()
 export class VerificationService implements IVerificationService {
@@ -16,7 +17,8 @@ export class VerificationService implements IVerificationService {
   constructor(
     @inject("IEmailService") private _emailService: IEmailService,
     @inject("ITokenService") private _tokenService: ITokenService,
-    @inject("IUserRepository") private _userRepository: IUserRepository
+    @inject("IUserRepository") private _userRepository: IUserRepository,
+    @inject("IPreferenceService") private _preferenceService: IPreferenceService
   ) {
     this._frontendUrl = config.cors.ALLOWED_ORIGIN;
   }
@@ -74,6 +76,8 @@ export class VerificationService implements IVerificationService {
         HTTP_STATUS.INTERNAL_SERVER_ERROR
       );
     }
+
+    await this._preferenceService.createPreferences(newUser.userId);
 
     authEvents.emit(AuthEvent.EmailVerified, { userId: newUser.userId });
 
