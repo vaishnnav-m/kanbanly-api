@@ -115,7 +115,7 @@ export default class Server {
 
         const paylod = tokenService.verifyAccessToken(token);
         socket.data.userId = paylod?.userid;
-        
+
         next();
       } catch (error) {
         console.log(error);

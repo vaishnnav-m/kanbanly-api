@@ -1,15 +1,13 @@
 import { Server, Socket } from "socket.io";
-import logger from "../logger/winston.logger";
 import { inject, injectable } from "tsyringe";
+import logger from "../logger/winston.logger";
 import { IMessageService } from "../types/service-interface/IMessageService";
-import { IProjectService } from "../types/service-interface/IProjectService";
 
 @injectable()
 export class SocketHandler {
   private _io!: Server;
   constructor(
-    @inject("IMessageService") private _messageService: IMessageService,
-    @inject("IProjectService") private _projectService: IProjectService
+    @inject("IMessageService") private _messageService: IMessageService
   ) {}
 
   initialize(io: Server) {
@@ -28,19 +26,35 @@ export class SocketHandler {
 
   private registerEventHandlers(socket: Socket) {
     const userId = socket.data.userId;
-    socket.on("joinRooms", async (payload: { workSpaceId: string }) => {
-      const { workSpaceId } = payload;
-      if (workSpaceId) {
-        socket.join(userId);
-        const projects = await this._projectService.getAllProjects(
-          workSpaceId,
-          userId
-        );
-        if (projects?.length) {
-          projects.forEach((project) => socket.join(`project_${project.projectId}`));
-          logger.info(`User ${userId} joined ${projects.length} projects`);
-        }
+    // join rooms
+    socket.on(
+      "joinRooms",
+      async (payload: { workSpaceId: string; chatId: string }) => {
+        const { chatId } = payload;
+
+        // join chat room
+        socket.join(chatId);
+        logger.info(`User ${userId} joined ${chatId} chat`);
       }
-    });
+    );
+
+    // sendMessage
+    socket.on(
+      "sendMessage",
+      async (payload: { chatId: string; text: string }) => {
+        const { chatId, text } = payload;
+
+        await this._messageService.createMessage({
+          chatId,
+          senderId: userId,
+          text,
+        });
+
+        console.log(`${text} message sending...`);
+        socket
+          .to(chatId)
+          .emit("messageReceived", { chatId, senderId: userId, text });
+      }
+    );
   }
 }

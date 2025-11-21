@@ -1,6 +1,9 @@
 import { inject, injectable } from "tsyringe";
 import { v4 as uuidV4 } from "uuid";
-import { CreateMessageDto } from "../types/dtos/message/message.dto";
+import {
+  CreateMessageDto,
+  MessageResponseDto,
+} from "../types/dtos/message/message.dto";
 import { IMessageService } from "../types/service-interface/IMessageService";
 import { IMessageRepository } from "../types/repository-interfaces/IMessageRepository";
 import { IChatRepository } from "../types/repository-interfaces/IChatRepository";
@@ -30,7 +33,29 @@ export class MessageService implements IMessageService {
       text: data.text,
       senderId: data.senderId,
     };
-    
+
     await this._messageRepo.create(newMessage);
+  }
+
+  async getChatMessages(chatId: string): Promise<MessageResponseDto[]> {
+    const chat = await this._chatRepo.findOne({ chatId });
+    if (!chat) {
+      throw new AppError(
+        ERROR_MESSAGES.CHAT_ID_REQUIRED,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const messages = await this._messageRepo.find({ chatId },{sort:{createdAt:1}});
+    const mappedMessages = messages.map((message) => ({
+      chatId: message.chatId,
+      text: message.text,
+      sender: message.senderId,
+      createdAt: message.createdAt,
+    }));
+
+    console.log("mappedMessages",mappedMessages)
+
+    return mappedMessages;
   }
 }

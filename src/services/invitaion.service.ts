@@ -87,6 +87,7 @@ export class InvitationService implements IInvitationService {
     const existingInvitation = await this._invitationRepo.findOne({
       workspaceId: data.workspaceId,
       invitedEmail: data.invitedEmail,
+      status: "pending",
     });
     if (existingInvitation) {
       if (existingInvitation.expiresAt < new Date()) {

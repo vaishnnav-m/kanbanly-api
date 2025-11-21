@@ -15,15 +15,12 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 import { IPlan } from "../types/entities/IPlan";
 import { config } from "../config";
 import { stripe } from "../shared/utils/stripeClient";
-import { ISubscriptionRepository } from "../types/repository-interfaces/ISubscriptionRepository";
 
 @injectable()
 export class PlanService implements IPlanService {
   private _normalizeName;
   constructor(
     @inject("IPlanRepository") private _planRepo: IPlanRepository,
-    @inject("ISubscriptionRepository")
-    private _subscriptionRepo: ISubscriptionRepository
   ) {
     this._normalizeName = normalizeString;
   }
