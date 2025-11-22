@@ -17,6 +17,7 @@ import {
   responseDataDto,
   userDto,
 } from "../types/dtos/auth/auth.dto";
+import { IPreferenceService } from "../types/service-interface/IPreferenceService";
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -26,7 +27,8 @@ export class AuthService implements IAuthService {
     @inject("IGoogleService") private _googleService: IGoogleService,
     @inject("ITokenService") private _tokenService: ITokenService,
     @inject("IEmailService") private _emailService: IEmailService,
-    @inject("ICacheService") private _cache: ICacheService
+    @inject("ICacheService") private _cache: ICacheService,
+    @inject("IPreferenceService") private _preferenceService: IPreferenceService
   ) {}
 
   async register(user: userDto): Promise<AuthUserResponseDto> {
@@ -87,6 +89,13 @@ export class AuthService implements IAuthService {
         "Please verify your email to login",
         HTTP_STATUS.FORBIDDEN
       );
+    }
+
+    const preferences = await this._preferenceService.getUserPreferences(
+      userData.userId
+    );
+    if (!preferences) {
+      await this._preferenceService.createPreferences(userData.userId);
     }
 
     const accessToken = this._tokenService.generateAccessToken({
@@ -182,6 +191,13 @@ export class AuthService implements IAuthService {
 
     if (!user?.isActive) {
       throw new AppError(ERROR_MESSAGES.USER_BLOCKED, HTTP_STATUS.FORBIDDEN);
+    }
+
+    const preferences = await this._preferenceService.getUserPreferences(
+      user.userId
+    );
+    if (!preferences) {
+      await this._preferenceService.createPreferences(user.userId);
     }
 
     return {

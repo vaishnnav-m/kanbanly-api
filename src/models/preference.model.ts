@@ -4,16 +4,19 @@ import {
   IPreference,
 } from "../types/entities/IPreference";
 
-const notificationTypeSchema = new Schema<INotificationPreference>({
-  app: {
-    type: Boolean,
-    default: true,
+const notificationTypeSchema = new Schema<INotificationPreference>(
+  {
+    app: {
+      type: Boolean,
+      default: true,
+    },
+    email: {
+      type: Boolean,
+      default: true,
+    },
   },
-  email: {
-    type: Boolean,
-    default: true,
-  },
-});
+  { _id: false }
+);
 
 const preferenceSchema = new Schema<IPreference>(
   {
@@ -25,8 +28,13 @@ const preferenceSchema = new Schema<IPreference>(
     userId: {
       type: String,
       required: true,
+      index: true,
     },
     taskAssigned: {
+      type: notificationTypeSchema,
+      default: () => ({}),
+    },
+    taskCompleted: {
       type: notificationTypeSchema,
       default: () => ({}),
     },
@@ -35,6 +43,14 @@ const preferenceSchema = new Schema<IPreference>(
       default: () => ({}),
     },
     mention: {
+      type: notificationTypeSchema,
+      default: () => ({}),
+    },
+    invitation: {
+      type: notificationTypeSchema,
+      default: () => ({}),
+    },
+    sprint: {
       type: notificationTypeSchema,
       default: () => ({}),
     },

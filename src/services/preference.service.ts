@@ -28,15 +28,27 @@ export class PreferenceService implements IPreferenceService {
     const newPreference = {
       preferenceId: uuidv4(),
       userId: userId,
-      dueDateReminder: {
-        app: true,
-        email: true,
-      },
       taskAssigned: {
         app: true,
         email: true,
       },
+      taskCompleted: {
+        app: true,
+        email: true,
+      },
+      dueDateReminder: {
+        app: true,
+        email: true,
+      },
       mention: {
+        app: true,
+        email: true,
+      },
+      sprint: {
+        app: true,
+        email: true,
+      },
+      invitation: {
         app: true,
         email: true,
       },
@@ -45,7 +57,9 @@ export class PreferenceService implements IPreferenceService {
     await this._preferenceRepo.create(newPreference);
   }
 
-  async getUserPreferences(userId: string): Promise<PreferenceResponseDto> {
+  async getUserPreferences(
+    userId: string
+  ): Promise<PreferenceResponseDto | undefined> {
     const userData = await this._userService.getUserData(userId);
     if (!userData) {
       throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
@@ -54,18 +68,18 @@ export class PreferenceService implements IPreferenceService {
     const preference = await this._preferenceRepo.findOne({ userId });
 
     if (!preference) {
-      throw new AppError(
-        ERROR_MESSAGES.PREFERENCE_NOT_FOUND,
-        HTTP_STATUS.NOT_FOUND
-      );
+      return;
     }
 
     return {
       preferenceId: preference.preferenceId,
       userId,
       taskAssigned: preference.taskAssigned,
-      mention: preference.mention,
+      taskCompleted: preference.taskCompleted,
       dueDateReminder: preference.dueDateReminder,
+      mention: preference.mention,
+      sprint: preference.sprint,
+      invitation: preference.invitation,
     };
   }
 

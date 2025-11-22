@@ -7,8 +7,11 @@ export interface IPreference {
   preferenceId: string;
   userId: string;
   taskAssigned: INotificationPreference;
-  mention: INotificationPreference;
+  taskCompleted: INotificationPreference;
   dueDateReminder: INotificationPreference;
+  mention: INotificationPreference;
+  sprint: INotificationPreference;
+  invitation: INotificationPreference;
   createdAt: Date;
   updatedAt: Date;
 }
