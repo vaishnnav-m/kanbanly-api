@@ -94,5 +94,6 @@ export const ERROR_MESSAGES = {
   CHAT_DIRECT_MEMBER_LIMIT: "A direct chat must have exactly 2 participants",
   CHAT_ID_REQUIRED: "Chat ID is required.",
   CAN_NOT_CHAT_YOURSELF: "You can't chat your self",
-  // MESSAGE
+  // PREFERENCE
+  PREFERENCE_NOT_FOUND: "Preference data not found. Please contact support",
 };

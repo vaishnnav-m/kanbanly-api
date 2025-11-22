@@ -31,6 +31,8 @@ import { ChatController } from "../controllers/chat.controller";
 import { IChatController } from "../types/controller-interfaces/IChatController";
 import { IMessageController } from "../types/controller-interfaces/IMessageController";
 import { MessageController } from "../controllers/message.controller";
+import { IPreferenceController } from "../types/controller-interfaces/IPreferenceController";
+import { PreferenceController } from "../controllers/preference.controller";
 
 export class ControllerRegistry {
   static registerController(): void {
@@ -84,6 +86,9 @@ export class ControllerRegistry {
     });
     container.register<IMessageController>("IMessageController", {
       useClass: MessageController,
+    });
+    container.register<IPreferenceController>("IPreferenceController", {
+      useClass: PreferenceController,
     });
   }
 }

@@ -41,6 +41,8 @@ import { IChatService } from "../types/service-interface/IChatService";
 import { ChatService } from "../services/chat.service";
 import { IMessageService } from "../types/service-interface/IMessageService";
 import { MessageService } from "../services/message.service";
+import { IPreferenceService } from "../types/service-interface/IPreferenceService";
+import { PreferenceService } from "../services/preference.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -106,6 +108,9 @@ export class ServiceRegistry {
     });
     container.register<IMessageService>("IMessageService", {
       useClass: MessageService,
+    });
+    container.register<IPreferenceService>("IPreferenceService", {
+      useClass: PreferenceService,
     });
   }
 }

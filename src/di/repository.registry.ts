@@ -23,6 +23,8 @@ import { IChatRepository } from "../types/repository-interfaces/IChatRepository"
 import { ChatRepository } from "../repositories/chat.repository";
 import { IMessageRepository } from "../types/repository-interfaces/IMessageRepository";
 import { MessageRepository } from "../repositories/message.repository";
+import { IPreferenceRepository } from "../types/repository-interfaces/IPreferenceRepository";
+import { PreferenceRepository } from "../repositories/preference.repository";
 
 export class RepositoryRegistry {
   static registerRepositories(): void {
@@ -64,6 +66,9 @@ export class RepositoryRegistry {
     });
     container.register<IMessageRepository>("IMessageRepository", {
       useClass: MessageRepository,
+    });
+    container.register<IPreferenceRepository>("IPreferenceRepository", {
+      useClass: PreferenceRepository,
     });
   }
 }
