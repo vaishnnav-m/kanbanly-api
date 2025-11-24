@@ -91,12 +91,31 @@ export class WorkspaceService implements IWorkspaceService {
     });
   }
 
-  async getAllWorkspaces(userId: string): Promise<WorkspaceListResponseDto[]> {
+  async getAllWorkspaces(
+    userId: string,
+    role: string
+  ): Promise<WorkspaceListResponseDto[]> {
+    if (role === "admin") {
+      const workspaces = await this._workspaceRepo.find();
+
+      const modified = workspaces.map((workspace) => {
+        return {
+          workspaceId: workspace.workspaceId,
+          name: workspace.name,
+          description: workspace.description,
+          logo: workspace.logo,
+          slug: workspace.slug,
+        };
+      });
+
+      return modified;
+    }
+
     const memberWorkspaces: IWorkspaceMember[] =
       await this._workspaceMemberRepo.find({ userId });
 
-    const memberWorkspaceIds = memberWorkspaces.map((workspace) =>
-      workspace.workspaceId.toString()
+    const memberWorkspaceIds = memberWorkspaces.map(
+      (workspace) => workspace.workspaceId
     );
 
     const workspaces = await this._workspaceRepo.findAllWorkspaces(
@@ -199,16 +218,22 @@ export class WorkspaceService implements IWorkspaceService {
     );
   }
 
-  async removeWorkspace(workspaceId: string, userId: string): Promise<void> {
-    const workspace = await this._workspaceRepo.findOne({
-      workspaceId,
-      createdBy: userId,
-    });
-    if (!workspace) {
-      throw new AppError(
-        "Workspace not found or you don't have enough permission",
-        HTTP_STATUS.BAD_REQUEST
-      );
+  async removeWorkspace(
+    workspaceId: string,
+    userId: string,
+    role: string
+  ): Promise<void> {
+    if (role === "user") {
+      const workspace = await this._workspaceRepo.findOne({
+        workspaceId,
+        createdBy: userId,
+      });
+      if (!workspace) {
+        throw new AppError(
+          "Workspace not found or you don't have enough permission",
+          HTTP_STATUS.BAD_REQUEST
+        );
+      }
     }
 
     await this._workspaceMemberRepo.deleteMany({ workspaceId });

@@ -46,7 +46,8 @@ export class WorkspaceController implements IWorkspaceController {
     }
 
     const workspaces = await this._workspaceService.getAllWorkspaces(
-      user?.userid
+      user.userid,
+      user.role as string
     );
 
     res.status(HTTP_STATUS.OK).json({
@@ -119,7 +120,11 @@ export class WorkspaceController implements IWorkspaceController {
     if (!workspaceId)
       throw new AppError("workspaceId is required", HTTP_STATUS.BAD_REQUEST);
 
-    await this._workspaceService.removeWorkspace(workspaceId, userId);
+    await this._workspaceService.removeWorkspace(
+      workspaceId,
+      userId,
+      req.user?.role as string
+    );
 
     res.status(HTTP_STATUS.OK).json({
       success: true,
