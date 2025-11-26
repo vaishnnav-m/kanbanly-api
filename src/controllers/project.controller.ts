@@ -174,6 +174,8 @@ export class ProjectController implements IProjectController {
     const projectId = req.params.projectId;
     const workspaceId = req.params.workspaceId;
     const userId = req.user?.userid;
+    const search = req.query.search as string;
+
     if (!userId) {
       throw new AppError(
         ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
@@ -184,7 +186,8 @@ export class ProjectController implements IProjectController {
     const members = await this._projectService.getMembers(
       workspaceId,
       userId,
-      projectId
+      projectId,
+      search
     );
 
     res.status(HTTP_STATUS.OK).json({

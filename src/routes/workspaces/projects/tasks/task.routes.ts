@@ -1,15 +1,18 @@
 import { inject, injectable } from "tsyringe";
 import { BaseRoute } from "../../../base.routes";
 import { ITaskController } from "../../../../types/controller-interfaces/ITaskController";
+import { ICommentController } from "../../../../types/controller-interfaces/ICommentController";
 
 @injectable()
 export class TaskRoutes extends BaseRoute {
   constructor(
-    @inject("ITaskController") private _taskController: ITaskController
+    @inject("ITaskController") private _taskController: ITaskController,
+    @inject("ICommentController") private _commentController: ICommentController
   ) {
     super({ mergeParams: true });
     this.initializeRoutes();
   }
+  
   protected initializeRoutes(): void {
     this._router.post(
       "/",
@@ -46,6 +49,11 @@ export class TaskRoutes extends BaseRoute {
     this._router.delete(
       "/:taskId",
       this._taskController.removeTask.bind(this._taskController)
+    );
+    // comments
+    this._router.post(
+      "/:taskId/comments",
+      this._commentController.createComment.bind(this._commentController)
     );
   }
 }

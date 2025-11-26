@@ -54,7 +54,6 @@ export class WorkspaceMemberController implements IWorkspaceMemberController {
     const search =
       req.query.search !== "undefined" ? String(req.query.search) : "";
 
-    console.log("search is", req.query.search);
     // get limit from query
     const paramLimit = parseInt(req.query.limit as string, 10);
     const limit =

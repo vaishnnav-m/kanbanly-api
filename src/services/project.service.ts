@@ -20,7 +20,6 @@ import { IProject } from "../types/entities/IProject";
 import { projectStatus } from "../types/enums/project-status.enum";
 import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
 import { FilterQuery } from "mongoose";
-import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 import { normalizeString } from "../shared/utils/stringNormalizer";
 import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
 
@@ -353,7 +352,8 @@ export class ProjectService implements IProjectService {
   async getMembers(
     workspaceId: string,
     userId: string,
-    projectId: string
+    projectId: string,
+    search?: string
   ): Promise<Omit<WorkspaceMemberResponseDto, "isActive">[]> {
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       workspaceId,
@@ -370,13 +370,18 @@ export class ProjectService implements IProjectService {
     const members = await this._workspaceMemberRepo.find({
       workspaceId,
       userId: { $in: project?.members },
-    } as FilterQuery<IWorkspaceMember>);
+      $or: [
+        { name: { $regex: `^${search}`, $options: "i" } },
+        { email: { $regex: `^${search}`, $options: "i" } },
+      ],
+    });
 
     const mapedMembers = members.map((member) => ({
       _id: member.userId.toString(),
       email: member.email,
       name: member.name,
       role: member.role,
+      profile:member.profile
     }));
 
     return mapedMembers;

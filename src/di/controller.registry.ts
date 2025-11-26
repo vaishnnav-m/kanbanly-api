@@ -33,6 +33,8 @@ import { IMessageController } from "../types/controller-interfaces/IMessageContr
 import { MessageController } from "../controllers/message.controller";
 import { IPreferenceController } from "../types/controller-interfaces/IPreferenceController";
 import { PreferenceController } from "../controllers/preference.controller";
+import { ICommentController } from "../types/controller-interfaces/ICommentController";
+import { CommentController } from "../controllers/comment.controller";
 
 export class ControllerRegistry {
   static registerController(): void {
@@ -89,6 +91,9 @@ export class ControllerRegistry {
     });
     container.register<IPreferenceController>("IPreferenceController", {
       useClass: PreferenceController,
+    });
+    container.register<ICommentController>("ICommentController", {
+      useClass: CommentController,
     });
   }
 }
