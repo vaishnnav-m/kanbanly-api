@@ -96,4 +96,6 @@ export const ERROR_MESSAGES = {
   CAN_NOT_CHAT_YOURSELF: "You can't chat your self",
   // PREFERENCE
   PREFERENCE_NOT_FOUND: "Preference data not found. Please contact support",
+  // COMMENT
+  COMMENT_NOT_FOUND: "Comment doesn't exists",
 };

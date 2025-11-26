@@ -12,7 +12,7 @@ export class TaskRoutes extends BaseRoute {
     super({ mergeParams: true });
     this.initializeRoutes();
   }
-  
+
   protected initializeRoutes(): void {
     this._router.post(
       "/",
@@ -58,6 +58,14 @@ export class TaskRoutes extends BaseRoute {
     this._router.get(
       "/:taskId/comments",
       this._commentController.getAllComments.bind(this._commentController)
+    );
+    this._router.put(
+      "/:taskId/comments/:commentId",
+      this._commentController.editComment.bind(this._commentController)
+    );
+    this._router.delete(
+      "/:taskId/comments/:commentId",
+      this._commentController.deleteComment.bind(this._commentController)
     );
   }
 }

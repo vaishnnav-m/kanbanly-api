@@ -3,16 +3,54 @@ import { v4 as uuidV4 } from "uuid";
 import { ICommentService } from "../types/service-interface/ICommentService";
 import { ICommentRepository } from "../types/repository-interfaces/ICommentRepository";
 import {
-  CommentAuthor,
   CommentResponseDto,
   CreateCommentDto,
+  EditCommentDto,
+  Mention,
+  TiptapNode,
 } from "../types/dtos/comment/comment.dto";
+import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
+import AppError from "../shared/utils/AppError";
+import { ERROR_MESSAGES } from "../shared/constants/messages";
+import { HTTP_STATUS } from "../shared/constants/http.status";
 
 @injectable()
 export class CommentService implements ICommentService {
   constructor(
     @inject("ICommentRepository") private _commentRepo: ICommentRepository
   ) {}
+
+  private _extractMentions(content: TiptapNode): Mention[] {
+    const mentions: Mention[] = [];
+
+    function traverse(node: TiptapNode) {
+      if (node.type === "mention" && node.attrs) {
+        mentions.push({
+          id: node.attrs.id,
+          label: node.attrs.label || node.attrs.id,
+        });
+      }
+
+      if (node.marks) {
+        node.marks.forEach((mark) => {
+          if (mark.type === "mention" && mark.attrs) {
+            mentions.push({
+              id: mark.attrs.id,
+              label: mark.attrs.label || mark.attrs.id,
+            });
+          }
+        });
+      }
+
+      if (node.content) {
+        node.content.forEach(traverse);
+      }
+    }
+
+    traverse(content);
+
+    return Array.from(new Map(mentions.map((m) => [m.id, m])).values());
+  }
 
   async createComment(data: CreateCommentDto): Promise<void> {
     const comment = {
@@ -21,6 +59,11 @@ export class CommentService implements ICommentService {
       taskId: data.taskId,
       content: data.content,
     };
+
+    const mentions = this._extractMentions(data.content);
+    if (mentions.length) {
+      console.log(mentions, "1", mentions[0]);
+    }
 
     await this._commentRepo.create(comment);
   }
@@ -40,19 +83,57 @@ export class CommentService implements ICommentService {
       skip
     );
 
-    console.log("comments", comments);
-
-    const mappedComments = comments.map(
-      (comment): CommentResponseDto => ({
+    const mappedComments = comments.map((comment): CommentResponseDto => {
+      const author = comment.author as IWorkspaceMember;
+      return {
         commentId: comment.commentId,
         taskId: comment.taskId,
-        author: comment.author as CommentAuthor,
+        author: {
+          userId: author.userId,
+          name: author.name,
+          role: author.role,
+          profile: author.profile,
+        },
         content: comment.content,
         createdAt: comment.createdAt,
         updatedAt: comment.updatedAt,
-      })
-    );
+      };
+    });
 
     return mappedComments;
+  }
+
+  async editComment(data: EditCommentDto): Promise<void> {
+    const comment = await this._commentRepo.findOne({
+      commentId: data.commentId,
+    });
+    if (!comment || (comment.author as string) !== data.author) {
+      throw new AppError(
+        ERROR_MESSAGES.COMMENT_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    await this._commentRepo.update(
+      {
+        commentId: data.commentId,
+        taskId: data.taskId,
+      },
+      { content: data.content }
+    );
+  }
+
+  async deleteComment(commentId: string, userId: string): Promise<void> {
+    const comment = await this._commentRepo.findOne({
+      commentId,
+    });
+    if (!comment || (comment.author as string) !== userId) {
+      throw new AppError(
+        ERROR_MESSAGES.COMMENT_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    await this._commentRepo.delete({ commentId });
   }
 }

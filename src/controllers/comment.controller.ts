@@ -1,11 +1,11 @@
+import { Request, Response } from "express";
 import { inject, injectable } from "tsyringe";
 import { ICommentController } from "../types/controller-interfaces/ICommentController";
 import { ICommentService } from "../types/service-interface/ICommentService";
-import { Request, Response } from "express";
 import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../shared/constants/messages";
 import { HTTP_STATUS } from "../shared/constants/http.status";
-import { CreateCommentDto } from "../types/dtos/comment/comment.dto";
+import { TiptapNode } from "../types/dtos/comment/comment.dto";
 
 @injectable()
 export class CommentController implements ICommentController {
@@ -15,7 +15,7 @@ export class CommentController implements ICommentController {
 
   async createComment(req: Request, res: Response): Promise<void> {
     const user = req.user;
-    const data = req.body as Omit<CreateCommentDto, "authorId" | "taskId">;
+    const data = req.body as { content: TiptapNode };
     const taskId = req.params.taskId;
 
     if (!user) {
@@ -50,12 +50,53 @@ export class CommentController implements ICommentController {
       page
     );
 
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_FETCHED,
+      data: comments,
+    });
+  }
+
+  async editComment(req: Request, res: Response): Promise<void> {
+    const user = req.user;
+    const data = req.body as { content: TiptapNode };
+    const taskId = req.params.taskId;
+    const commentId = req.params.commentId;
+
+    if (!user) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    await this._commentService.editComment({
+      commentId,
+      taskId,
+      author: user.userid,
+      content: data.content,
+    });
+
     res
-      .status(HTTP_STATUS.OK)
-      .json({
-        success: true,
-        message: SUCCESS_MESSAGES.DATA_FETCHED,
-        data: comments,
-      });
+      .status(HTTP_STATUS.CREATED)
+      .json({ success: true, message: SUCCESS_MESSAGES.DATA_EDITED });
+  }
+
+  async deleteComment(req: Request, res: Response): Promise<void> {
+    const user = req.user;
+    const commentId = req.params.commentId;
+
+    if (!user) {
+      throw new AppError(
+        ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
+        HTTP_STATUS.UNAUTHORIZED
+      );
+    }
+
+    await this._commentService.deleteComment(commentId, user.userid);
+
+    res
+      .status(HTTP_STATUS.CREATED)
+      .json({ success: true, message: SUCCESS_MESSAGES.DATA_DELETED });
   }
 }
