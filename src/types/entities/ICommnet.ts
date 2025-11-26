@@ -7,6 +7,8 @@
 //   text?: string;
 // }
 
+import { CommentAuthor } from "../dtos/comment/comment.dto";
+
 // interface CustomTiptapContent {
 //   type: string;
 //   content?: CustomTiptapNode[];
@@ -15,7 +17,7 @@
 
 export interface IComment {
   commentId: string;
-  author: string;
+  author: string | CommentAuthor;
   taskId: string;
   content: object;
   createdAt: Date;

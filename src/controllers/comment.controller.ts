@@ -35,4 +35,27 @@ export class CommentController implements ICommentController {
       .status(HTTP_STATUS.CREATED)
       .json({ success: true, message: SUCCESS_MESSAGES.DATA_CREATED });
   }
+
+  async getAllComments(req: Request, res: Response): Promise<void> {
+    const params = req.params as {
+      workspaceId: string;
+      projectId: string;
+      taskId: string;
+    };
+    const page = Number(req.query.page) || 0;
+
+    const comments = await this._commentService.getAllComments(
+      params.workspaceId,
+      params.taskId,
+      page
+    );
+
+    res
+      .status(HTTP_STATUS.OK)
+      .json({
+        success: true,
+        message: SUCCESS_MESSAGES.DATA_FETCHED,
+        data: comments,
+      });
+  }
 }

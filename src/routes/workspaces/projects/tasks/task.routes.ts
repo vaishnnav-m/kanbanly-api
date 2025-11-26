@@ -55,5 +55,9 @@ export class TaskRoutes extends BaseRoute {
       "/:taskId/comments",
       this._commentController.createComment.bind(this._commentController)
     );
+    this._router.get(
+      "/:taskId/comments",
+      this._commentController.getAllComments.bind(this._commentController)
+    );
   }
 }
