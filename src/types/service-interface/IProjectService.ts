@@ -41,7 +41,8 @@ export interface IProjectService {
   getMembers(
     workspaceId: string,
     userId: string,
-    projectId: string
+    projectId: string,
+    search?: string
   ): Promise<Omit<WorkspaceMemberResponseDto, "isActive">[]>;
   removeMember(
     workspaceId: string,
