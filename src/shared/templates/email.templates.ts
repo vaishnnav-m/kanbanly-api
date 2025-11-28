@@ -64,3 +64,24 @@ export const WORKSPACE_INVITATION = (
     <p><strong>The Kanbanly Team</strong></p>
   </div>
 `;
+
+export const COMMENT_MENTION_EMAIL = (
+  commenterName: string,
+  taskTitle: string
+) => `
+  <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;
+              max-width: 600px; margin: 0 auto; padding: 20px;
+              border: 1px solid #ddd; border-radius: 8px;">
+
+    <h1 style="color: #0275d8;">You Were Mentioned</h1>
+
+    <p><strong>${commenterName}</strong> mentioned you in a comment on the task 
+    <strong>${taskTitle}</strong> in Kanbanly.</p>
+
+    <p>You can log in to your workspace to view the comment.</p>
+
+    <p style="margin-top: 20px;">Stay productive and keep collaborating!</p>
+    <p><strong>The Kanbanly Team</strong></p>
+  </div>
+`;
+

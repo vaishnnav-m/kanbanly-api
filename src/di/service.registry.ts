@@ -45,6 +45,8 @@ import { IPreferenceService } from "../types/service-interface/IPreferenceServic
 import { PreferenceService } from "../services/preference.service";
 import { ICommentService } from "../types/service-interface/ICommentService";
 import { CommentService } from "../services/comment.service";
+import { INotificationService } from "../types/service-interface/INotificationService";
+import { NotificationService } from "../services/notification.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -116,6 +118,9 @@ export class ServiceRegistry {
     });
     container.register<ICommentService>("ICommentService", {
       useClass: CommentService,
+    });
+    container.register<INotificationService>("INotificationService", {
+      useClass: NotificationService,
     });
   }
 }

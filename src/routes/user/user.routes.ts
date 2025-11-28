@@ -3,13 +3,16 @@ import { BaseRoute } from "../base.routes";
 import { authenticateToken } from "../../middlewares/auth.middleware";
 import { IUserController } from "../../types/controller-interfaces/IUserController";
 import { IPreferenceController } from "../../types/controller-interfaces/IPreferenceController";
+import { INotificationController } from "../../types/controller-interfaces/INotificationController";
 
 @injectable()
 export class UserRoutes extends BaseRoute {
   constructor(
     @inject("IUserController") private _userController: IUserController,
     @inject("IPreferenceController")
-    private _preferenceController: IPreferenceController
+    private _preferenceController: IPreferenceController,
+    @inject("INotificationController")
+    private _notificationController: INotificationController
   ) {
     super();
     this.initializeRoutes();
@@ -44,6 +47,18 @@ export class UserRoutes extends BaseRoute {
       this._preferenceController.updateUserPreferences.bind(
         this._preferenceController
       )
+    );
+    this._router.get(
+      "/me/notifications",
+      authenticateToken,
+      this._notificationController.getNotifications.bind(
+        this._notificationController
+      )
+    );
+    this._router.patch(
+      "/me/notifications",
+      authenticateToken,
+      this._notificationController.markAsRead.bind(this._notificationController)
     );
   }
 }

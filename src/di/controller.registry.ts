@@ -35,6 +35,8 @@ import { IPreferenceController } from "../types/controller-interfaces/IPreferenc
 import { PreferenceController } from "../controllers/preference.controller";
 import { ICommentController } from "../types/controller-interfaces/ICommentController";
 import { CommentController } from "../controllers/comment.controller";
+import { INotificationController } from "../types/controller-interfaces/INotificationController";
+import { NotificationController } from "../controllers/notification.controller";
 
 export class ControllerRegistry {
   static registerController(): void {
@@ -94,6 +96,9 @@ export class ControllerRegistry {
     });
     container.register<ICommentController>("ICommentController", {
       useClass: CommentController,
+    });
+    container.register<INotificationController>("INotificationController", {
+      useClass: NotificationController,
     });
   }
 }

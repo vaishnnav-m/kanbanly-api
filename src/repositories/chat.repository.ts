@@ -57,7 +57,7 @@ export class ChatRepository
         },
       },
       {
-        $unwind: "$otherUser",
+        $unwind: { path: "$otherUser", preserveNullAndEmptyArrays: true },
       },
       {
         $addFields: {
@@ -65,11 +65,11 @@ export class ChatRepository
             $cond: [
               { $eq: ["$type", "direct"] },
               "$otherUser.firstName",
-              "name",
+              "$name",
             ],
           },
           icon: {
-            $cond: [{ $eq: ["$type", "direct"] }, "$otherUser.profile", "icon"],
+            $cond: [{ $eq: ["$type", "direct"] }, "$otherUser.profile", "$icon"],
           },
         },
       },
