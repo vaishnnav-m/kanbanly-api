@@ -10,10 +10,14 @@ import { IChatRepository } from "../types/repository-interfaces/IChatRepository"
 import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { HTTP_STATUS } from "../shared/constants/http.status";
+import { IProjectRepository } from "../types/repository-interfaces/IProjectRepository";
 
 @injectable()
 export class ChatService implements IChatService {
-  constructor(@inject("IChatRepository") private _chatRepo: IChatRepository) {}
+  constructor(
+    @inject("IChatRepository") private _chatRepo: IChatRepository,
+    @inject("IProjectRepository") private _projectRepo: IProjectRepository
+  ) {}
 
   async createChat(
     data: CreateChatDto
@@ -112,5 +116,59 @@ export class ChatService implements IChatService {
       icon: chat.icon,
       createdAt: chat.createdAt,
     };
+  }
+
+  async addMember(
+    projectId: string,
+    userId: string,
+    memberId: string
+  ): Promise<void> {
+    const project = await this._projectRepo.findOne({ projectId });
+    if (!project || project.createdBy !== userId) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.FORBIDDEN
+      );
+    }
+
+    if (!project.members.includes(memberId)) {
+      throw new AppError(
+        ERROR_MESSAGES.MEMBER_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    await this._chatRepo.update(
+      { projectId },
+      { $push: { participants: memberId } }
+    );
+  }
+
+  async removeMember(
+    projectId: string,
+    userId: string,
+    memberId: string
+  ): Promise<void> {
+    const project = await this._projectRepo.findOne({ projectId });
+    if (!project || project.createdBy !== userId) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.FORBIDDEN
+      );
+    }
+
+    const chat = await this._chatRepo.findOne({ projectId });
+    if (!chat) {
+      throw new AppError(ERROR_MESSAGES.CHAT_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+    }
+
+    const filteredMembers = chat.participants.filter(
+      (user) => user !== memberId
+    );
+
+    await this._chatRepo.update(
+      { projectId },
+      { participants: filteredMembers }
+    );
   }
 }

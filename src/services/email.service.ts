@@ -4,6 +4,7 @@ import { IEmailService } from "../types/service-interface/IEmailService";
 import { config } from "../config";
 import {
   ACCOUNT_VERIFICATION,
+  COMMENT_MENTION_EMAIL,
   PASSWORD_RESET,
   WORKSPACE_INVITATION,
 } from "../shared/templates/email.templates";
@@ -63,6 +64,24 @@ export class EmailService implements IEmailService {
       to,
       subject: `You've been invited to join the workspace ${workspaceName}`,
       html: WORKSPACE_INVITATION(workspaceName, role, link),
+    };
+
+    await this._transporter.sendMail(mailOptions);
+  }
+
+  async sendMentionEmail(
+    to: string,
+    commenterName: string,
+    taskTitle: string,
+  ): Promise<void> {
+    const mailOptions = {
+      from: "Kanbanly",
+      to,
+      subject: `You've been mentioned in a comment by ${commenterName}`,
+      html: COMMENT_MENTION_EMAIL(
+        commenterName,
+        taskTitle,
+      ),
     };
 
     await this._transporter.sendMail(mailOptions);

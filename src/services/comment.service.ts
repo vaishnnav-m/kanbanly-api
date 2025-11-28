@@ -13,11 +13,20 @@ import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { HTTP_STATUS } from "../shared/constants/http.status";
+import { IPreferenceService } from "../types/service-interface/IPreferenceService";
+import { IEmailService } from "../types/service-interface/IEmailService";
+import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
+import { IUserService } from "../types/service-interface/IUserService";
 
 @injectable()
 export class CommentService implements ICommentService {
   constructor(
-    @inject("ICommentRepository") private _commentRepo: ICommentRepository
+    @inject("ICommentRepository") private _commentRepo: ICommentRepository,
+    @inject("IPreferenceService")
+    private _preferenseService: IPreferenceService,
+    @inject("IEmailService") private _emailService: IEmailService,
+    @inject("IWorkItemRepository") private _taskRepo: IWorkItemRepository,
+    @inject("IUserService") private _userService: IUserService
   ) {}
 
   private _extractMentions(content: TiptapNode): Mention[] {
@@ -53,6 +62,15 @@ export class CommentService implements ICommentService {
   }
 
   async createComment(data: CreateCommentDto): Promise<void> {
+    const taskArray = await this._taskRepo.getTasksWithAssigness({
+      taskId: data.taskId,
+    });
+    const task = taskArray[0];
+
+    if (!task) {
+      throw new AppError(ERROR_MESSAGES.TASK_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+    }
+
     const comment = {
       commentId: uuidV4(),
       author: data.author,
@@ -62,7 +80,26 @@ export class CommentService implements ICommentService {
 
     const mentions = this._extractMentions(data.content);
     if (mentions.length) {
-      console.log(mentions, "1", mentions[0]);
+      const author = await this._userService.getUserData(data.author);
+      for (const mention of mentions) {
+        const mentionedUser = await this._userService.getUserData(mention.id);
+
+        if (!mentionedUser) continue;
+
+        const userPreference = await this._preferenseService.getUserPreferences(
+          mention.id
+        );
+
+        if (!userPreference?.mention?.email) {
+          continue;
+        }
+
+        await this._emailService.sendMentionEmail(
+          mentionedUser.email,
+          author.firstName,
+          task.task
+        );
+      }
     }
 
     await this._commentRepo.create(comment);

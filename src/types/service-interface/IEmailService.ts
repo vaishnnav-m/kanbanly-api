@@ -18,4 +18,10 @@ export interface IEmailService {
     role: string,
     link: string
   ): Promise<void>;
+
+  sendMentionEmail(
+    to: string,
+    commenterName: string,
+    taskTitle: string
+  ): Promise<void>;
 }

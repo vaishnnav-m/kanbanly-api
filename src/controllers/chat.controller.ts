@@ -27,13 +27,11 @@ export class ChatController implements IChatController {
       workspaceId,
     });
 
-    res
-      .status(HTTP_STATUS.CREATED)
-      .json({
-        success: true,
-        message: SUCCESS_MESSAGES.DATA_CREATED,
-        data: chatData,
-      });
+    res.status(HTTP_STATUS.CREATED).json({
+      success: true,
+      message: SUCCESS_MESSAGES.DATA_CREATED,
+      data: chatData,
+    });
   }
 
   async getUserChats(req: Request, res: Response) {

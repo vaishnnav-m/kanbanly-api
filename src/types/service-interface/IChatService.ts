@@ -12,4 +12,14 @@ export interface IChatService {
     workspaceId: string,
     chatId: string
   ): Promise<ChatDetailsDto>;
+  addMember(
+    projectId: string,
+    userId: string,
+    memberId: string
+  ): Promise<void>;
+   removeMember(
+    projectId: string,
+    userId: string,
+    memberId: string
+  ): Promise<void>;
 }

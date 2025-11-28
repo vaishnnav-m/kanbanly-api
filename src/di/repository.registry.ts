@@ -27,6 +27,8 @@ import { IPreferenceRepository } from "../types/repository-interfaces/IPreferenc
 import { PreferenceRepository } from "../repositories/preference.repository";
 import { ICommentRepository } from "../types/repository-interfaces/ICommentRepository";
 import { CommentRepository } from "../repositories/comment.repository";
+import { INotificationRepository } from "../types/repository-interfaces/INotificationRepository";
+import { NotificationRepository } from "../repositories/notification.repository";
 
 export class RepositoryRegistry {
   static registerRepositories(): void {
@@ -74,6 +76,9 @@ export class RepositoryRegistry {
     });
     container.register<ICommentRepository>("ICommentRepository", {
       useClass: CommentRepository,
+    });
+    container.register<INotificationRepository>("INotificationRepository", {
+      useClass: NotificationRepository,
     });
   }
 }

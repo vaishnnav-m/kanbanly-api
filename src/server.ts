@@ -23,6 +23,7 @@ import logger from "./logger/winston.logger";
 import { CloudinaryRoutes } from "./routes/cloudinary/cloudinary.routes";
 import { SocketHandler } from "./socket/socket.handler";
 import { ITokenService } from "./types/service-interface/ITokenService";
+import { registerNotificationEventListner } from "./events/listeners/notification.listener";
 
 export default class Server {
   private _app: Application;
@@ -45,6 +46,7 @@ export default class Server {
   private initialize() {
     DependencyInjection.registerAll();
     registerUserEventListner();
+    registerNotificationEventListner();
     this.configureWebhooks();
     this.configureMiddlewares();
     this.configureRoutes();

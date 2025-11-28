@@ -1,9 +1,9 @@
 import { Server, Socket } from "socket.io";
-import { inject, injectable } from "tsyringe";
+import { inject, singleton } from "tsyringe";
 import logger from "../logger/winston.logger";
 import { IMessageService } from "../types/service-interface/IMessageService";
 
-@injectable()
+@singleton()
 export class SocketHandler {
   private _io!: Server;
   constructor(
@@ -16,12 +16,22 @@ export class SocketHandler {
     this._io.on("connection", (socket) => {
       logger.info(`Socket connected: ${socket.id}`);
 
+      socket.join(socket.data.userId);
+
+      logger.info(`User joined ${socket.data.userId} room`);
+
       this.registerEventHandlers(socket);
 
       socket.on("disconnect", () => {
         logger.info(`Socket disconnected: ${socket.id}`);
       });
     });
+  }
+
+  emitToUser<T>(userId: string, event: string, payload: T) {
+    if (!this._io) return;
+
+    this._io.to(userId).emit(event, payload);
   }
 
   private registerEventHandlers(socket: Socket) {

@@ -22,6 +22,7 @@ import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRep
 import { FilterQuery } from "mongoose";
 import { normalizeString } from "../shared/utils/stringNormalizer";
 import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
+import { IChatService } from "../types/service-interface/IChatService";
 
 @injectable()
 export class ProjectService implements IProjectService {
@@ -34,7 +35,8 @@ export class ProjectService implements IProjectService {
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
     @inject("IWorkItemRepository") private _workItemRepo: IWorkItemRepository,
     @inject("ISubscriptionService")
-    private _subscriptionService: ISubscriptionService
+    private _subscriptionService: ISubscriptionService,
+    @inject("IChatService") private _chatService: IChatService
   ) {
     this._normalizeName = normalizeString;
   }
@@ -102,7 +104,7 @@ export class ProjectService implements IProjectService {
       );
     }
 
-    const project: Omit<IProject, "createdAt" | "updatedAt"> = {
+    const newProject: Omit<IProject, "createdAt" | "updatedAt"> = {
       projectId: uuidv4(),
       workspaceId: data.workspaceId,
       name: data.name,
@@ -115,7 +117,15 @@ export class ProjectService implements IProjectService {
       status: projectStatus.active,
     };
     // creating the project
-    await this._projectRepo.create(project);
+    const project = await this._projectRepo.create(newProject);
+
+    await this._chatService.createChat({
+      workspaceId,
+      projectId: project.projectId,
+      name: project.name,
+      type: "project",
+      participants: project.members,
+    });
   }
 
   async getAllProjects(
@@ -347,6 +357,8 @@ export class ProjectService implements IProjectService {
       { projectId, workspaceId },
       { $addToSet: { members: isMemberExists.userId } }
     );
+
+    await this._chatService.addMember(projectId, userId, isMemberExists.userId);
   }
 
   async getMembers(
@@ -370,10 +382,12 @@ export class ProjectService implements IProjectService {
     const members = await this._workspaceMemberRepo.find({
       workspaceId,
       userId: { $in: project?.members },
-      $or: [
-        { name: { $regex: `^${search}`, $options: "i" } },
-        { email: { $regex: `^${search}`, $options: "i" } },
-      ],
+      ...(search && {
+        $or: [
+          { name: { $regex: `^${search}`, $options: "i" } },
+          { email: { $regex: `^${search}`, $options: "i" } },
+        ],
+      }),
     });
 
     const mapedMembers = members.map((member) => ({
@@ -381,7 +395,7 @@ export class ProjectService implements IProjectService {
       email: member.email,
       name: member.name,
       role: member.role,
-      profile:member.profile
+      profile: member.profile,
     }));
 
     return mapedMembers;
@@ -436,5 +450,7 @@ export class ProjectService implements IProjectService {
       { projectId, workspaceId },
       { members: newMembers }
     );
+
+    await this._chatService.removeMember(projectId, userId, userToRemove);
   }
 }
