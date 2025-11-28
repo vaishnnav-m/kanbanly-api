@@ -9,4 +9,5 @@ export interface NotificationResponseDto {
   userId: string;
   title: string;
   message: string;
+  createdAt: Date;
 }

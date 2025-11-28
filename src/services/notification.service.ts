@@ -35,30 +35,38 @@ export class NotificationService implements INotificationService {
   }
 
   async getNotifications(userId: string): Promise<NotificationResponseDto[]> {
-    const notifications = await this._notificationRepo.find({ userId });
+    const notifications = await this._notificationRepo.find({
+      userId,
+      read: false,
+    });
 
     const mappedNotifications = notifications.map((notification) => ({
       notificationId: notification.notificationId,
       userId,
       title: notification.title,
       message: notification.message,
+      createdAt: notification.createdAt,
     }));
 
     return mappedNotifications;
   }
 
-  async markAsRead(notificationId: string, userId: string): Promise<void> {
-    const notification = await this._notificationRepo.findOne({
-      notificationId,
+  async markAsRead(notificationIds: string[], userId: string): Promise<void> {
+    const notifications = await this._notificationRepo.find({
+      notificationId: { $in: notificationIds },
       userId,
     });
-    if (!notification) {
+
+    if (notifications.length !== notificationIds.length) {
       throw new AppError(
         ERROR_MESSAGES.NOTIFICATION_NOT_FOUND,
         HTTP_STATUS.NOT_FOUND
       );
     }
 
-    await this._notificationRepo.update({ notificationId }, { read: true });
+    await this._notificationRepo.updateMany(
+      { notificationId: { $in: notificationIds }, userId },
+      { read: true }
+    );
   }
 }

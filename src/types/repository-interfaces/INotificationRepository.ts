@@ -1,6 +1,11 @@
+import { FilterQuery } from "mongoose";
 import { INotification } from "../entities/INotification";
 import { IBaseRepository } from "./IBaseRepositroy";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface INotificationRepository
-  extends IBaseRepository<INotification> {}
+  extends IBaseRepository<INotification> {
+  updateMany(
+    query: FilterQuery<INotification>,
+    data: Partial<INotification>
+  ): Promise<void>;
+}

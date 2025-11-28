@@ -35,7 +35,7 @@ export class NotificationController implements INotificationController {
 
   async markAsRead(req: Request, res: Response) {
     const userId = req.user?.userid;
-    const notificationId = req.params.notificationId;
+    const notificationIds = req.body as string[];
     if (!userId) {
       throw new AppError(
         ERROR_MESSAGES.UNAUTHORIZED_ACCESS,
@@ -43,7 +43,7 @@ export class NotificationController implements INotificationController {
       );
     }
 
-    await this._notificationService.markAsRead(notificationId, userId);
+    await this._notificationService.markAsRead(notificationIds, userId);
 
     res.status(HTTP_STATUS.OK).json({
       success: true,
