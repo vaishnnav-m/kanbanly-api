@@ -5,6 +5,7 @@ import express, { Application } from "express";
 import morgan from "morgan";
 import { container } from "tsyringe";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
 import { Server as SocketServer } from "socket.io";
 import { config } from "./config";
 import { AuthRoutes } from "./routes/auth/auth.routes";
@@ -58,6 +59,7 @@ export default class Server {
     this._app.use(cors(corsOptions));
     this._app.use(express.json());
     this._app.use(cookieParser());
+    this._app.use(helmet());
     this._app.use(morgan("dev"));
   }
 

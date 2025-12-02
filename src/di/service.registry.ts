@@ -47,6 +47,8 @@ import { ICommentService } from "../types/service-interface/ICommentService";
 import { CommentService } from "../services/comment.service";
 import { INotificationService } from "../types/service-interface/INotificationService";
 import { NotificationService } from "../services/notification.service";
+import { IActivityService } from "../types/service-interface/IActivityService";
+import { ActivityService } from "../services/activity.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -121,6 +123,9 @@ export class ServiceRegistry {
     });
     container.register<INotificationService>("INotificationService", {
       useClass: NotificationService,
+    });
+    container.register<IActivityService>("IActivityService", {
+      useClass: ActivityService,
     });
   }
 }

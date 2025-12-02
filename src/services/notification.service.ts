@@ -29,9 +29,9 @@ export class NotificationService implements INotificationService {
       message: data.message,
     };
 
-    await this._notificationRepo.create(newNotification);
+    const notification = await this._notificationRepo.create(newNotification);
 
-    notificationEvents.emit(NotificationEvent.Notification, newNotification);
+    notificationEvents.emit(NotificationEvent.Notification, notification);
   }
 
   async getNotifications(userId: string): Promise<NotificationResponseDto[]> {
