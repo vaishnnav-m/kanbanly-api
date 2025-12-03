@@ -17,6 +17,12 @@ import { IPreferenceService } from "../types/service-interface/IPreferenceServic
 import { IEmailService } from "../types/service-interface/IEmailService";
 import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
 import { IUserService } from "../types/service-interface/IUserService";
+import { IActivityService } from "../types/service-interface/IActivityService";
+import { CreateActivityDto } from "../types/dtos/activity/activity.dto";
+import {
+  ActivityTypeEnum,
+  TaskActivityActionEnum,
+} from "../types/enums/activity.enum";
 
 @injectable()
 export class CommentService implements ICommentService {
@@ -26,7 +32,8 @@ export class CommentService implements ICommentService {
     private _preferenseService: IPreferenceService,
     @inject("IEmailService") private _emailService: IEmailService,
     @inject("IWorkItemRepository") private _taskRepo: IWorkItemRepository,
-    @inject("IUserService") private _userService: IUserService
+    @inject("IUserService") private _userService: IUserService,
+    @inject("IActivityService") private _activityService: IActivityService
   ) {}
 
   private _extractMentions(content: TiptapNode): Mention[] {
@@ -79,8 +86,8 @@ export class CommentService implements ICommentService {
     };
 
     const mentions = this._extractMentions(data.content);
+    const author = await this._userService.getUserData(data.author);
     if (mentions.length) {
-      const author = await this._userService.getUserData(data.author);
       for (const mention of mentions) {
         const mentionedUser = await this._userService.getUserData(mention.id);
 
@@ -103,6 +110,21 @@ export class CommentService implements ICommentService {
     }
 
     await this._commentRepo.create(comment);
+
+    console.log(task, author);
+
+    const activitylogPayload: CreateActivityDto = {
+      workspaceId: task.workspaceId,
+      projectId: task.projectId,
+      taskId: task.taskId,
+      entityId: task.taskId,
+      entityType: ActivityTypeEnum.Task,
+      action: TaskActivityActionEnum.Commented,
+      description: `${author.firstName} commented on this ${task.workItemType}`,
+      member: data.author,
+    };
+
+    await this._activityService.createActivity(activitylogPayload);
   }
 
   async getAllComments(

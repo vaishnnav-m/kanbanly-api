@@ -16,10 +16,11 @@ export class SocketHandler {
     this._io.on("connection", (socket) => {
       logger.info(`Socket connected: ${socket.id}`);
 
+      // joining to the user room
       socket.join(socket.data.userId);
-
       logger.info(`User joined ${socket.data.userId} room`);
 
+      // registering all the event handlers
       this.registerEventHandlers(socket);
 
       socket.on("disconnect", () => {
@@ -28,25 +29,24 @@ export class SocketHandler {
     });
   }
 
+  // function to send the data to user room
   emitToUser<T>(userId: string, event: string, payload: T) {
     if (!this._io) return;
 
     this._io.to(userId).emit(event, payload);
   }
 
+  // socket event handlers
   private registerEventHandlers(socket: Socket) {
     const userId = socket.data.userId;
     // join rooms
-    socket.on(
-      "joinRooms",
-      async (payload: { workSpaceId: string; chatId: string }) => {
-        const { chatId } = payload;
+    socket.on("joinChatRoom", async (payload: { chatId: string }) => {
+      const { chatId } = payload;
 
-        // join chat room
-        socket.join(chatId);
-        logger.info(`User ${userId} joined ${chatId} chat`);
-      }
-    );
+      // join chat room
+      socket.join(chatId);
+      logger.info(`User ${userId} joined ${chatId} chat`);
+    });
 
     // sendMessage
     socket.on(
@@ -60,11 +60,19 @@ export class SocketHandler {
           text,
         });
 
-        console.log(`${text} message sending...`);
         socket
           .to(chatId)
           .emit("messageReceived", { chatId, senderId: userId, text });
       }
     );
+
+    // join workspace room
+    socket.on("joinWorkspaceRoom", async (payload: { workSpaceId: string }) => {
+      const { workSpaceId } = payload;
+      console.log("joinworkspaceroom", workSpaceId);
+      // join workspace room
+      socket.join(workSpaceId);
+      logger.info(`User ${userId} joined ${workSpaceId} workpsace`);
+    });
   }
 }

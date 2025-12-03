@@ -23,6 +23,12 @@ import { IProjectService } from "../types/service-interface/IProjectService";
 import logger from "../logger/winston.logger";
 import { ISprintService } from "../types/service-interface/ISprintService";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
+import { IActivityService } from "../types/service-interface/IActivityService";
+import { CreateActivityDto } from "../types/dtos/activity/activity.dto";
+import {
+  ActivityTypeEnum,
+  TaskActivityActionEnum,
+} from "../types/enums/activity.enum";
 
 @injectable()
 export class TaskService implements ITaskService {
@@ -32,7 +38,8 @@ export class TaskService implements ITaskService {
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
     @inject("IProjectRepository") private _projectRepo: IProjectRepository,
     @inject("IProjectService") private _projectService: IProjectService,
-    @inject("ISprintService") private _sprintService: ISprintService
+    @inject("ISprintService") private _sprintService: ISprintService,
+    @inject("IActivityService") private _activityService: IActivityService
   ) {}
 
   async createTask(data: CreateTaskDto): Promise<void> {
@@ -75,7 +82,7 @@ export class TaskService implements ITaskService {
       }
     }
 
-    const task: Omit<IWorkItem, "isDeleted" | "createdAt" | "updatedAt"> = {
+    const newTask: Omit<IWorkItem, "isDeleted" | "createdAt" | "updatedAt"> = {
       taskId: uuidv4(),
       task: data.task.trim(),
       description: data.description,
@@ -93,7 +100,20 @@ export class TaskService implements ITaskService {
       ...(data.storyPoint && { storyPoint: data.storyPoint }),
     };
 
-    await this._workItemRepo.create(task);
+    const task = await this._workItemRepo.create(newTask);
+
+    const activitylogPayload: CreateActivityDto = {
+      workspaceId: task.workspaceId,
+      projectId: task.projectId,
+      taskId: task.taskId,
+      entityId: task.taskId,
+      entityType: ActivityTypeEnum.Task,
+      action: TaskActivityActionEnum.TaskCreated,
+      description: `Task created.`,
+      member: task.createdBy as string,
+    };
+
+    await this._activityService.createActivity(activitylogPayload);
   }
 
   async getAllTask(
@@ -336,6 +356,21 @@ export class TaskService implements ITaskService {
     }
 
     await this._workItemRepo.update({ taskId }, { status: newStatus });
+
+    const activitylogPayload: CreateActivityDto = {
+      workspaceId: task.workspaceId,
+      projectId: task.projectId,
+      taskId: task.taskId,
+      entityId: task.taskId,
+      entityType: ActivityTypeEnum.Task,
+      action: TaskActivityActionEnum.StatusChanged,
+      description: `Task status changed from ${task.status} to ${newStatus}`,
+      member: task.createdBy as string,
+      oldValue: { status: task.status },
+      newValue: { status: newStatus },
+    };
+
+    await this._activityService.createActivity(activitylogPayload);
   }
 
   async editTask(
@@ -410,7 +445,45 @@ export class TaskService implements ITaskService {
       ...(data.storyPoint && { storyPoint: data.storyPoint }),
     };
 
+    if (!Object.keys(newTask).length) {
+      return;
+    }
+
     await this._workItemRepo.update({ taskId }, newTask);
+
+    const changedFields: Partial<Record<keyof IWorkItem, boolean>> = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const oldValues: Record<string, any> = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const newValues: Record<string, any> = {};
+
+    for (const key in newTask) {
+      const objkey = key as keyof IWorkItem;
+      if (task[objkey] !== newTask[objkey]) {
+        changedFields[objkey] = true;
+        oldValues[objkey] = task[objkey];
+        newValues[objkey] = newTask[objkey];
+      }
+    }
+
+    if (Object.keys(changedFields).length) {
+      const description = `Updated ${Object.keys(changedFields).join(", ")}`;
+
+      const activitylogPayload: CreateActivityDto = {
+        workspaceId: task.workspaceId,
+        projectId: task.projectId,
+        taskId: task.taskId,
+        entityId: task.taskId,
+        entityType: ActivityTypeEnum.Task,
+        action: TaskActivityActionEnum.TaskUpdated,
+        description,
+        member: task.createdBy as string,
+        oldValue: oldValues,
+        newValue: newValues,
+      };
+
+      await this._activityService.createActivity(activitylogPayload);
+    }
   }
 
   async attachParentItem(
@@ -446,6 +519,19 @@ export class TaskService implements ITaskService {
           type: parentType,
         });
     }
+
+    const activitylogPayload: CreateActivityDto = {
+      workspaceId: task.workspaceId,
+      projectId: task.projectId,
+      taskId: task.taskId,
+      entityId: task.taskId,
+      entityType: ActivityTypeEnum.Task,
+      action: TaskActivityActionEnum.ParentAttached,
+      description: `${parentType} is attached.`,
+      member: task.createdBy as string,
+    };
+
+    await this._activityService.createActivity(activitylogPayload);
   }
 
   async attachSprint(
@@ -496,6 +582,19 @@ export class TaskService implements ITaskService {
     }
 
     await this._workItemRepo.update({ taskId }, { sprintId });
+
+    const activitylogPayload: CreateActivityDto = {
+      workspaceId: task.workspaceId,
+      projectId: task.projectId,
+      taskId: task.taskId,
+      entityId: task.taskId,
+      entityType: ActivityTypeEnum.Task,
+      action: TaskActivityActionEnum.ParentAttached,
+      description: `${sprint.name} sprint is attached.`,
+      member: task.createdBy as string,
+    };
+
+    await this._activityService.createActivity(activitylogPayload);
   }
 
   async removeTask(
