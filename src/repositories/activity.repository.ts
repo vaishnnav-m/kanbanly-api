@@ -33,6 +33,9 @@ export class ActivityRepository
           preserveNullAndEmptyArrays: true,
         },
       },
+      {
+        $sort: { createdAt: -1 },
+      },
     ]);
 
     return result;

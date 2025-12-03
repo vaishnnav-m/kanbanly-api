@@ -25,7 +25,10 @@ import { ISprintService } from "../types/service-interface/ISprintService";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 import { IActivityService } from "../types/service-interface/IActivityService";
 import { CreateActivityDto } from "../types/dtos/activity/activity.dto";
-import { ActivityTypeEnum } from "../types/enums/activity-type.enum";
+import {
+  ActivityTypeEnum,
+  TaskActivityActionEnum,
+} from "../types/enums/activity.enum";
 
 @injectable()
 export class TaskService implements ITaskService {
@@ -105,7 +108,7 @@ export class TaskService implements ITaskService {
       taskId: task.taskId,
       entityId: task.taskId,
       entityType: ActivityTypeEnum.Task,
-      action: "task_created",
+      action: TaskActivityActionEnum.TaskCreated,
       description: `Task created.`,
       member: task.createdBy as string,
     };
@@ -360,7 +363,7 @@ export class TaskService implements ITaskService {
       taskId: task.taskId,
       entityId: task.taskId,
       entityType: ActivityTypeEnum.Task,
-      action: "status_changed",
+      action: TaskActivityActionEnum.StatusChanged,
       description: `Task status changed from ${task.status} to ${newStatus}`,
       member: task.createdBy as string,
       oldValue: { status: task.status },
@@ -472,7 +475,7 @@ export class TaskService implements ITaskService {
         taskId: task.taskId,
         entityId: task.taskId,
         entityType: ActivityTypeEnum.Task,
-        action: "task_updated",
+        action: TaskActivityActionEnum.TaskUpdated,
         description,
         member: task.createdBy as string,
         oldValue: oldValues,
@@ -516,6 +519,19 @@ export class TaskService implements ITaskService {
           type: parentType,
         });
     }
+
+    const activitylogPayload: CreateActivityDto = {
+      workspaceId: task.workspaceId,
+      projectId: task.projectId,
+      taskId: task.taskId,
+      entityId: task.taskId,
+      entityType: ActivityTypeEnum.Task,
+      action: TaskActivityActionEnum.ParentAttached,
+      description: `${parentType} is attached.`,
+      member: task.createdBy as string,
+    };
+
+    await this._activityService.createActivity(activitylogPayload);
   }
 
   async attachSprint(
@@ -566,6 +582,19 @@ export class TaskService implements ITaskService {
     }
 
     await this._workItemRepo.update({ taskId }, { sprintId });
+
+    const activitylogPayload: CreateActivityDto = {
+      workspaceId: task.workspaceId,
+      projectId: task.projectId,
+      taskId: task.taskId,
+      entityId: task.taskId,
+      entityType: ActivityTypeEnum.Task,
+      action: TaskActivityActionEnum.ParentAttached,
+      description: `${sprint.name} sprint is attached.`,
+      member: task.createdBy as string,
+    };
+
+    await this._activityService.createActivity(activitylogPayload);
   }
 
   async removeTask(

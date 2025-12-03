@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 import { IActivity } from "../types/entities/IActivity";
-import { ActivityTypeEnum } from "../types/enums/activity-type.enum";
+import { ActivityTypeEnum } from "../types/enums/activity.enum";
 
 const activitySchema = new Schema<IActivity>(
   {
@@ -30,6 +30,10 @@ const activitySchema = new Schema<IActivity>(
       required: true,
     },
     action: {
+      type: String,
+      required: true,
+    },
+    description: {
       type: String,
       required: true,
     },

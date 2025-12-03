@@ -22,13 +22,14 @@ export class ActivityService implements IActivityService {
       taskId: data.taskId,
       entityId: data.entityId,
       entityType: data.entityType,
+      description: data.description,
       action: data.action,
       oldValue: data.oldValue,
       newValue: data.newValue,
       member: data.member,
     };
 
-    await this._activityRepo.create(newActivity);
+    await this._activityRepo.create(newActivity); 
   }
 
   async getTaskAcivities(taskId: string): Promise<ActivityResponseDto[]> {

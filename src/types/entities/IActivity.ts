@@ -1,4 +1,4 @@
-import { ActivityTypeEnum } from "../enums/activity-type.enum";
+import { ActivityTypeEnum, TaskActivityActionEnum } from "../enums/activity.enum";
 import { IUser } from "./IUser";
 
 export interface IActivity {
@@ -8,7 +8,7 @@ export interface IActivity {
   taskId?: string;
   entityId: string;
   entityType: ActivityTypeEnum;
-  action: string;
+  action: TaskActivityActionEnum;
   oldValue?: Record<string, string | boolean>;
   newValue?: Record<string, string | boolean>;
   member: string | IUser;

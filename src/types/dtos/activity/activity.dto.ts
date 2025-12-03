@@ -1,5 +1,5 @@
 import { IActivity } from "../../entities/IActivity";
-import { ActivityTypeEnum } from "../../enums/activity-type.enum";
+import { ActivityTypeEnum, TaskActivityActionEnum } from "../../enums/activity.enum";
 
 export interface CreateActivityDto {
   workspaceId: string;
@@ -7,7 +7,7 @@ export interface CreateActivityDto {
   taskId?: string;
   entityId: string;
   entityType: ActivityTypeEnum;
-  action: string;
+  action: TaskActivityActionEnum;
   description: string;
   oldValue?: Record<string, string | boolean>;
   newValue?: Record<string, string | boolean>;
