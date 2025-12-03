@@ -29,6 +29,7 @@ import {
   ActivityTypeEnum,
   TaskActivityActionEnum,
 } from "../types/enums/activity.enum";
+import { WorkspaceEvent, workspaceEvents } from "../events/workspace.events";
 
 @injectable()
 export class TaskService implements ITaskService {
@@ -102,6 +103,8 @@ export class TaskService implements ITaskService {
 
     const task = await this._workItemRepo.create(newTask);
 
+    workspaceEvents.emit(WorkspaceEvent.TaskChange, task);
+
     const activitylogPayload: CreateActivityDto = {
       workspaceId: task.workspaceId,
       projectId: task.projectId,
@@ -158,6 +161,7 @@ export class TaskService implements ITaskService {
       const createdBy = task.createdBy as IWorkspaceMember;
 
       return {
+        workspaceId: task.workspaceId,
         taskId: task.taskId,
         task: task.task,
         dueDate: task.dueDate,
@@ -355,7 +359,37 @@ export class TaskService implements ITaskService {
       );
     }
 
-    await this._workItemRepo.update({ taskId }, { status: newStatus });
+    const newTask = await this._workItemRepo.update(
+      { taskId },
+      { status: newStatus }
+    );
+
+    if (!newTask) {
+      throw new AppError(
+        ERROR_MESSAGES.UNEXPECTED_SERVER_ERROR,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR
+      );
+    }
+
+    const populate: {
+      createdBy: IWorkspaceMember | string;
+      assignedTo: IWorkspaceMember | string;
+    } = {
+      assignedTo: workspaceMember,
+      createdBy: workspaceMember,
+    };
+    if (typeof newTask.createdBy !== userId) {
+      const createdBy = await this._workspaceMemberRepo.findOne({
+        userId: newTask.createdBy,
+      });
+      if (createdBy) populate.createdBy = createdBy;
+    }
+
+    workspaceEvents.emit(WorkspaceEvent.TaskChange, {
+      ...newTask,
+      createdBy: populate.createdBy,
+      assignedTo: populate.assignedTo,
+    });
 
     const activitylogPayload: CreateActivityDto = {
       workspaceId: task.workspaceId,

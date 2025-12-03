@@ -96,6 +96,7 @@ export type TaskDetailRepoDto = Omit<IWorkItem, "assignedTo"> & {
 };
 
 export interface TaskListingDto {
+  workspaceId: string;
   taskId: string;
   task: string;
   description?: string;

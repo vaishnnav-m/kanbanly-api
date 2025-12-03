@@ -10,7 +10,7 @@ export function registerNotificationEventListner() {
   notificationEvents.on(
     NotificationEvent.Notification,
     (notification: NotificationResponseDto) => {
-      socketHandler.emitToUser(
+      socketHandler.emitToRoom(
         notification.userId,
         "notification",
         notification
