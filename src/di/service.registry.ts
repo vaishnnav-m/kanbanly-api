@@ -49,6 +49,8 @@ import { INotificationService } from "../types/service-interface/INotificationSe
 import { NotificationService } from "../services/notification.service";
 import { IActivityService } from "../types/service-interface/IActivityService";
 import { ActivityService } from "../services/activity.service";
+import { IPermissionService } from "../types/service-interface/IPermissionService";
+import { PermissionService } from "../services/permission.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -126,6 +128,9 @@ export class ServiceRegistry {
     });
     container.register<IActivityService>("IActivityService", {
       useClass: ActivityService,
+    });
+    container.register<IPermissionService>("IPermissionService", {
+      useClass: PermissionService,
     });
   }
 }

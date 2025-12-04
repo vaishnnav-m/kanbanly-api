@@ -4,9 +4,10 @@ import {
   EditWorkspaceDto,
   GetOneWorkspaceDto,
   GetOneWorkspaceResponseDto,
+  IWorkspacePermissions,
   WorkspaceListResponseDto,
 } from "../types/dtos/workspaces/workspace.dto";
-import { IWorkspace } from "../types/entities/IWrokspace";
+import { IWorkspace } from "../types/entities/IWorkspace";
 import { IWorkspaceService } from "../types/service-interface/IWorkspaceService";
 import { IWorkspaceRepository } from "../types/repository-interfaces/IWorkspaceRepository";
 import { v4 as uuidv4 } from "uuid";
@@ -21,6 +22,7 @@ import { IProjectRepository } from "../types/repository-interfaces/IProjectRepos
 import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
 import { normalizeString } from "../shared/utils/stringNormalizer";
 import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
+import { DEFAULT_WORKSPACE_PERMISSIONS } from "../shared/constants/permissions";
 
 @injectable()
 export class WorkspaceService implements IWorkspaceService {
@@ -80,6 +82,7 @@ export class WorkspaceService implements IWorkspaceService {
       description: workspaceData.description,
       logo: workspaceData.logo,
       createdBy: workspaceData.createdBy,
+      permissions: DEFAULT_WORKSPACE_PERMISSIONS,
     };
 
     await this._workspaceRepo.create(workspace);
@@ -168,6 +171,7 @@ export class WorkspaceService implements IWorkspaceService {
       createdAt: workspace.createdAt,
       logo: workspace.logo || "",
       members: count,
+      permissions: workspace.permissions,
     };
 
     return mappedWorkspace;
@@ -215,6 +219,45 @@ export class WorkspaceService implements IWorkspaceService {
         createdBy: data.createdBy,
       },
       newWorkspace
+    );
+  }
+
+  async updateRolePermissions(
+    workspaceId: string,
+    role: workspaceRoles,
+    newPermissions: Partial<IWorkspacePermissions>,
+    userId: string
+  ): Promise<void> {
+    const member = await this._workspaceMemberRepo.findOne({
+      userId,
+      workspaceId,
+    });
+    if (!member)
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
+
+    if (member.role !== "owner") {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const workspace = await this._workspaceRepo.findOne({ workspaceId });
+    if (!workspace) {
+      throw new AppError(
+        ERROR_MESSAGES.WORKSPACE_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    workspace.permissions[role] = {
+      ...workspace.permissions[role],
+      ...newPermissions,
+    };
+
+    this._workspaceRepo.update(
+      { workspaceId },
+      { permissions: workspace.permissions }
     );
   }
 
