@@ -29,11 +29,11 @@ export class SocketHandler {
     });
   }
 
-  // function to send the data to user room
-  emitToUser<T>(userId: string, event: string, payload: T) {
+  // function to send the data to a room
+  emitToRoom<T>(roomId: string, event: string, payload: T) {
     if (!this._io) return;
 
-    this._io.to(userId).emit(event, payload);
+    this._io.to(roomId).emit(event, payload);
   }
 
   // socket event handlers
@@ -69,10 +69,17 @@ export class SocketHandler {
     // join workspace room
     socket.on("joinWorkspaceRoom", async (payload: { workSpaceId: string }) => {
       const { workSpaceId } = payload;
-      console.log("joinworkspaceroom", workSpaceId);
-      // join workspace room
+
       socket.join(workSpaceId);
-      logger.info(`User ${userId} joined ${workSpaceId} workpsace`);
+      logger.info(`User ${userId} joined ${workSpaceId} workpsace room`);
+    });
+
+    // join project room
+    socket.on("joinProjectRoom", async (payload: { projectId: string }) => {
+      const { projectId } = payload;
+
+      socket.join(projectId);
+      logger.info(`User ${userId} joined ${projectId} project room`);
     });
   }
 }

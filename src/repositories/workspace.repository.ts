@@ -1,5 +1,5 @@
 import { injectable } from "tsyringe";
-import { IWorkspace } from "../types/entities/IWrokspace";
+import { IWorkspace } from "../types/entities/IWorkspace";
 import { IWorkspaceRepository } from "../types/repository-interfaces/IWorkspaceRepository";
 import { BaseRepository } from "./base.repository";
 import { workspaceModel } from "../models/workspace.model";

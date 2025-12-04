@@ -1,4 +1,9 @@
-import { IWorkspace } from "../../entities/IWrokspace";
+import { IWorkspace } from "../../entities/IWorkspace";
+import { WorkspacePermission } from "../../enums/workspace-permissions.enum";
+
+export type IWorkspacePermissions = {
+  [key in WorkspacePermission]: boolean;
+};
 
 export interface CreateWorkspaceDto {
   name: string;
@@ -9,9 +14,8 @@ export interface CreateWorkspaceDto {
 
 export type WorkspaceListResponseDto = Omit<
   IWorkspace,
-  "createdAt" | "createdBy"
+  "createdAt" | "createdBy" | "permissions"
 >;
-// & { members: number };
 
 export interface GetOneWorkspaceDto {
   workspaceId: string;
@@ -24,8 +28,14 @@ export interface GetOneWorkspaceResponseDto {
   logo: string;
   createdAt: Date;
   members: number;
+  permissions: {
+    owner: IWorkspacePermissions;
+    projectManager: IWorkspacePermissions;
+    member: IWorkspacePermissions;
+  };
 }
 
 export type EditWorkspaceDto = Partial<CreateWorkspaceDto> & {
   workspaceId: string;
+  createdBy: string;
 };

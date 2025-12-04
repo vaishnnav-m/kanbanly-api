@@ -1,15 +1,16 @@
 import { inject, injectable } from "tsyringe";
+import { v4 as uuidv4 } from "uuid";
 import {
   CreateWorkspaceDto,
   EditWorkspaceDto,
   GetOneWorkspaceDto,
   GetOneWorkspaceResponseDto,
+  IWorkspacePermissions,
   WorkspaceListResponseDto,
 } from "../types/dtos/workspaces/workspace.dto";
-import { IWorkspace } from "../types/entities/IWrokspace";
+import { IWorkspace } from "../types/entities/IWorkspace";
 import { IWorkspaceService } from "../types/service-interface/IWorkspaceService";
 import { IWorkspaceRepository } from "../types/repository-interfaces/IWorkspaceRepository";
-import { v4 as uuidv4 } from "uuid";
 import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { IWorkspaceMemberService } from "../types/service-interface/IWorkspaceMemberService";
@@ -21,6 +22,9 @@ import { IProjectRepository } from "../types/repository-interfaces/IProjectRepos
 import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
 import { normalizeString } from "../shared/utils/stringNormalizer";
 import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
+import { DEFAULT_WORKSPACE_PERMISSIONS } from "../shared/constants/permissions";
+import { IPermissionService } from "../types/service-interface/IPermissionService";
+import { WorkspacePermission } from "../types/enums/workspace-permissions.enum";
 
 @injectable()
 export class WorkspaceService implements IWorkspaceService {
@@ -35,7 +39,8 @@ export class WorkspaceService implements IWorkspaceService {
     @inject("IProjectRepository") private _projectRepo: IProjectRepository,
     @inject("IWorkItemRepository") private _workItemRepo: IWorkItemRepository,
     @inject("ISubscriptionService")
-    private _subscriptionService: ISubscriptionService
+    private _subscriptionService: ISubscriptionService,
+    @inject("IPermissionService") private _permissionService: IPermissionService
   ) {
     this._slugify = normalizeString;
   }
@@ -80,6 +85,7 @@ export class WorkspaceService implements IWorkspaceService {
       description: workspaceData.description,
       logo: workspaceData.logo,
       createdBy: workspaceData.createdBy,
+      permissions: DEFAULT_WORKSPACE_PERMISSIONS,
     };
 
     await this._workspaceRepo.create(workspace);
@@ -168,21 +174,22 @@ export class WorkspaceService implements IWorkspaceService {
       createdAt: workspace.createdAt,
       logo: workspace.logo || "",
       members: count,
+      permissions: workspace.permissions,
     };
 
     return mappedWorkspace;
   }
 
   async editWorkspace(data: EditWorkspaceDto): Promise<void> {
-    const workspace = await this._workspaceRepo.findOne({
-      workspaceId: data.workspaceId,
-      createdBy: data.createdBy,
-    });
-
-    if (!workspace) {
+    const hasPermission = await this._permissionService.hasPermission(
+      data.createdBy,
+      data.workspaceId,
+      WorkspacePermission.WORKSPACE_MANAGE
+    );
+    if (!hasPermission) {
       throw new AppError(
-        ERROR_MESSAGES.WORKSPACE_NOT_FOUND,
-        HTTP_STATUS.NOT_FOUND
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
       );
     }
 
@@ -215,6 +222,45 @@ export class WorkspaceService implements IWorkspaceService {
         createdBy: data.createdBy,
       },
       newWorkspace
+    );
+  }
+
+  async updateRolePermissions(
+    workspaceId: string,
+    role: workspaceRoles,
+    newPermissions: Partial<IWorkspacePermissions>,
+    userId: string
+  ): Promise<void> {
+    const member = await this._workspaceMemberRepo.findOne({
+      userId,
+      workspaceId,
+    });
+    if (!member)
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
+
+    if (member.role !== "owner") {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const workspace = await this._workspaceRepo.findOne({ workspaceId });
+    if (!workspace) {
+      throw new AppError(
+        ERROR_MESSAGES.WORKSPACE_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
+    workspace.permissions[role] = {
+      ...workspace.permissions[role],
+      ...newPermissions,
+    };
+
+    this._workspaceRepo.update(
+      { workspaceId },
+      { permissions: workspace.permissions }
     );
   }
 

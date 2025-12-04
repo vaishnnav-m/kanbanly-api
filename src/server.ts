@@ -15,7 +15,6 @@ import { ErrorMiddleware } from "./middlewares/error.middleware";
 import { AdminRoutes } from "./routes/admin/admin.routes";
 import { WorkspaceRoutes } from "./routes/workspaces/workspace.routes";
 import { InvitationRoutes } from "./routes/invitations/invitation.routes";
-import { registerUserEventListner } from "./events/listeners/auth.listener";
 import { UserRoutes } from "./routes/user/user.routes";
 import { PlanRoutes } from "./routes/plan/plan.routes";
 import { SubscriptionRoutes } from "./routes/subscription/subscription.routes";
@@ -24,7 +23,7 @@ import logger from "./logger/winston.logger";
 import { CloudinaryRoutes } from "./routes/cloudinary/cloudinary.routes";
 import { SocketHandler } from "./socket/socket.handler";
 import { ITokenService } from "./types/service-interface/ITokenService";
-import { registerNotificationEventListner } from "./events/listeners/notification.listener";
+import { registerEvents } from "./events";
 
 export default class Server {
   private _app: Application;
@@ -46,8 +45,7 @@ export default class Server {
 
   private initialize() {
     DependencyInjection.registerAll();
-    registerUserEventListner();
-    registerNotificationEventListner();
+    registerEvents();
     this.configureWebhooks();
     this.configureMiddlewares();
     this.configureRoutes();
