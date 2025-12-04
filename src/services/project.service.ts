@@ -10,7 +10,6 @@ import {
 import AppError from "../shared/utils/AppError";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
-import { IWorkspaceRepository } from "../types/repository-interfaces/IWorkspaceRepository";
 import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWorkspaceMember";
 import {
   WorkspaceMemberResponseDto,
@@ -23,20 +22,22 @@ import { FilterQuery } from "mongoose";
 import { normalizeString } from "../shared/utils/stringNormalizer";
 import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
 import { IChatService } from "../types/service-interface/IChatService";
+import { IPermissionService } from "../types/service-interface/IPermissionService";
+import { WorkspacePermission } from "../types/enums/workspace-permissions.enum";
 
 @injectable()
 export class ProjectService implements IProjectService {
   private _normalizeName;
   constructor(
     @inject("IProjectRepository") private _projectRepo: IProjectRepository,
-    @inject("IWorkspaceRepository")
-    private _workspaceRepo: IWorkspaceRepository,
     @inject("IWorkspaceMemberRepository")
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
     @inject("IWorkItemRepository") private _workItemRepo: IWorkItemRepository,
     @inject("ISubscriptionService")
     private _subscriptionService: ISubscriptionService,
-    @inject("IChatService") private _chatService: IChatService
+    @inject("IChatService") private _chatService: IChatService,
+    @inject("IPermissionService")
+    private _permissionService: IPermissionService
   ) {
     this._normalizeName = normalizeString;
   }
@@ -45,18 +46,13 @@ export class ProjectService implements IProjectService {
     const { name, createdBy, workspaceId } = data;
     const normalizedName = this._normalizeName(name);
 
-    // checking if the workspace exists or not
-    const workspace = await this._workspaceRepo.findOne({
-      workspaceId,
-    });
-    if (!workspace) {
-      throw new AppError(
-        ERROR_MESSAGES.WORKSPACE_NOT_FOUND,
-        HTTP_STATUS.NOT_FOUND
-      );
-    }
-
-    if (workspace.createdBy !== createdBy) {
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
+      data.createdBy,
+      data.workspaceId,
+      WorkspacePermission.PROJECT_CREATE
+    );
+    if (!hasPermission) {
       throw new AppError(
         ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
         HTTP_STATUS.BAD_REQUEST
@@ -81,16 +77,6 @@ export class ProjectService implements IProjectService {
         ERROR_MESSAGES.PROJECT_LIMIT_EXCEED,
         HTTP_STATUS.BAD_REQUEST
       );
-    }
-
-    // checking if the user is owner or not
-    const workspaceMember = await this._workspaceMemberRepo.findOne({
-      userId: createdBy,
-      workspaceId,
-      isActive: true,
-    });
-    if (!workspaceMember || workspaceMember.role !== workspaceRoles.owner) {
-      throw new AppError(ERROR_MESSAGES.NOT_OWNER, HTTP_STATUS.BAD_REQUEST);
     }
 
     // cheking if the project is already exists
@@ -253,13 +239,15 @@ export class ProjectService implements IProjectService {
   }
 
   async editProject(data: EditProjectDto): Promise<void> {
-    const workspaceMember = await this._workspaceMemberRepo.findOne({
-      workspaceId: data.workspaceId,
-      userId: data.userId,
-    });
-    if (!workspaceMember || workspaceMember.role === workspaceRoles.member) {
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
+      data.userId,
+      data.workspaceId as string,
+      WorkspacePermission.PROJECT_EDIT
+    );
+    if (!hasPermission) {
       throw new AppError(
-        "Member not exists or insufficient permission",
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
         HTTP_STATUS.BAD_REQUEST
       );
     }
@@ -298,13 +286,15 @@ export class ProjectService implements IProjectService {
     userId: string,
     projectId: string
   ): Promise<void> {
-    const workspaceMember = await this._workspaceMemberRepo.findOne({
-      workspaceId,
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
       userId,
-    });
-    if (!workspaceMember || workspaceMember.role !== workspaceRoles.owner) {
+      workspaceId,
+      WorkspacePermission.PROJECT_DELETE
+    );
+    if (!hasPermission) {
       throw new AppError(
-        "Member not exists or insufficient permission",
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
         HTTP_STATUS.BAD_REQUEST
       );
     }
@@ -319,14 +309,13 @@ export class ProjectService implements IProjectService {
     projectId: string,
     email: string
   ): Promise<void> {
-    const workspaceMember = await this._workspaceMemberRepo.findOne({
-      workspaceId,
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
       userId,
-    });
-    if (!workspaceMember) {
-      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.FORBIDDEN);
-    }
-    if (workspaceMember.role === workspaceRoles.member) {
+      workspaceId,
+      WorkspacePermission.PROJECT_MEMBER_ADD
+    );
+    if (!hasPermission) {
       throw new AppError(
         ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
         HTTP_STATUS.BAD_REQUEST
@@ -407,14 +396,13 @@ export class ProjectService implements IProjectService {
     userId: string,
     userToRemove: string
   ): Promise<void> {
-    const workspaceMember = await this._workspaceMemberRepo.findOne({
-      workspaceId,
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
       userId,
-    });
-    if (!workspaceMember) {
-      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.FORBIDDEN);
-    }
-    if (workspaceMember.role === workspaceRoles.member) {
+      workspaceId,
+      WorkspacePermission.PROJECT_MEMBER_ADD
+    );
+    if (!hasPermission) {
       throw new AppError(
         ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
         HTTP_STATUS.BAD_REQUEST

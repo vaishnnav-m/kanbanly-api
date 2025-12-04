@@ -16,7 +16,6 @@ import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWork
 import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { HTTP_STATUS } from "../shared/constants/http.status";
-import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
 import { IProjectRepository } from "../types/repository-interfaces/IProjectRepository";
 import { IWorkItem } from "../types/entities/IWorkItem";
 import { IProjectService } from "../types/service-interface/IProjectService";
@@ -30,6 +29,8 @@ import {
   TaskActivityActionEnum,
 } from "../types/enums/activity.enum";
 import { WorkspaceEvent, workspaceEvents } from "../events/workspace.events";
+import { IPermissionService } from "../types/service-interface/IPermissionService";
+import { WorkspacePermission } from "../types/enums/workspace-permissions.enum";
 
 @injectable()
 export class TaskService implements ITaskService {
@@ -40,25 +41,23 @@ export class TaskService implements ITaskService {
     @inject("IProjectRepository") private _projectRepo: IProjectRepository,
     @inject("IProjectService") private _projectService: IProjectService,
     @inject("ISprintService") private _sprintService: ISprintService,
-    @inject("IActivityService") private _activityService: IActivityService
+    @inject("IActivityService") private _activityService: IActivityService,
+    @inject("IPermissionService")
+    private _permissionService: IPermissionService
   ) {}
 
   async createTask(data: CreateTaskDto): Promise<void> {
-    const workspaceMember = await this._workspaceMemberRepo.findOne({
-      userId: data.createdBy,
-      workspaceId: data.workspaceId,
-      isActive: true,
-    });
-
-    if (!workspaceMember) {
-      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
-    }
-
-    if (
-      workspaceMember.role !== workspaceRoles.owner &&
-      workspaceMember.role !== workspaceRoles.projectManager
-    ) {
-      throw new AppError(ERROR_MESSAGES.ACTION_DENIED, HTTP_STATUS.BAD_REQUEST);
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
+      data.createdBy,
+      data.workspaceId,
+      WorkspacePermission.TASK_CREATE
+    );
+    if (!hasPermission) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
     }
 
     const project = await this._projectRepo.findOne({
@@ -414,21 +413,17 @@ export class TaskService implements ITaskService {
     userId: string,
     data: EditTaskDto
   ): Promise<void> {
-    const workspaceMember = await this._workspaceMemberRepo.findOne({
-      userId,
-      workspaceId,
-      isActive: true,
-    });
-    if (!workspaceMember) {
-      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.FORBIDDEN);
-    }
-
     const task = await this._workItemRepo.findOne({ taskId });
     if (!task) {
       throw new AppError(ERROR_MESSAGES.TASK_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
     }
 
-    const isAllowed = workspaceMember.role !== "member";
+    // permission check
+    const isAllowed = await this._permissionService.hasPermission(
+      userId,
+      workspaceId,
+      WorkspacePermission.TASK_EDIT
+    );
     if (!isAllowed) {
       throw new AppError(
         ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
@@ -527,13 +522,17 @@ export class TaskService implements ITaskService {
     userId: string,
     workspaceId: string
   ): Promise<void> {
-    const workspaceMember = await this._workspaceMemberRepo.findOne({
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
       userId,
       workspaceId,
-      isActive: true,
-    });
-    if (!workspaceMember) {
-      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
+      WorkspacePermission.TASK_EDIT
+    );
+    if (!hasPermission) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
     }
 
     const task = await this._workItemRepo.findOne({ taskId });
@@ -575,13 +574,17 @@ export class TaskService implements ITaskService {
     workspaceId: string,
     projectId: string
   ): Promise<void> {
-    const workspaceMember = await this._workspaceMemberRepo.findOne({
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
       userId,
       workspaceId,
-      isActive: true,
-    });
-    if (!workspaceMember) {
-      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
+      WorkspacePermission.TASK_EDIT
+    );
+    if (!hasPermission) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
     }
 
     const task = await this._workItemRepo.findOne({ taskId });
@@ -636,21 +639,17 @@ export class TaskService implements ITaskService {
     taskId: string,
     userId: string
   ): Promise<void> {
-    const workspaceMember = await this._workspaceMemberRepo.findOne({
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
       userId,
       workspaceId,
-      isActive: true,
-    });
-
-    if (!workspaceMember) {
-      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
-    }
-
-    if (
-      workspaceMember.role !== workspaceRoles.owner &&
-      workspaceMember.role !== workspaceRoles.projectManager
-    ) {
-      throw new AppError(ERROR_MESSAGES.ACTION_DENIED, HTTP_STATUS.BAD_REQUEST);
+      WorkspacePermission.TASK_DELETE
+    );
+    if (!hasPermission) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.BAD_REQUEST
+      );
     }
 
     await this._workItemRepo.update({ taskId }, { isDeleted: true });

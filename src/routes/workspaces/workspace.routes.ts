@@ -51,6 +51,13 @@ export class WorkspaceRoutes extends BaseRoute {
       authenticateToken,
       this._workspaceController.editWorkspace.bind(this._workspaceController)
     );
+    this._router.patch(
+      "/:workspaceId/permissions",
+      authenticateToken,
+      this._workspaceController.updateRolePermissions.bind(
+        this._workspaceController
+      )
+    );
     this._router.delete(
       "/:workspaceId",
       authenticateToken,

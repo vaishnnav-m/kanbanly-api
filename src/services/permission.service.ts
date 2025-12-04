@@ -1,15 +1,16 @@
 import { inject, injectable } from "tsyringe";
 import { IPermissionService } from "../types/service-interface/IPermissionService";
 import { WorkspacePermission } from "../types/enums/workspace-permissions.enum";
-import { IWorkspaceService } from "../types/service-interface/IWorkspaceService";
-import { IWorkspaceMemberService } from "../types/service-interface/IWorkspaceMemberService";
+import { IWorkspaceRepository } from "../types/repository-interfaces/IWorkspaceRepository";
+import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWorkspaceMember";
 
 @injectable()
 export class PermissionService implements IPermissionService {
   constructor(
-    @inject("IWorkspaceService") private _workspaceService: IWorkspaceService,
-    @inject("IWorkspaceMemberService")
-    private _workspaceMemberService: IWorkspaceMemberService
+    @inject("IWorkspaceRepository")
+    private _workspaceRepo: IWorkspaceRepository,
+    @inject("IWorkspaceMemberRepository")
+    private _workspaceMemberRepo: IWorkspaceMemberRepository
   ) {}
 
   async hasPermission(
@@ -17,13 +18,13 @@ export class PermissionService implements IPermissionService {
     workspaceId: string,
     permission: WorkspacePermission
   ): Promise<boolean> {
-    const member = await this._workspaceMemberService.getCurrentMember(
+    const member = await this._workspaceMemberRepo.findOne({
       workspaceId,
-      userId
-    );
+      userId,
+    });
     if (!member) return false;
 
-    const workspace = await this._workspaceService.getOneWorkspace({
+    const workspace = await this._workspaceRepo.findOne({
       userId,
       workspaceId,
     });

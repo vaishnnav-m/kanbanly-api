@@ -5,5 +5,6 @@ export interface IWorkspaceController {
   getAllWorkspaces: controllerMethod;
   getOneWorkspace: controllerMethod;
   editWorkspace: controllerMethod;
+  updateRolePermissions: controllerMethod;
   removeWorkspace: controllerMethod;
 }

@@ -16,7 +16,6 @@ export type WorkspaceListResponseDto = Omit<
   IWorkspace,
   "createdAt" | "createdBy" | "permissions"
 >;
-// & { members: number };
 
 export interface GetOneWorkspaceDto {
   workspaceId: string;
@@ -38,4 +37,5 @@ export interface GetOneWorkspaceResponseDto {
 
 export type EditWorkspaceDto = Partial<CreateWorkspaceDto> & {
   workspaceId: string;
+  createdBy: string;
 };
