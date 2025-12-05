@@ -4,10 +4,14 @@ import { Request, Response } from "express";
 import { IAdminService } from "../types/service-interface/IAdminService";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import AppError from "../shared/utils/AppError";
+import { IAnalyticsService } from "../types/service-interface/IAnalyticsService";
 
 @injectable()
 export class AdminController implements IAdminController {
-  constructor(@inject("IAdminService") private _adminService: IAdminService) {}
+  constructor(
+    @inject("IAdminService") private _adminService: IAdminService,
+    @inject("IAnalyticsService") private _analyticsService: IAnalyticsService
+  ) {}
 
   async getAllUsers(req: Request, res: Response) {
     const pageParam = req.query.page;
@@ -33,6 +37,14 @@ export class AdminController implements IAdminController {
     res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "successfully updated the user",
+    });
+  }
+
+  async getAnalytics(req: Request, res: Response) {
+    const analytics = await this._analyticsService.getSummary();
+    res.status(HTTP_STATUS.OK).json({
+      message: "Users fetched successfully",
+      data: analytics,
     });
   }
 }

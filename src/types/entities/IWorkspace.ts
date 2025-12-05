@@ -1,4 +1,5 @@
 import { IWorkspacePermissions } from "../dtos/workspaces/workspace.dto";
+import { IUser } from "./IUser";
 
 export interface IWorkspace {
   workspaceId: string;
@@ -11,6 +12,7 @@ export interface IWorkspace {
     projectManager: IWorkspacePermissions;
     member: IWorkspacePermissions;
   };
-  createdBy: string;
+  createdBy: string | IUser;
+  memberCount?: number;
   createdAt: Date;
 }

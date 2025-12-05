@@ -3,6 +3,7 @@ import { projectModel } from "../models/project.model";
 import { IProject } from "../types/entities/IProject";
 import { IProjectRepository } from "../types/repository-interfaces/IProjectRepository";
 import { BaseRepository } from "./base.repository";
+import { FilterQuery } from "mongoose";
 
 @injectable()
 export class ProjectRepository
@@ -22,5 +23,9 @@ export class ProjectRepository
       workspaceId,
       createdAt: { $gte: start },
     });
+  }
+
+  async countProjects(query?: FilterQuery<IProject>): Promise<number> {
+    return await this.model.countDocuments(query);
   }
 }
