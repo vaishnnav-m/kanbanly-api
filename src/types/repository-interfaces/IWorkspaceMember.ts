@@ -15,4 +15,5 @@ export interface IWorkspaceMemberRepository
     workspaceId: string,
     userId: string
   ): Promise<IWorkspaceMember | null>;
+  countJoinedThisWeek(workspaceId: string): Promise<number>
 }

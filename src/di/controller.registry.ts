@@ -39,6 +39,8 @@ import { INotificationController } from "../types/controller-interfaces/INotific
 import { NotificationController } from "../controllers/notification.controller";
 import { IActivityController } from "../types/controller-interfaces/IActivityController";
 import { ActivityController } from "../controllers/activity.controller";
+import { IDashboardController } from "../types/controller-interfaces/IDashBoardController";
+import { DashboardController } from "../controllers/dashboard.controller";
 
 export class ControllerRegistry {
   static registerController(): void {
@@ -104,6 +106,9 @@ export class ControllerRegistry {
     });
     container.register<IActivityController>("IActivityController", {
       useClass: ActivityController,
+    });
+    container.register<IDashboardController>("IDashboardController", {
+      useClass: DashboardController,
     });
   }
 }

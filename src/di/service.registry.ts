@@ -51,6 +51,8 @@ import { IActivityService } from "../types/service-interface/IActivityService";
 import { ActivityService } from "../services/activity.service";
 import { IPermissionService } from "../types/service-interface/IPermissionService";
 import { PermissionService } from "../services/permission.service";
+import { IDashboardService } from "../types/service-interface/IDashboardService";
+import { DashboardService } from "../services/dashboard.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -131,6 +133,9 @@ export class ServiceRegistry {
     });
     container.register<IPermissionService>("IPermissionService", {
       useClass: PermissionService,
+    });
+    container.register<IDashboardService>("IDashboardService", {
+      useClass: DashboardService,
     });
   }
 }

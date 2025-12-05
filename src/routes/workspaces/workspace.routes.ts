@@ -6,6 +6,7 @@ import { IInvitationController } from "../../types/controller-interfaces/IInvita
 import { ProjectRoutes } from "./projects/project.routes";
 import { WorkspaceMembersRoutes } from "./members/members.routes";
 import { ChatRoutes } from "./chats/chat.routes";
+import { IDashboardController } from "../../types/controller-interfaces/IDashBoardController";
 
 @injectable()
 export class WorkspaceRoutes extends BaseRoute {
@@ -16,6 +17,8 @@ export class WorkspaceRoutes extends BaseRoute {
     private _invitationController: IInvitationController,
     @inject(WorkspaceMembersRoutes)
     private _membersRoutes: WorkspaceMembersRoutes,
+    @inject("IDashboardController")
+    private _dashboardController: IDashboardController,
     @inject(ProjectRoutes) private _projectRoutes: ProjectRoutes,
     @inject(ChatRoutes) private _chatRoutes: ChatRoutes
   ) {
@@ -57,6 +60,11 @@ export class WorkspaceRoutes extends BaseRoute {
       this._workspaceController.updateRolePermissions.bind(
         this._workspaceController
       )
+    );
+    this._router.get(
+      "/:workspaceId/dashboard",
+      authenticateToken,
+      this._dashboardController.getDashboardData.bind(this._dashboardController)
     );
     this._router.delete(
       "/:workspaceId",
