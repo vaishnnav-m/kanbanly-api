@@ -25,6 +25,7 @@ import { ISubscriptionService } from "../types/service-interface/ISubscriptionSe
 import { DEFAULT_WORKSPACE_PERMISSIONS } from "../shared/constants/permissions";
 import { IPermissionService } from "../types/service-interface/IPermissionService";
 import { WorkspacePermission } from "../types/enums/workspace-permissions.enum";
+import { IUser } from "../types/entities/IUser";
 
 @injectable()
 export class WorkspaceService implements IWorkspaceService {
@@ -102,13 +103,21 @@ export class WorkspaceService implements IWorkspaceService {
     role: string
   ): Promise<WorkspaceListResponseDto[]> {
     if (role === "admin") {
-      const workspaces = await this._workspaceRepo.find();
+      const workspaces = await this._workspaceRepo.findWorkspacesWithOwner();
 
       const modified = workspaces.map((workspace) => {
+        const createdBy = workspace.createdBy as IUser;
         return {
           workspaceId: workspace.workspaceId,
           name: workspace.name,
           description: workspace.description,
+          createdBy: {
+            userId: createdBy.userId,
+            email: createdBy.email,
+            name: createdBy.firstName,
+            profile: createdBy.profile,
+          },
+          memberCount: workspace.memberCount,
           logo: workspace.logo,
           slug: workspace.slug,
         };

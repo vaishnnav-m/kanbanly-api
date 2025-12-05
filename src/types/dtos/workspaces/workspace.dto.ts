@@ -15,7 +15,14 @@ export interface CreateWorkspaceDto {
 export type WorkspaceListResponseDto = Omit<
   IWorkspace,
   "createdAt" | "createdBy" | "permissions"
->;
+> & {
+  createdBy?: {
+    userId: string;
+    email: string;
+    name: string;
+    profile?: string;
+  };
+};
 
 export interface GetOneWorkspaceDto {
   workspaceId: string;

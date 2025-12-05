@@ -27,5 +27,12 @@ export class AdminRoutes extends BaseRoute {
       checkRole("admin"),
       this._adminController.updateUserStatus.bind(this._adminController)
     );
+
+    this._router.get(
+      "/analytics",
+      authenticateToken,
+      checkRole("admin"),
+      this._adminController.getAnalytics.bind(this._adminController)
+    );
   }
 }

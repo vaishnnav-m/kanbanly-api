@@ -32,4 +32,48 @@ export class WorkspaceRepository
       .select("createdBy");
     return userId === onwner?.createdBy;
   }
+
+  async findWorkspacesWithOwner(): Promise<IWorkspace[]> {
+    const result = this.model.aggregate([
+      {
+        $match: {},
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "userId",
+          as: "createdBy",
+        },
+      },
+      { $unwind: "$createdBy" },
+      {
+        $lookup: {
+          from: "workspacemembers",
+          localField: "workspaceId",
+          foreignField: "workspaceId",
+          as: "members",
+        },
+      },
+      {
+        $addFields: {
+          memberCount: { $size: "$members" },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          workspaceId: 1,
+          name: 1,
+          description: 1,
+          memberCount: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          createdBy: 1,
+        },
+      },
+    ]);
+
+    return result;
+  }
 }
