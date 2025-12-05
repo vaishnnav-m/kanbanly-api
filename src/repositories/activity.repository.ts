@@ -40,4 +40,14 @@ export class ActivityRepository
 
     return result;
   }
+
+  async countToday(workspaceId: string): Promise<number> {
+    const count = await this.model.countDocuments({
+      workspaceId,
+      createdAt: {
+        $gte: new Date(new Date().setHours(0, 0, 0, 0)),
+      },
+    });
+    return count;
+  }
 }

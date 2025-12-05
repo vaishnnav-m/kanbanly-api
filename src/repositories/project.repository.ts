@@ -13,22 +13,14 @@ export class ProjectRepository
     super(projectModel);
   }
 
-  // async getProjectByUsers(
-  //   workspaceId: string,
-  //   projectId: string
-  // ): Promise<Omit<IProject, "members"> & { members: IWorkspaceMember[] }> {
-  //   const result = await this.model.aggregate([
-  //     { $match: { workspaceId, projectId } },
-  //     {
-  //       $lookup: {
-  //         from: "workspaceMembers",
-  //         localField: "members",
-  //         foreignField: "userId",
-  //         as: "members",
-  //       },
-  //     },
-  //   ]);
+  async countCreatedThisMonth(workspaceId: string): Promise<number> {
+    const start = new Date();
+    start.setDate(1);
+    start.setHours(0, 0, 0, 0);
 
-  //   return result;
-  // }
+    return this.model.countDocuments({
+      workspaceId,
+      createdAt: { $gte: start },
+    });
+  }
 }

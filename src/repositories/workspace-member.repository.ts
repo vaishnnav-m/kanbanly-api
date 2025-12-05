@@ -44,4 +44,17 @@ export class WorkspaceMemberRepository
   ): Promise<IWorkspaceMember | null> {
     return await this.model.findOne({ workspaceId, userId }).populate("userId");
   }
+
+  async countJoinedThisWeek(workspaceId: string): Promise<number> {
+    const now = new Date();
+    const day = now.getDay();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - day + (day === 0 ? -6 : 1));
+    monday.setHours(0, 0, 0, 0);
+
+    return this.model.countDocuments({
+      workspaceId,
+      createdAt: { $gte: monday },
+    });
+  }
 }
