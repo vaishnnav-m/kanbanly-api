@@ -9,6 +9,11 @@ export interface CreateMessageDto {
 export interface MessageResponseDto {
   chatId: string;
   text: string;
-  sender: string;
+  sender: {
+    userId: string;
+    email: string;
+    name: string;
+    profile?: string;
+  };
   createdAt: Date;
 }

@@ -17,6 +17,7 @@ import { IUserRepository } from "../types/repository-interfaces/IUserRepository"
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { ISubscriptionService } from "../types/service-interface/ISubscriptionService";
 import { IWorkspaceMemberRepository } from "../types/repository-interfaces/IWorkspaceMember";
+import { INotificationService } from "../types/service-interface/INotificationService";
 
 @injectable()
 export class InvitationService implements IInvitationService {
@@ -33,7 +34,9 @@ export class InvitationService implements IInvitationService {
     @inject("IEmailService") private _mailService: IEmailService,
     @inject("IUserRepository") private _userRepo: IUserRepository,
     @inject("ISubscriptionService")
-    private _subscriptionService: ISubscriptionService
+    private _subscriptionService: ISubscriptionService,
+    @inject("INotificationService")
+    private _notificationService: INotificationService
   ) {
     this._frontendUrl = config.cors.ALLOWED_ORIGIN;
   }
@@ -73,6 +76,9 @@ export class InvitationService implements IInvitationService {
     }
 
     const user = await this._userRepo.findByEmail(data.invitedEmail);
+    if (!user) {
+      throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+    }
 
     if (user) {
       const isMember = await this._workspaceMemberService.isMember(
@@ -106,7 +112,7 @@ export class InvitationService implements IInvitationService {
     const invitationToken = uuidv4();
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    this._invitationRepo.create({
+    await this._invitationRepo.create({
       workspaceId: data.workspaceId,
       invitedBy: data.invitedBy,
       invitationToken,
@@ -116,8 +122,17 @@ export class InvitationService implements IInvitationService {
       expiresAt,
     });
 
+    await this._notificationService.createNotification({
+      title: "Invitation Received",
+      message: `You’ve been invited to join the workspace ${workspace.name}.`,
+      userId: user?.userId,
+      type: "INVITATION",
+      token: invitationToken,
+      workspaceName: workspace.name,
+    });
+
     const invitationLink = `${this._frontendUrl}/join-workspace?token=${invitationToken}`;
-    this._mailService.sendInvitationEmail(
+    await this._mailService.sendInvitationEmail(
       data.invitedEmail,
       workspace.name,
       data.role,
