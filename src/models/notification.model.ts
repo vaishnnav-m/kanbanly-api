@@ -25,6 +25,15 @@ const notificationSchema = new Schema<INotification>(
       required: true,
       default: false,
     },
+    type: {
+      type: String,
+    },
+    token: {
+      type: String,
+    },
+    workspaceName: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

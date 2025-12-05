@@ -27,9 +27,14 @@ export class NotificationService implements INotificationService {
       userId: data.userId,
       title: data.title,
       message: data.message,
+      ...{ type: data.type },
+      ...{ token: data.token },
+      ...{ workspaceName: data.workspaceName },
     };
 
+    console.log("new notification creation", newNotification);
     const notification = await this._notificationRepo.create(newNotification);
+    console.log("new notification created success", notification);
 
     notificationEvents.emit(NotificationEvent.Notification, notification);
   }
@@ -45,6 +50,9 @@ export class NotificationService implements INotificationService {
       userId,
       title: notification.title,
       message: notification.message,
+      ...{ type: notification.type },
+      ...{ token: notification.token },
+      ...{ workspaceName: notification.workspaceName },
       createdAt: notification.createdAt,
     }));
 

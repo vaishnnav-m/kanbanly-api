@@ -11,6 +11,9 @@ import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { INotificationService } from "../types/service-interface/INotificationService";
+import { IUserService } from "../types/service-interface/IUserService";
+import { UserDataResponseDto } from "../types/dtos/users/user-response.dto";
+import { IUser } from "../types/entities/IUser";
 
 @injectable()
 export class MessageService implements IMessageService {
@@ -18,7 +21,8 @@ export class MessageService implements IMessageService {
     @inject("IMessageRepository") private _messageRepo: IMessageRepository,
     @inject("IChatRepository") private _chatRepo: IChatRepository,
     @inject("INotificationService")
-    private _notificationService: INotificationService
+    private _notificationService: INotificationService,
+    @inject("IUserService") private _userService: IUserService
   ) {}
 
   async createMessage(data: CreateMessageDto): Promise<void> {
@@ -28,6 +32,15 @@ export class MessageService implements IMessageService {
         ERROR_MESSAGES.CHAT_ID_REQUIRED,
         HTTP_STATUS.BAD_REQUEST
       );
+    }
+
+    let directUser: UserDataResponseDto | null = null;
+
+    if (chat.type === "direct") {
+      const otherUserId = chat.participants.find((id) => id !== data.senderId);
+      if (otherUserId) {
+        directUser = await this._userService.getUserData(otherUserId);
+      }
     }
 
     const newMessage = {
@@ -44,12 +57,17 @@ export class MessageService implements IMessageService {
     const receivers = members.filter((id) => id !== data.senderId);
 
     for (const receiverId of receivers) {
+      let title = "";
+
+      if (chat.type === "project") {
+        title = `New message in ${chat.name}`;
+      } else if (chat.type === "direct") {
+        title = `New message from ${directUser?.firstName ?? "Someone"}`;
+      }
+
       await this._notificationService.createNotification({
         userId: receiverId,
-        title:
-          chat.type === "project"
-            ? `New message in ${chat.name}`
-            : `New message from ${chat.name}`,
+        title,
         message:
           data.text.length > 50
             ? data.text.substring(0, 50) + "..."
@@ -67,18 +85,21 @@ export class MessageService implements IMessageService {
       );
     }
 
-    const messages = await this._messageRepo.find(
-      { chatId },
-      { sort: { createdAt: 1 } }
-    );
-    const mappedMessages = messages.map((message) => ({
-      chatId: message.chatId,
-      text: message.text,
-      sender: message.senderId,
-      createdAt: message.createdAt,
-    }));
-
-    console.log("mappedMessages", mappedMessages);
+    const messages = await this._messageRepo.getMessages(chatId);
+    const mappedMessages = messages.map((message) => {
+      const sender = message.senderId as IUser;
+      return {
+        chatId: message.chatId,
+        text: message.text,
+        sender: {
+          userId: sender.userId,
+          name: sender.firstName,
+          email: sender.email,
+          profile: sender.profile,
+        },
+        createdAt: message.createdAt,
+      };
+    });
 
     return mappedMessages;
   }

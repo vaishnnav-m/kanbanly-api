@@ -1,7 +1,9 @@
+import { IUser } from "./IUser";
+
 export interface IMessage {
   messageId: string;
   chatId: string;
-  senderId: string;
+  senderId: string | IUser;
   text: string;
   //   for future if i enable attachments
   //   attachments?: [
