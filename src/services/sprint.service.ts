@@ -6,7 +6,6 @@ import {
   SprintStatus,
 } from "../types/dtos/sprint/sprint.dto";
 import { IWorkspaceMemberService } from "../types/service-interface/IWorkspaceMemberService";
-import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
 import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { HTTP_STATUS } from "../shared/constants/http.status";
@@ -16,6 +15,8 @@ import { v4 as uuidV4 } from "uuid";
 import { IProjectService } from "../types/service-interface/IProjectService";
 import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
 import { TaskStatus } from "../types/dtos/task/task.dto";
+import { IPermissionService } from "../types/service-interface/IPermissionService";
+import { WorkspacePermission } from "../types/enums/workspace-permissions.enum";
 
 @injectable()
 export class SprintService implements ISprintService {
@@ -24,7 +25,8 @@ export class SprintService implements ISprintService {
     private _workspaceMemberService: IWorkspaceMemberService,
     @inject("ISprintRepository") private _sprintRepo: ISprintRepository,
     @inject("IProjectService") private _projectService: IProjectService,
-    @inject("IWorkItemRepository") private _workItemRepo: IWorkItemRepository
+    @inject("IWorkItemRepository") private _workItemRepo: IWorkItemRepository,
+    @inject("IPermissionService") private _permissionService: IPermissionService
   ) {}
 
   private async _handleIncompleteItems(sprintId: string) {
@@ -48,12 +50,17 @@ export class SprintService implements ISprintService {
     workspaceId: string,
     projectId: string
   ): Promise<void> {
-    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
+      userId,
       workspaceId,
-      userId
+      WorkspacePermission.SPRINT_CREATE
     );
-    if (workspaceMember.role == workspaceRoles.member) {
-      throw new AppError(ERROR_MESSAGES.ACTION_DENIED, HTTP_STATUS.FORBIDDEN);
+    if (!hasPermission) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.FORBIDDEN
+      );
     }
 
     const project = await this._projectService.getOneProject(
@@ -183,12 +190,17 @@ export class SprintService implements ISprintService {
     sprintId: string,
     sprintData: Partial<CreateSprintDto>
   ): Promise<void> {
-    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
+      userId,
       workspaceId,
-      userId
+      WorkspacePermission.SPRINT_EDIT
     );
-    if (workspaceMember.role == workspaceRoles.member) {
-      throw new AppError(ERROR_MESSAGES.ACTION_DENIED, HTTP_STATUS.FORBIDDEN);
+    if (!hasPermission) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.FORBIDDEN
+      );
     }
 
     const activeSprint = await this._sprintRepo.findOne({
@@ -238,12 +250,17 @@ export class SprintService implements ISprintService {
     sprintId: string,
     sprintData: Partial<CreateSprintDto>
   ): Promise<void> {
-    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
+      userId,
       workspaceId,
-      userId
+      WorkspacePermission.SPRINT_EDIT
     );
-    if (workspaceMember.role == workspaceRoles.member) {
-      throw new AppError(ERROR_MESSAGES.ACTION_DENIED, HTTP_STATUS.FORBIDDEN);
+    if (!hasPermission) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.FORBIDDEN
+      );
     }
 
     const workItemCount = await this._workItemRepo.count({ sprintId });
@@ -382,12 +399,17 @@ export class SprintService implements ISprintService {
     projectId: string,
     sprintId: string
   ): Promise<void> {
-    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
+      userId,
       workspaceId,
-      userId
+      WorkspacePermission.SPRINT_DELETE
     );
-    if (!workspaceMember) {
-      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.FORBIDDEN);
+    if (!hasPermission) {
+      throw new AppError(
+        ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+        HTTP_STATUS.FORBIDDEN
+      );
     }
 
     await this._handleIncompleteItems(sprintId);

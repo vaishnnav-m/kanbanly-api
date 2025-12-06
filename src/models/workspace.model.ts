@@ -6,8 +6,8 @@ const permissionSchema = new Schema<IWorkspacePermissions>(
   {
     workspaceManage: { type: Boolean, default: false },
 
-    memberInvite: { type: Boolean, default: false },
-    memberRemove: { type: Boolean, default: false },
+    projectMemberAdd: { type: Boolean, default: false },
+    projectMemberDelete: { type: Boolean, default: false },
 
     projectCreate: { type: Boolean, default: false },
     projectEdit: { type: Boolean, default: false },

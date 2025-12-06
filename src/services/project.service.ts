@@ -400,7 +400,7 @@ export class ProjectService implements IProjectService {
     const hasPermission = await this._permissionService.hasPermission(
       userId,
       workspaceId,
-      WorkspacePermission.PROJECT_MEMBER_ADD
+      WorkspacePermission.PROJECT_MEMBER_DELETE
     );
     if (!hasPermission) {
       throw new AppError(

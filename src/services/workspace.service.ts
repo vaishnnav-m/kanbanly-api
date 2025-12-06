@@ -26,6 +26,7 @@ import { DEFAULT_WORKSPACE_PERMISSIONS } from "../shared/constants/permissions";
 import { IPermissionService } from "../types/service-interface/IPermissionService";
 import { WorkspacePermission } from "../types/enums/workspace-permissions.enum";
 import { IUser } from "../types/entities/IUser";
+import { IProjectService } from "../types/service-interface/IProjectService";
 
 @injectable()
 export class WorkspaceService implements IWorkspaceService {
@@ -41,7 +42,9 @@ export class WorkspaceService implements IWorkspaceService {
     @inject("IWorkItemRepository") private _workItemRepo: IWorkItemRepository,
     @inject("ISubscriptionService")
     private _subscriptionService: ISubscriptionService,
-    @inject("IPermissionService") private _permissionService: IPermissionService
+    @inject("IPermissionService")
+    private _permissionService: IPermissionService,
+    @inject("IProjectService") private _projectService: IProjectService
   ) {
     this._slugify = normalizeString;
   }
@@ -92,7 +95,7 @@ export class WorkspaceService implements IWorkspaceService {
     await this._workspaceRepo.create(workspace);
 
     await this._workspaceMemberService.addMember({
-      userId: workspaceData.createdBy,
+      invitedUserId: workspaceData.createdBy,
       workspaceId: workspace.workspaceId,
       role: workspaceRoles.owner,
     });
@@ -193,7 +196,7 @@ export class WorkspaceService implements IWorkspaceService {
     const hasPermission = await this._permissionService.hasPermission(
       data.createdBy,
       data.workspaceId,
-      WorkspacePermission.WORKSPACE_MANAGE
+      WorkspacePermission.WORKSPACE_EDIT
     );
     if (!hasPermission) {
       throw new AppError(
@@ -267,7 +270,7 @@ export class WorkspaceService implements IWorkspaceService {
       ...newPermissions,
     };
 
-    this._workspaceRepo.update(
+    await this._workspaceRepo.update(
       { workspaceId },
       { permissions: workspace.permissions }
     );
@@ -278,6 +281,7 @@ export class WorkspaceService implements IWorkspaceService {
     userId: string,
     role: string
   ): Promise<void> {
+    // skip this for platform admin
     if (role === "user") {
       const workspace = await this._workspaceRepo.findOne({
         workspaceId,

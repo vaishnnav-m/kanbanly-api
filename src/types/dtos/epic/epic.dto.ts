@@ -20,5 +20,5 @@ export interface EpicUpdationDto {
 
 export interface EpicDetailsDto extends EpicResponseDto {
   status: TaskStatus;
-  children?: Omit<TaskListingDto, "createdBy">[];
+  children?: Omit<TaskListingDto, "createdBy" | "workspaceId">[];
 }

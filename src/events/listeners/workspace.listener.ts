@@ -9,7 +9,6 @@ export function registerWorkspaceEventListner() {
   const socketHandler = container.resolve(SocketHandler);
 
   workspaceEvents.on(WorkspaceEvent.TaskChange, (task: IWorkItem) => {
-   console.log("task changed",task)
     socketHandler.emitToRoom(task.projectId, "taskchange", {
       taskId: task.taskId,
       workspaceId: task.workspaceId,

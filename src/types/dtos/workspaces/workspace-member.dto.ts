@@ -1,4 +1,5 @@
 import { IWorkspaceMember } from "../../entities/IWorkspaceMember";
+import { IWorkspacePermissions } from "./workspace.dto";
 
 // workspace roels
 export enum workspaceRoles {
@@ -10,7 +11,8 @@ export enum workspaceRoles {
 // request dto
 export interface WorkspaceMemberDto {
   workspaceId: string;
-  userId: string;
+  inviterUserId?: string;
+  invitedUserId: string;
   role: workspaceRoles;
 }
 
@@ -23,6 +25,14 @@ export interface WorkspaceMemberResponseDto {
   role: workspaceRoles;
   isActive: boolean;
 }
+
+export type CurrentMemberResponseDto = Omit<
+  WorkspaceMemberResponseDto,
+  "_id" | "isActive"
+> & {
+  userId: string;
+  permissions: IWorkspacePermissions;
+};
 
 // repository dto
 export interface WorkspaceMemberRepoDto {

@@ -25,7 +25,6 @@ export class PermissionService implements IPermissionService {
     if (!member) return false;
 
     const workspace = await this._workspaceRepo.findOne({
-      userId,
       workspaceId,
     });
     if (!workspace) return false;

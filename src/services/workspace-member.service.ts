@@ -1,5 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import {
+  CurrentMemberResponseDto,
   EditWorkspaceMemberDto,
   WorkspaceMemberDto,
   WorkspaceMemberResponseDto,
@@ -14,6 +15,8 @@ import { PaginatedResponseDto } from "../types/dtos/paginated.dto";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
 import { IUserRepository } from "../types/repository-interfaces/IUserRepository";
+import { IPermissionService } from "../types/service-interface/IPermissionService";
+import { WorkspacePermission } from "../types/enums/workspace-permissions.enum";
 
 @injectable()
 export class WorkspaceMemberService implements IWorkspaceMemberService {
@@ -22,18 +25,27 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     private _workspaceMemberRepo: IWorkspaceMemberRepository,
     @inject("IWorkspaceRepository")
     private _workspaceRepo: IWorkspaceRepository,
-    @inject("IUserRepository") private _userRepo: IUserRepository
+    @inject("IUserRepository") private _userRepo: IUserRepository,
+    @inject("IPermissionService") private _permissionService: IPermissionService
   ) {}
 
   async addMember(data: WorkspaceMemberDto): Promise<void> {
-    const workspace = await this._workspaceRepo.findOne({
-      workspaceId: data.workspaceId,
-    });
-    if (!workspace) {
-      throw new AppError("workspace not found", HTTP_STATUS.BAD_REQUEST);
+    if (data.inviterUserId) {
+      // permission check
+      const hasPermission = await this._permissionService.hasPermission(
+        data.inviterUserId,
+        data.workspaceId,
+        WorkspacePermission.WORKSPACE_MEMBER_ADD
+      );
+      if (!hasPermission) {
+        throw new AppError(
+          ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
+          HTTP_STATUS.BAD_REQUEST
+        );
+      }
     }
 
-    const user = await this._userRepo.findOne({ userId: data.userId });
+    const user = await this._userRepo.findOne({ userId: data.invitedUserId });
     if (!user) {
       throw new AppError(
         ERROR_MESSAGES.MEMBER_NOT_FOUND,
@@ -47,7 +59,7 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
 
     const existingMember = await this._workspaceMemberRepo.findOne({
       workspaceId: data.workspaceId,
-      userId: data.userId,
+      userId: data.invitedUserId,
     });
     if (existingMember) {
       throw new AppError(
@@ -58,7 +70,7 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
 
     const workspaceMember: Omit<IWorkspaceMember, "createdAt"> = {
       workspaceId: data.workspaceId,
-      userId: data.userId,
+      userId: data.invitedUserId,
       email: user.email,
       name: user.firstName,
       role: data.role,
@@ -129,7 +141,14 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
   async getCurrentMember(
     workspaceId: string,
     userId: string
-  ): Promise<Omit<IWorkspaceMember, "isActive">> {
+  ): Promise<CurrentMemberResponseDto> {
+    const workspace = await this._workspaceRepo.findOne({ workspaceId });
+    if (!workspace) {
+      throw new AppError(
+        ERROR_MESSAGES.WORKSPACE_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
     const workspaceMember = await this._workspaceMemberRepo.findOne({
       workspaceId,
       userId,
@@ -145,11 +164,10 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
 
     return {
       userId: workspaceMember.userId,
-      workspaceId: workspaceMember.workspaceId,
       role: workspaceMember.role,
       email: workspaceMember.email,
       name: workspaceMember.name,
-      createdAt: workspaceMember.createdAt,
+      permissions: workspace.permissions[workspaceMember.role],
     };
   }
 
@@ -241,19 +259,16 @@ export class WorkspaceMemberService implements IWorkspaceMemberService {
     userId: string,
     memberId: string
   ): Promise<void> {
-    const member = await this._workspaceMemberRepo.findOne({
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
       userId,
       workspaceId,
-      isActive: true,
-    });
-    if (!member) {
-      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.NOT_FOUND);
-    }
-
-    if (member.role !== "owner") {
+      WorkspacePermission.WORKSPACE_MEMBER_DELETE
+    );
+    if (!hasPermission) {
       throw new AppError(
         ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
-        HTTP_STATUS.FORBIDDEN
+        HTTP_STATUS.BAD_REQUEST
       );
     }
 

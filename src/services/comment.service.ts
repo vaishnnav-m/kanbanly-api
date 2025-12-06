@@ -111,8 +111,6 @@ export class CommentService implements ICommentService {
 
     await this._commentRepo.create(comment);
 
-    console.log(task, author);
-
     const activitylogPayload: CreateActivityDto = {
       workspaceId: task.workspaceId,
       projectId: task.projectId,
