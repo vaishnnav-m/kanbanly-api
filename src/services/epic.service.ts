@@ -14,12 +14,13 @@ import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import { IWorkspaceMemberService } from "../types/service-interface/IWorkspaceMemberService";
-import { workspaceRoles } from "../types/dtos/workspaces/workspace-member.dto";
 import { IEpic } from "../types/entities/IEpic";
 import { IWorkItemRepository } from "../types/repository-interfaces/IWorkItemRepository";
 import logger from "../logger/winston.logger";
 import { TaskStatus } from "../types/dtos/task/task.dto";
 import { IWorkspaceMember } from "../types/entities/IWorkspaceMember";
+import { IPermissionService } from "../types/service-interface/IPermissionService";
+import { WorkspacePermission } from "../types/enums/workspace-permissions.enum";
 
 @injectable()
 export class EpicService implements IEpicService {
@@ -27,19 +28,21 @@ export class EpicService implements IEpicService {
     @inject("IEpicRepository") private _epicRepo: IEpicRepository,
     @inject("IWorkspaceMemberService")
     private _workspaceMemberService: IWorkspaceMemberService,
-    @inject("IWorkItemRepository") private _taskRepo: IWorkItemRepository
+    @inject("IWorkItemRepository") private _taskRepo: IWorkItemRepository,
+    @inject("IPermissionService") private _permissionService: IPermissionService
   ) {}
 
   async createEpic(epicData: EpicCreationDto): Promise<void> {
-    // checking the user role
-    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
+      epicData.createdBy,
       epicData.workspaceId,
-      epicData.createdBy
+      WorkspacePermission.EPIC_CREATE
     );
-    if (!workspaceMember || workspaceMember.role === workspaceRoles.member) {
+    if (!hasPermission) {
       throw new AppError(
         ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
-        HTTP_STATUS.BAD_REQUEST
+        HTTP_STATUS.FORBIDDEN
       );
     }
 
@@ -184,11 +187,13 @@ export class EpicService implements IEpicService {
   }
 
   async editEpic(userId: string, epicData: EpicUpdationDto): Promise<void> {
-    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
+      userId,
       epicData.workspaceId,
-      userId
+      WorkspacePermission.EPIC_EDIT
     );
-    if (!workspaceMember || workspaceMember.role === workspaceRoles.member) {
+    if (!hasPermission) {
       throw new AppError(
         ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
         HTTP_STATUS.FORBIDDEN
@@ -228,14 +233,16 @@ export class EpicService implements IEpicService {
     epicId: string,
     workspaceId: string
   ): Promise<void> {
-    const workspaceMember = await this._workspaceMemberService.getCurrentMember(
+    // permission check
+    const hasPermission = await this._permissionService.hasPermission(
+      userId,
       workspaceId,
-      userId
+      WorkspacePermission.EPIC_DELETE
     );
-    if (!workspaceMember || workspaceMember.role === workspaceRoles.member) {
+    if (!hasPermission) {
       throw new AppError(
         ERROR_MESSAGES.INSUFFICIENT_PERMISSION,
-        HTTP_STATUS.BAD_REQUEST
+        HTTP_STATUS.FORBIDDEN
       );
     }
 

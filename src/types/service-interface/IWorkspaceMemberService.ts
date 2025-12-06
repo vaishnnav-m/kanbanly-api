@@ -1,10 +1,10 @@
 import { PaginatedResponseDto } from "../dtos/paginated.dto";
 import {
+  CurrentMemberResponseDto,
   EditWorkspaceMemberDto,
   WorkspaceMemberDto,
   WorkspaceMemberResponseDto,
 } from "../dtos/workspaces/workspace-member.dto";
-import { IWorkspaceMember } from "../entities/IWorkspaceMember";
 
 export interface IWorkspaceMemberService {
   addMember(data: WorkspaceMemberDto): Promise<void>;
@@ -19,7 +19,7 @@ export interface IWorkspaceMemberService {
   getCurrentMember(
     workspaceId: string,
     userId: string
-  ): Promise<Omit<IWorkspaceMember, "isActive">>;
+  ): Promise<CurrentMemberResponseDto>;
   searchMember(
     workspaceId: string,
     userId: string,

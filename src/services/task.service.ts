@@ -60,6 +60,13 @@ export class TaskService implements ITaskService {
       );
     }
 
+    const workspaceMember = await this._workspaceMemberRepo.findOne({
+      userId: data.createdBy,
+    });
+    if (!workspaceMember) {
+      throw new AppError(ERROR_MESSAGES.NOT_MEMBER, HTTP_STATUS.BAD_REQUEST);
+    }
+
     const project = await this._projectRepo.findOne({
       projectId: data.projectId,
     });
@@ -102,6 +109,8 @@ export class TaskService implements ITaskService {
 
     const task = await this._workItemRepo.create(newTask);
 
+    task.createdBy = workspaceMember;
+
     workspaceEvents.emit(WorkspaceEvent.TaskChange, task);
 
     const activitylogPayload: CreateActivityDto = {
@@ -112,7 +121,7 @@ export class TaskService implements ITaskService {
       entityType: ActivityTypeEnum.Task,
       action: TaskActivityActionEnum.TaskCreated,
       description: `Task created.`,
-      member: task.createdBy as string,
+      member: data.createdBy,
     };
 
     await this._activityService.createActivity(activitylogPayload);
