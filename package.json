@@ -5,12 +5,19 @@
   "main": "index.ts",
   "scripts": {
     "test": "jest",
+    "seed": "tsx src/ai/rag/seed/seed-knowledge.ts",
     "dev": "tsx watch src/index.ts",
     "lint": "eslint ."
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@langchain/community": "^1.1.0",
+    "@langchain/core": "^1.1.5",
+    "@langchain/google-genai": "^2.1.0",
+    "@langchain/pinecone": "^1.0.1",
+    "@pinecone-database/pinecone": "^5.1.2",
     "axios": "^1.9.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.8.0",
@@ -23,6 +30,7 @@
     "google-auth-library": "^10.1.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
+    "langchain": "^1.2.0",
     "mongoose": "^8.15.0",
     "morgan": "^1.10.1",
     "nodemailer": "^7.0.3",
@@ -34,7 +42,7 @@
     "uuid": "^11.1.0",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0",
-    "zod": "^4.0.5"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@eslint/js": "^9.38.0",

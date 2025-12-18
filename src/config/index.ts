@@ -58,4 +58,13 @@ export const config = {
     WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET!,
     STRIPE_FRONTEND_URL: process.env.CORS_ALLOWED_ORIGIN,
   },
+
+  ai: {
+    GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
+  },
+
+  vectorDB: {
+    PINECONE_API_KEY: process.env.PINECONE_API_KEY,
+    INDEX_NAME: process.env.PINECONE_INDEX_NAME,
+  },
 };
