@@ -55,6 +55,8 @@ import { IDashboardService } from "../types/service-interface/IDashboardService"
 import { DashboardService } from "../services/dashboard.service";
 import { IAnalyticsService } from "../types/service-interface/IAnalyticsService";
 import { AnalyticsService } from "../services/analytics.service";
+import { IAiService } from "../types/service-interface/IAiService";
+import { AiService } from "../services/ai.service";
 
 export class ServiceRegistry {
   static registerServices(): void {
@@ -141,6 +143,9 @@ export class ServiceRegistry {
     });
     container.register<IAnalyticsService>("IAnalyticsService", {
       useClass: AnalyticsService,
+    });
+    container.register<IAiService>("IAiService", {
+      useClass: AiService,
     });
   }
 }

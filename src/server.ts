@@ -24,6 +24,7 @@ import { CloudinaryRoutes } from "./routes/cloudinary/cloudinary.routes";
 import { SocketHandler } from "./socket/socket.handler";
 import { ITokenService } from "./types/service-interface/ITokenService";
 import { registerEvents } from "./events";
+import { AiRoutes } from "./routes/ai/ai.routes";
 
 export default class Server {
   private _app: Application;
@@ -96,6 +97,7 @@ export default class Server {
       "/api/v1/subscriptions",
       container.resolve(SubscriptionRoutes).router
     );
+    this._app.use("/api/v1/ai", container.resolve(AiRoutes).router);
   }
 
   // Socket.io setup

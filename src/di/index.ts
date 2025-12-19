@@ -1,3 +1,4 @@
+import { AiRegistry } from "./ai.register";
 import { CommonRegistry } from "./common.registry";
 import { ControllerRegistry } from "./controller.registry";
 import { RepositoryRegistry } from "./repository.registry";
@@ -9,5 +10,6 @@ export class DependencyInjection {
     ServiceRegistry.registerServices();
     ControllerRegistry.registerController();
     CommonRegistry.registerCommon();
+    AiRegistry.registerAi();
   }
 }

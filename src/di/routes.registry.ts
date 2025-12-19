@@ -10,6 +10,7 @@ import { SprintRoutes } from "../routes/workspaces/projects/sprints/sprint.route
 import { EpicRoutes } from "../routes/workspaces/projects/epics/epic.routes";
 import { CloudinaryRoutes } from "../routes/cloudinary/cloudinary.routes";
 import { ChatRoutes } from "../routes/workspaces/chats/chat.routes";
+import { AiRoutes } from "../routes/ai/ai.routes";
 
 export class RoutesRegistry {
   static registerRoutes(): void {
@@ -45,6 +46,9 @@ export class RoutesRegistry {
     });
     container.register(ChatRoutes, {
       useClass: ChatRoutes,
+    });
+    container.register(AiRoutes, {
+      useClass: AiRoutes,
     });
   }
 }

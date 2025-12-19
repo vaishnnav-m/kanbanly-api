@@ -41,6 +41,8 @@ import { IActivityController } from "../types/controller-interfaces/IActivityCon
 import { ActivityController } from "../controllers/activity.controller";
 import { IDashboardController } from "../types/controller-interfaces/IDashBoardController";
 import { DashboardController } from "../controllers/dashboard.controller";
+import { IAiController } from "../types/controller-interfaces/IAiController";
+import { AiController } from "../controllers/ai.controller";
 
 export class ControllerRegistry {
   static registerController(): void {
@@ -109,6 +111,9 @@ export class ControllerRegistry {
     });
     container.register<IDashboardController>("IDashboardController", {
       useClass: DashboardController,
+    });
+    container.register<IAiController>("IAiController", {
+      useClass: AiController,
     });
   }
 }
