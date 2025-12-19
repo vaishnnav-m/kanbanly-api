@@ -61,10 +61,13 @@ export const config = {
 
   ai: {
     GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
+    model: "gemini-2.5-flash",
+    temperature:0,
   },
 
   vectorDB: {
     PINECONE_API_KEY: process.env.PINECONE_API_KEY,
     INDEX_NAME: process.env.PINECONE_INDEX_NAME,
+    NAMESPACE: process.env.PINECONE_NAMESPACE,
   },
 };

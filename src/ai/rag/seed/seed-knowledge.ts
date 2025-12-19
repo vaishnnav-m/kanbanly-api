@@ -42,7 +42,7 @@ async function seedKnowledge() {
 
   const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
     pineconeIndex: index,
-    namespace: "app-knowledge",
+    namespace: config.vectorDB.NAMESPACE,
   });
 
   const docs = APP_KNOWLEDGE_DOCS.filter(
