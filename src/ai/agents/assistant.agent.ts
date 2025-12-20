@@ -1,12 +1,11 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { config } from "../../config";
-import { IKnowledgeBaseService } from "../../types/ai/IKnowledgeBaseService";
 import { inject, injectable } from "tsyringe";
 import logger from "../../logger/winston.logger";
-import { createTools } from "../tools";
 import { AIMessage, createAgent, HumanMessage } from "langchain";
 import { SYSTEM_PROMPT } from "../rag/prompts/system.prompt";
 import { AiMessage } from "../../types/dtos/ai/ai.dto";
+import { ToolFactory } from "../tools";
 
 interface AgentInput {
   question: string;
@@ -21,8 +20,8 @@ export class AssistantAgent {
   private _model: ChatGoogleGenerativeAI;
 
   constructor(
-    @inject("IKnowledgeBaseService")
-    private _knowledgeBase: IKnowledgeBaseService
+    @inject(ToolFactory)
+    private _toolFactory: ToolFactory
   ) {
     this._model = new ChatGoogleGenerativeAI({
       model: config.ai.model,
@@ -33,11 +32,7 @@ export class AssistantAgent {
 
   async run(input: AgentInput): Promise<string> {
     try {
-      const tools = createTools(
-        input.workspaceId,
-        input.userId,
-        this._knowledgeBase
-      );
+      const tools = this._toolFactory.build(input.workspaceId, input.userId);
 
       const formattedSystemPrompt = SYSTEM_PROMPT.replace(
         "{workspace_id}",
@@ -54,15 +49,15 @@ export class AssistantAgent {
 
       const messages = [];
       if (input.lastMessages) {
-        const lasMessages = [];
+        const lastMessages = [];
         if (input.lastMessages.length > 5) {
-          lasMessages.push(...input.lastMessages.slice(-4));
+          lastMessages.push(...input.lastMessages.slice(-4));
         } else {
-          lasMessages.push(...input.lastMessages);
+          lastMessages.push(...input.lastMessages);
         }
 
         messages.push(
-          ...lasMessages.map((m) =>
+          ...lastMessages.map((m) =>
             m.role === "user"
               ? new HumanMessage(m.content)
               : new AIMessage(m.content)
