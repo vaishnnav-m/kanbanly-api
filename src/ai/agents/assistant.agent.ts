@@ -4,16 +4,16 @@ import { IKnowledgeBaseService } from "../../types/ai/IKnowledgeBaseService";
 import { inject, injectable } from "tsyringe";
 import logger from "../../logger/winston.logger";
 import { createTools } from "../tools";
-import { createAgent, HumanMessage } from "langchain";
+import { AIMessage, createAgent, HumanMessage } from "langchain";
 import { SYSTEM_PROMPT } from "../rag/prompts/system.prompt";
+import { AiMessage } from "../../types/dtos/ai/ai.dto";
 
 interface AgentInput {
   question: string;
   userId: string;
   workspaceId: string;
   currentProjectId?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  lastMentioned?: Record<string, any>;
+  lastMessages?: AiMessage[];
 }
 
 @injectable()
@@ -44,7 +44,7 @@ export class AssistantAgent {
         input.workspaceId
       )
         .replace("{current_project_id}", input.currentProjectId || "None")
-        .replace("{last_mentioned}", JSON.stringify(input.lastMentioned || {}));
+        .replace("{last_mentioned}", JSON.stringify({}));
 
       const agent = createAgent({
         model: this._model,
@@ -52,14 +52,34 @@ export class AssistantAgent {
         systemPrompt: formattedSystemPrompt,
       });
 
+      const messages = [];
+      if (input.lastMessages) {
+        const lasMessages = [];
+        if (input.lastMessages.length > 5) {
+          lasMessages.push(...input.lastMessages.slice(-4));
+        } else {
+          lasMessages.push(...input.lastMessages);
+        }
+
+        messages.push(
+          ...lasMessages.map((m) =>
+            m.role === "user"
+              ? new HumanMessage(m.content)
+              : new AIMessage(m.content)
+          )
+        );
+      }
+
+      messages.push(new HumanMessage(input.question));
+
       const result = await agent.invoke({
-        messages: [new HumanMessage(input.question)],
+        messages,
       });
 
       const lastMessage = result.messages[result.messages.length - 1];
       return lastMessage.content as string;
     } catch (error) {
-      logger.error("[AssistantAgent] Error:", error);
+      logger.error("[AssistaHumanMessagentAgent] Error:", error);
       return "";
     }
   }
