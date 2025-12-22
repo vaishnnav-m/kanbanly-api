@@ -4,7 +4,9 @@ import { IWorkspacePermissions } from "../types/dtos/workspaces/workspace.dto";
 
 const permissionSchema = new Schema<IWorkspacePermissions>(
   {
-    workspaceManage: { type: Boolean, default: false },
+    workspaceEdit: { type: Boolean, default: false },
+    workspaceMemberAdd: { type: Boolean, default: false },
+    workspaceMemberDelete: { type: Boolean, default: false },
 
     projectMemberAdd: { type: Boolean, default: false },
     projectMemberDelete: { type: Boolean, default: false },
@@ -17,6 +19,14 @@ const permissionSchema = new Schema<IWorkspacePermissions>(
     taskEdit: { type: Boolean, default: false },
     taskDelete: { type: Boolean, default: false },
     taskAssign: { type: Boolean, default: false },
+
+    epicCreate: { type: Boolean, default: false },
+    epicEdit: { type: Boolean, default: false },
+    epicDelete: { type: Boolean, default: false },
+
+    sprintCreate: { type: Boolean, default: false },
+    sprintEdit: { type: Boolean, default: false },
+    sprintDelete: { type: Boolean, default: false },
   },
   { _id: false }
 );

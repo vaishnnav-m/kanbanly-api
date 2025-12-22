@@ -1,6 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import { IAiService } from "../types/service-interface/IAiService";
 import { AssistantAgent } from "../ai/agents/assistant.agent";
+import { AiMessage } from "../types/dtos/ai/ai.dto";
 
 @injectable()
 export class AiService implements IAiService {
@@ -13,8 +14,7 @@ export class AiService implements IAiService {
     workspaceId: string,
     question: string,
     context: {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      lastMentioned?: any;
+      lastMessages?: AiMessage[];
       currentProjectId?: string;
     }
   ): Promise<string> {
@@ -23,7 +23,7 @@ export class AiService implements IAiService {
       userId,
       workspaceId,
       currentProjectId: context.currentProjectId,
-      lastMentioned: context.lastMentioned,
+      lastMessages: context.lastMessages,
     });
 
     return response;

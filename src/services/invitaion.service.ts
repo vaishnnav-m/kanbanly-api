@@ -170,8 +170,8 @@ export class InvitationService implements IInvitationService {
 
     await this._workspaceMemberService.addMember({
       workspaceId: invitation.workspaceId,
-      userId: user.userId,
       role: invitation.role,
+      invitedUserId: user.userId,
     });
 
     await this._invitationRepo.update(

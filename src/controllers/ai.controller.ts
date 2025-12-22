@@ -5,13 +5,15 @@ import { Request, Response } from "express";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
+import { AiChatCreationDto } from "../types/dtos/ai/ai.dto";
 
 @injectable()
 export class AiController implements IAiController {
   constructor(@inject("IAiService") private _aiService: IAiService) {}
 
   async chat(req: Request, res: Response) {
-    const { question, projectId } = req.body;
+    const { question, prevMessages } = req.body as AiChatCreationDto;
+    const projectId = req.body?.projectId;
     const { workspaceId } = req.params;
     const userId = req.user?.userid;
 
@@ -28,6 +30,7 @@ export class AiController implements IAiController {
       question,
       {
         currentProjectId: projectId,
+        lastMessages: prevMessages,
       }
     );
 
