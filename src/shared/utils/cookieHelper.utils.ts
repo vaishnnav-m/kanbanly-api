@@ -13,6 +13,7 @@ export const setAuthCookies = (
     secure: isProduction,
     sameSite: isProduction ? "none" : "lax",
     maxAge,
+    domain: ".vaishnnav.online"
   });
 };
 
@@ -22,5 +23,6 @@ export const clearAuthCookies = (res: Response, key: string) => {
     secure: isProduction,
     sameSite: isProduction ? "none" : "lax",
     maxAge: 0,
+    domain: ".vaishnnav.online"
   });
 };
