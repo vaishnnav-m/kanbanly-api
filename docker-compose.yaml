@@ -14,6 +14,7 @@ services:
     profiles: ["dev"]
 
   express-prod:
+    container_name: kanbanly-api
     build:
       context: .
       target: production
