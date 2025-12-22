@@ -40,7 +40,7 @@ export class SprintService implements ISprintService {
     if (incompleteworkItemsIds.length) {
       await this._workItemRepo.updateMany(
         { taskId: { $in: incompleteworkItemsIds } },
-        { $set: { sprintId: null } }
+        { sprintId: "" }
       );
     }
   }
