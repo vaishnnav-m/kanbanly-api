@@ -1,3 +1,5 @@
+import Stripe from "stripe";
+
 export interface IWebhookService {
-  handleStripeWebhookEvent(event: any): Promise<void>;
+  handleStripeWebhookEvent(event: Stripe.Event): Promise<void>;
 }
