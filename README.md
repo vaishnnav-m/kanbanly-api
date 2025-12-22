@@ -8,45 +8,45 @@ Built with **Service-Repository Architecture**, adhering to **SOLID principles**
 
 ## 🚀 Key Features
 
-*   **Project Management Methodologies**:
-    *   **Scrum**: Sprint planning, backlogs, story points, and sprint lifecycles.
-    *   **Kanban**: Visual boards, WIP limits, and continuous flow.
-*   **Hierarchical Work Items**: Workspaces → Projects → Epics → Stories → Tasks → Subtasks.
-*   **Real-time Collaboration**: Instant updates for board movements, comments, and status changes via **Socket.IO**.
-*   **Team Communication**:
-    *   Built-in real-time chat (Direct & Project-based).
-    *   Rich-text comments with `@mentions` and notifications.
-*   **Advanced Authentication**:
-    *   JWT-based auth (Access & Refresh tokens).
-    *   Google OAuth integration.
-    *   Role-Based Access Control (RBAC) with customizable permissions (Owner, Project Manager, Member).
-*   **AI Assistant (Gemini + LangChain)**:
-    *   Context-aware chat assistant.
-    *   Automated project generation & breakdown.
-    *   RAG architecture using **Pinecone** vector database for documentation retrieval.
-*   **Subscription & Billing**:
-    *   SaaS model integration with **Stripe**.
-    *   Tiered plans (Free, Pro, Enterprise) with feature/usage limits.
-*   **Analytics & Reporting**: Comprehensive dashboards for team velocity, task distribution, and productivity.
+- **Project Management Methodologies**:
+  - **Scrum**: Sprint planning, backlogs, story points, and sprint lifecycles.
+  - **Kanban**: Visual boards, WIP limits, and continuous flow.
+- **Hierarchical Work Items**: Workspaces → Projects → Epics → Stories → Tasks → Subtasks.
+- **Real-time Collaboration**: Instant updates for board movements, comments, and status changes via **Socket.IO**.
+- **Team Communication**:
+  - Built-in real-time chat (Direct & Project-based).
+  - Rich-text comments with `@mentions` and notifications.
+- **Advanced Authentication**:
+  - JWT-based auth (Access & Refresh tokens).
+  - Google OAuth integration.
+  - Role-Based Access Control (RBAC) with customizable permissions (Owner, Project Manager, Member).
+- **AI Assistant (Gemini + LangChain)**:
+  - Context-aware chat assistant.
+  - Automated project generation & breakdown.
+  - RAG architecture using **Pinecone** vector database for documentation retrieval.
+- **Subscription & Billing**:
+  - SaaS model integration with **Stripe**.
+  - Tiered plans (Free, Pro, Enterprise) with feature/usage limits.
+- **Analytics & Reporting**: Comprehensive dashboards for team velocity, task distribution, and productivity.
 
 ## 🛠️ Tech Stack
 
-*   **Runtime Environment**: Node.js
-*   **Framework**: Express.js
-*   **Language**: TypeScript
-*   **Containerization**: Docker
-*   **Database**: MongoDB (Mongoose ODM)
-*   **Caching**: Redis
-*   **Real-time Engine**: Socket.IO
-*   **AI & ML**:
-    *   Google Gemini (LLM)
-    *   LangChain (Orchestration)
-    *   Pinecone (Vector Database)
-*   **Storage**: Cloudinary (Asset management)
-*   **Payment Processing**: Stripe
-*   **Logging**: Winston (Daily rotate files)
-*   **Validation**: Zod
-*   **DI Container**: TSyringe
+- **Runtime Environment**: Node.js
+- **Framework**: Express.js
+- **Language**: TypeScript
+- **Containerization**: Docker
+- **Database**: MongoDB (Mongoose ODM)
+- **Caching**: Redis
+- **Real-time Engine**: Socket.IO
+- **AI & ML**:
+  - Google Gemini (LLM)
+  - LangChain (Orchestration)
+  - Pinecone (Vector Database)
+- **Storage**: Cloudinary (Asset management)
+- **Payment Processing**: Stripe
+- **Logging**: Winston (Daily rotate files)
+- **Validation**: Zod
+- **DI Container**: TSyringe
 
 ## 📂 Architecture
 
@@ -71,23 +71,25 @@ src/
 
 ### Prerequisites
 
-*   Node.js (v18 or higher)
-*   MongoDB (Local or Atlas)
-*   Redis (Local or Cloud)
-*   Stripe Account
-*   Cloudinary Account
-*   Google Cloud Console Project (for OAuth & Gemini API)
-*   Pinecone Account
+- Node.js (v18 or higher)
+- MongoDB (Local or Atlas)
+- Redis (Local or Cloud)
+- Stripe Account
+- Cloudinary Account
+- Google Cloud Console Project (for OAuth & Gemini API)
+- Pinecone Account
 
 ### Installation
 
 1.  **Clone the repository:**
+
     ```bash
     git clone https://github.com/your-username/kanbanly-api.git
     cd kanbanly-api
     ```
 
 2.  **Install dependencies:**
+
     ```bash
     npm install
     ```
@@ -145,34 +147,37 @@ src/
 
 4.  **Seed the AI Knowledge Base (Optional):**
     If you want the AI assistant to be aware of the documentation:
+
     ```bash
-    npx ts-node src/ai/rag/seed/seed-knowledge.ts
+    npm run seed
     ```
 
 5.  **Run the server:**
 
-    *   **Development**:
-        ```bash
-        npm run dev
-        ```
-    *   **Production**:
-        ```bash
-        npm run build
-        npm start
-        ```
+    - **Development**:
+      ```bash
+      npm run dev
+      ```
+    - **Production**:
+      ```bash
+      npm run build
+      npm start
+      ```
 
 ## 🐳 Docker Support
 
 You can run the application using Docker to isolate the environment.
 
 ### Prerequisites
-*   Docker installed on your machine.
+
+- Docker installed on your machine.
 
 ### Running the Application
 
 1.  **Ensure your `.env` file is configured** as described in the Installation section.
 
 2.  **Development Mode** (with hot-reloading):
+
     ```bash
     docker compose --profile dev up --build
     ```
@@ -187,9 +192,13 @@ The API will be accessible at `http://localhost:5000`.
 ## 🧠 AI Capabilities
 
 The `src/ai` module contains a sophisticated agent system:
-*   **Assistant Agent**: A conversational agent that understands user intent.
-*   **Tools**:
-    *   `create_project`: Auto-generates projects based on natural language descriptions.
-    *   `search_documentation`: Retrieves system usage guides from the vector store.
-*   **RAG**: Uses Pinecone to store and retrieve embedded documentation for context-aware answers.
 
+- **Assistant Agent**: A conversational agent that understands user intent.
+- **Tools**:
+  - `create_project`: Auto-generates projects based on natural language descriptions.
+  - `create_epic`: Creates epics within a project based on high-level requirements.
+  - `create_sprint`: Creates sprints with optional goals and timelines.
+  - `create_task`: Creates tasks and work items, automatically linking them to projects, epics, or sprints when context is available.
+  - `assign_member`: Assigns workspace members to projects, epics, sprints, or tasks.
+  - `search_documentation`: Retrieves system usage guides from the vector store.
+- **RAG**: Uses Pinecone to store and retrieve embedded documentation for context-aware answers.
