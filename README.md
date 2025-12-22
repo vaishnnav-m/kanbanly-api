@@ -34,6 +34,7 @@ Built with **Service-Repository Architecture**, adhering to **SOLID principles**
 *   **Runtime Environment**: Node.js
 *   **Framework**: Express.js
 *   **Language**: TypeScript
+*   **Containerization**: Docker
 *   **Database**: MongoDB (Mongoose ODM)
 *   **Caching**: Redis
 *   **Real-time Engine**: Socket.IO
@@ -159,6 +160,29 @@ src/
         npm run build
         npm start
         ```
+
+## 🐳 Docker Support
+
+You can run the application using Docker to isolate the environment.
+
+### Prerequisites
+*   Docker installed on your machine.
+
+### Running the Application
+
+1.  **Ensure your `.env` file is configured** as described in the Installation section.
+
+2.  **Development Mode** (with hot-reloading):
+    ```bash
+    docker compose --profile dev up --build
+    ```
+
+3.  **Production Mode**:
+    ```bash
+    docker compose --profile prod up --build
+    ```
+
+The API will be accessible at `http://localhost:5000`.
 
 ## 🧠 AI Capabilities
 
