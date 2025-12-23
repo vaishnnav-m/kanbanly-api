@@ -32,11 +32,11 @@ export interface CreateTaskDto {
   status?: TaskStatus;
   epicId?: string;
   sprintId?: string;
-  assignedTo: string;
+  assignedTo?: string;
   parentId?: string;
   storyPoint?: number;
   createdBy: string;
-  dueDate: Date;
+  dueDate?: Date;
 }
 
 export interface CreateChildDto {

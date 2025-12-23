@@ -32,7 +32,11 @@ export class AssistantAgent {
 
   async run(input: AgentInput): Promise<string> {
     try {
-      const tools = this._toolFactory.build(input.workspaceId, input.userId);
+      const tools = this._toolFactory.build({
+        workspaceId: input.workspaceId,
+        userId: input.userId,
+        projectId: input.currentProjectId,
+      });
 
       const formattedSystemPrompt = SYSTEM_PROMPT.replace(
         "{workspace_id}",
