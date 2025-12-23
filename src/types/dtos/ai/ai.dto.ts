@@ -8,3 +8,9 @@ export interface AiMessage {
   content: string;
   timestamp: Date;
 }
+
+export interface ToolPayloadDto {
+  userId: string;
+  workspaceId: string;
+  projectId?: string;
+}

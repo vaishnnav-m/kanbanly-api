@@ -4,6 +4,7 @@ import { inject, injectable } from "tsyringe";
 import logger from "../../logger/winston.logger";
 import { ProjectTemplateEnum } from "../../types/enums/project-template.enum";
 import { IProjectService } from "../../types/service-interface/IProjectService";
+import { ToolPayloadDto } from "../../types/dtos/ai/ai.dto";
 
 @injectable()
 export class CreateProjectTool {
@@ -11,7 +12,7 @@ export class CreateProjectTool {
     @inject("IProjectService") private _projectService: IProjectService
   ) {}
 
-  build({ userId, workspaceId }: { userId: string; workspaceId: string }) {
+  build({ userId, workspaceId }: ToolPayloadDto) {
     const schema = z.object({
       name: z.string().min(3).describe("Name of the project"),
       description: z
