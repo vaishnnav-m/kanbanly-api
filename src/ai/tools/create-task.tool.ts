@@ -17,17 +17,11 @@ export class CreateTaskTool {
   build({ userId, workspaceId, projectId }: ToolPayloadDto) {
     const schema = z.object({
       task: z.string().min(3).describe("Short title of the task"),
-
       description: z.string().optional().describe("Detailed description"),
-
       priority: z.enum(TaskPriority).describe("Task priority"),
-
       status: z.enum(TaskStatus).optional().describe("Initial status"),
-
       workItemType: z.enum(WorkItemType).describe("Type of work item"),
-
-      dueDate: z.date().optional().describe("Due date"),
-
+      dueDate: z.iso.datetime().optional().describe("Due date"),
       storyPoint: z
         .number()
         .int()
@@ -58,7 +52,7 @@ export class CreateTaskTool {
             task,
             workItemType,
             description,
-            dueDate,
+            dueDate: dueDate ? new Date(dueDate) : undefined,
             priority,
             status,
             createdBy: userId,
