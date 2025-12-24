@@ -91,12 +91,17 @@ export class WebhookService implements IWebhookService {
       interval
     );
 
+    const status =
+      session.payment_status === "paid"
+        ? SubscriptionStatus.active
+        : SubscriptionStatus.pending;
+
     const subscriptionData = {
       planId,
       stripeCustomerId: session.customer as string,
       stripeSubscriptionId: subscriptionId,
       stripePriceId: stripeSubscription.items.data[0].price.id,
-      status: SubscriptionStatus.pending,
+      status,
       currentPeriodStart: new Date(
         stripeSubscription.billing_cycle_anchor * 1000
       ),

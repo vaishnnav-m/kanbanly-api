@@ -22,12 +22,7 @@ export class CreateTaskTool {
       status: z.enum(TaskStatus).optional().describe("Initial status"),
       workItemType: z.enum(WorkItemType).describe("Type of work item"),
       dueDate: z.iso.datetime().optional().describe("Due date"),
-      storyPoint: z
-        .number()
-        .int()
-        .positive()
-        .optional()
-        .describe("Story points"),
+      storyPoint: z.number().int().min(1).optional().describe("Story points"),
     });
 
     return tool(
