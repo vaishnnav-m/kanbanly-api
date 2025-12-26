@@ -108,10 +108,22 @@ export class TaskService implements ITaskService {
     };
 
     const task = await this._workItemRepo.create(newTask);
-
-    newTask.createdBy = workspaceMember;
-
-    workspaceEvents.emit(WorkspaceEvent.TaskChange, newTask);
+    
+    const listTask = {
+      taskId: task.taskId,
+      workspaceId: task.workspaceId,
+      createdBy: {
+        name: workspaceMember.name,
+        email: workspaceMember.email,
+        profile: workspaceMember.profile,
+      },
+      task: task.task,
+      description: task.description,
+      priority: task.priority,
+      status: task.status,
+      dueDate: task.dueDate,
+    };
+    workspaceEvents.emit(WorkspaceEvent.TaskChange, listTask);
 
     const activitylogPayload: CreateActivityDto = {
       workspaceId: task.workspaceId,
