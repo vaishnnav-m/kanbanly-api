@@ -109,9 +109,9 @@ export class TaskService implements ITaskService {
 
     const task = await this._workItemRepo.create(newTask);
 
-    task.createdBy = workspaceMember;
+    newTask.createdBy = workspaceMember;
 
-    workspaceEvents.emit(WorkspaceEvent.TaskChange, task);
+    workspaceEvents.emit(WorkspaceEvent.TaskChange, newTask);
 
     const activitylogPayload: CreateActivityDto = {
       workspaceId: task.workspaceId,

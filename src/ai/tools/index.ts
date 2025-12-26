@@ -11,6 +11,7 @@ export class ToolFactory {
     private _searchDocTool: SearchDocumentationTool,
     @inject(CreateProjectTool)
     private _createProjectTool: CreateProjectTool,
+    @inject(CreateTaskTool)
     private _createTaskTool: CreateTaskTool
   ) {}
 
