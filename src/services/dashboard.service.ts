@@ -98,7 +98,7 @@ export class DashboardService implements IDashboardService {
       completionRate,
 
       recentActivities: activities,
-      lastActivity: lastActivity[0].createdAt,
+      lastActivity: lastActivity[0]?.createdAt || new Date(),
     };
   }
 

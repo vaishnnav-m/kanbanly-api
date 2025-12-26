@@ -31,6 +31,7 @@ export class AssistantAgent {
   }
 
   async run(input: AgentInput): Promise<string> {
+    console.log("input is ",input)
     try {
       const tools = this._toolFactory.build({
         workspaceId: input.workspaceId,

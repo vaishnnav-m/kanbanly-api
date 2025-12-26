@@ -18,6 +18,7 @@ export class AiService implements IAiService {
       currentProjectId?: string;
     }
   ): Promise<string> {
+    console.log("context ",context)
     const response = await this._assistantAgent.run({
       question,
       userId,

@@ -22,6 +22,7 @@ export function registerWorkspaceEventListner() {
       sprintId: task.sprintId,
       epic: task.epic,
     } as TaskListingDto);
+    
     logger.info(
       `[Event Listener] Task change event is sent to ${task.projectId}`
     );
