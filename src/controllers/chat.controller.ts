@@ -70,6 +70,8 @@ export class ChatController implements IChatController {
       chatId
     );
 
+    console.log(chat);
+
     res.status(HTTP_STATUS.CREATED).json({
       success: true,
       message: SUCCESS_MESSAGES.DATA_FETCHED,
