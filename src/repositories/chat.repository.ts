@@ -69,15 +69,20 @@ export class ChatRepository
             ],
           },
           icon: {
-            $cond: [{ $eq: ["$type", "direct"] }, "$otherUser.profile", "$icon"],
+            $cond: [
+              { $eq: ["$type", "direct"] },
+              "$otherUser.profile",
+              "$icon",
+            ],
           },
         },
       },
       {
         $project: {
           chatId: 1,
-          type: 1,
           name: 1,
+          type: 1,
+          projectId: 1,
           description: 1,
           icon: 1,
           lastMessage: 1,

@@ -112,6 +112,7 @@ export class ChatService implements IChatService {
       chatId: chat.chatId,
       name: chat.name as string,
       type: chat.type,
+      projectId: chat.projectId,
       description: chat.description,
       icon: chat.icon,
       createdAt: chat.createdAt,
