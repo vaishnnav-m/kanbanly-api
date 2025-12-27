@@ -1,6 +1,6 @@
 import { container } from "tsyringe";
 import { SocketHandler } from "../../socket/socket.handler";
-import { WorkspaceEvent, workspaceEvents } from "../workspace.events";
+import { AppEvent, appEvents } from "../app.events";
 import { IWorkItem } from "../../types/entities/IWorkItem";
 import logger from "../../logger/winston.logger";
 import { TaskListingDto } from "../../types/dtos/task/task.dto";
@@ -8,7 +8,7 @@ import { TaskListingDto } from "../../types/dtos/task/task.dto";
 export function registerWorkspaceEventListner() {
   const socketHandler = container.resolve(SocketHandler);
 
-  workspaceEvents.on(WorkspaceEvent.TaskChange, (task: IWorkItem) => {
+  appEvents.on(AppEvent.TaskChange, (task: IWorkItem) => {
     socketHandler.emitToRoom(task.projectId, "taskchange", {
       taskId: task.taskId,
       workspaceId: task.workspaceId,

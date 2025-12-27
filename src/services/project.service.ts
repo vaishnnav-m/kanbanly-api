@@ -24,6 +24,7 @@ import { ISubscriptionService } from "../types/service-interface/ISubscriptionSe
 import { IChatService } from "../types/service-interface/IChatService";
 import { IPermissionService } from "../types/service-interface/IPermissionService";
 import { WorkspacePermission } from "../types/enums/workspace-permissions.enum";
+import { INotificationService } from "../types/service-interface/INotificationService";
 
 @injectable()
 export class ProjectService implements IProjectService {
@@ -37,7 +38,9 @@ export class ProjectService implements IProjectService {
     private _subscriptionService: ISubscriptionService,
     @inject("IChatService") private _chatService: IChatService,
     @inject("IPermissionService")
-    private _permissionService: IPermissionService
+    private _permissionService: IPermissionService,
+    @inject("INotificationService")
+    private _notificationService: INotificationService
   ) {
     this._normalizeName = normalizeString;
   }
@@ -322,6 +325,14 @@ export class ProjectService implements IProjectService {
       );
     }
 
+    const project = await this._projectRepo.findOne({ workspaceId, projectId });
+    if (!project) {
+      throw new AppError(
+        ERROR_MESSAGES.PROJECT_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
     const isMemberExists = await this._workspaceMemberRepo.findOne({
       email,
       workspaceId,
@@ -348,6 +359,11 @@ export class ProjectService implements IProjectService {
     );
 
     await this._chatService.addMember(projectId, userId, isMemberExists.userId);
+    await this._notificationService.createNotification({
+      title: "Added to a project",
+      message: `You have been added to the project ${project.name}`,
+      userId: isMemberExists.userId,
+    });
   }
 
   async getMembers(

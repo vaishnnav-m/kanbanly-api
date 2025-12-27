@@ -155,6 +155,16 @@ export class InvitationService implements IInvitationService {
       throw new AppError(ERROR_MESSAGES.EXPIRED_LINK, HTTP_STATUS.BAD_REQUEST);
     }
 
+    const workspace = await this._workspaceRepo.findOne({
+      workspaceId: invitation.workspaceId,
+    });
+    if (!workspace) {
+      throw new AppError(
+        ERROR_MESSAGES.WORKSPACE_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND
+      );
+    }
+
     const acceptingUser = await this._userRepo.findOne({ userId });
     if (acceptingUser?.email !== invitation.invitedEmail) {
       throw new AppError(
@@ -178,6 +188,13 @@ export class InvitationService implements IInvitationService {
       { invitationToken: token },
       { status: invitationStatus.accepted }
     );
+
+    await this._notificationService.createNotification({
+      title: "Invitation Accepted",
+      message: `${user.firstName} has accepted the invitation to join the workspace ${workspace.name}.`,
+      userId: workspace.createdBy as string,
+      type: "default",
+    });
   }
 
   async getAllInvitations(

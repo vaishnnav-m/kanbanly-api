@@ -11,7 +11,7 @@ import { ITokenService } from "../types/service-interface/ITokenService";
 import { IEmailService } from "../types/service-interface/IEmailService";
 import { ICacheService } from "../types/service-interface/ICacheService";
 import { config } from "../config";
-import { AuthEvent, authEvents } from "../events/auth.events";
+import { AppEvent, appEvents } from "../events/app.events";
 import {
   AuthUserResponseDto,
   responseDataDto,
@@ -50,7 +50,7 @@ export class AuthService implements IAuthService {
       profile,
     });
 
-    authEvents.emit(AuthEvent.UserRegistered, { userEmail: email });
+    appEvents.emit(AppEvent.UserRegistered, { userEmail: email });
 
     return {
       userId: newUser.userId,

@@ -7,7 +7,7 @@ import { HTTP_STATUS } from "../shared/constants/http.status";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { config } from "../config";
 import { IEmailService } from "../types/service-interface/IEmailService";
-import { AuthEvent, authEvents } from "../events/auth.events";
+import { AppEvent, appEvents } from "../events/app.events";
 import { ProcessVerificationResponseDto } from "../types/dtos/users/user-response.dto";
 import { IPreferenceService } from "../types/service-interface/IPreferenceService";
 
@@ -79,7 +79,7 @@ export class VerificationService implements IVerificationService {
 
     await this._preferenceService.createPreferences(newUser.userId);
 
-    authEvents.emit(AuthEvent.EmailVerified, { userId: newUser.userId });
+    appEvents.emit(AppEvent.EmailVerified, { userId: newUser.userId });
 
     return {
       userId: newUser.userId,
