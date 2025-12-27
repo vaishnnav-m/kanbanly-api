@@ -1,5 +1,5 @@
 import { container } from "tsyringe";
-import { AuthEvent, authEvents } from "../auth.events";
+import { AppEvent, appEvents } from "../app.events";
 import { IVerificationService } from "../../types/service-interface/IVerificationService";
 import { ISubscriptionService } from "../../types/service-interface/ISubscriptionService";
 import logger from "../../logger/winston.logger";
@@ -12,8 +12,8 @@ export function registerUserEventListner() {
     "ISubscriptionService"
   );
 
-  authEvents.on(
-    AuthEvent.UserRegistered,
+  appEvents.on(
+    AppEvent.UserRegistered,
     async ({ userEmail }: { userEmail: string }) => {
       try {
         await verificationService.sendVerificationEmail(userEmail);
@@ -29,8 +29,8 @@ export function registerUserEventListner() {
     }
   );
 
-  authEvents.on(
-    AuthEvent.EmailVerified,
+  appEvents.on(
+    AppEvent.EmailVerified,
     async ({ userId }: { userId: string }) => {
       try {
         await subscriptionService.createFreeSubscription(userId);

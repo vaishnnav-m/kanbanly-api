@@ -10,9 +10,9 @@ import AppError from "../shared/utils/AppError";
 import { ERROR_MESSAGES } from "../shared/constants/messages";
 import { HTTP_STATUS } from "../shared/constants/http.status";
 import {
-  NotificationEvent,
-  notificationEvents,
-} from "../events/notification.events";
+  AppEvent,
+  appEvents,
+} from "../events/app.events";
 
 @injectable()
 export class NotificationService implements INotificationService {
@@ -36,7 +36,7 @@ export class NotificationService implements INotificationService {
     const notification = await this._notificationRepo.create(newNotification);
     console.log("new notification created success", notification);
 
-    notificationEvents.emit(NotificationEvent.Notification, notification);
+    appEvents.emit(AppEvent.Notification, notification);
   }
 
   async getNotifications(userId: string): Promise<NotificationResponseDto[]> {

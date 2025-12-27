@@ -28,9 +28,10 @@ import {
   ActivityTypeEnum,
   TaskActivityActionEnum,
 } from "../types/enums/activity.enum";
-import { WorkspaceEvent, workspaceEvents } from "../events/workspace.events";
+import { AppEvent, appEvents } from "../events/app.events";
 import { IPermissionService } from "../types/service-interface/IPermissionService";
 import { WorkspacePermission } from "../types/enums/workspace-permissions.enum";
+import { INotificationService } from "../types/service-interface/INotificationService";
 
 @injectable()
 export class TaskService implements ITaskService {
@@ -43,7 +44,9 @@ export class TaskService implements ITaskService {
     @inject("ISprintService") private _sprintService: ISprintService,
     @inject("IActivityService") private _activityService: IActivityService,
     @inject("IPermissionService")
-    private _permissionService: IPermissionService
+    private _permissionService: IPermissionService,
+    @inject("INotificationService")
+    private _notificationService: INotificationService
   ) {}
 
   async createTask(data: CreateTaskDto): Promise<void> {
@@ -108,7 +111,7 @@ export class TaskService implements ITaskService {
     };
 
     const task = await this._workItemRepo.create(newTask);
-    
+
     const listTask = {
       taskId: task.taskId,
       workspaceId: task.workspaceId,
@@ -123,7 +126,7 @@ export class TaskService implements ITaskService {
       status: task.status,
       dueDate: task.dueDate,
     };
-    workspaceEvents.emit(WorkspaceEvent.TaskChange, listTask);
+    appEvents.emit(AppEvent.TaskChange, listTask);
 
     const activitylogPayload: CreateActivityDto = {
       workspaceId: task.workspaceId,
@@ -405,7 +408,7 @@ export class TaskService implements ITaskService {
       if (createdBy) populate.createdBy = createdBy;
     }
 
-    workspaceEvents.emit(WorkspaceEvent.TaskChange, {
+    appEvents.emit(AppEvent.TaskChange, {
       ...newTask,
       createdBy: populate.createdBy,
       assignedTo: populate.assignedTo,
@@ -517,6 +520,14 @@ export class TaskService implements ITaskService {
     }
 
     if (Object.keys(changedFields).length) {
+      if (data.assignedTo) {
+        await this._notificationService.createNotification({
+          title: "A task is assigned to you",
+          message: `You have been assigned to a task`,
+          userId: assigneeId,
+        });
+      }
+
       const description = `Updated ${Object.keys(changedFields).join(", ")}`;
 
       const activitylogPayload: CreateActivityDto = {
