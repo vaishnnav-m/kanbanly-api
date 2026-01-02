@@ -9,8 +9,8 @@ export interface IActivity {
   entityId: string;
   entityType: ActivityTypeEnum;
   action: TaskActivityActionEnum;
-  oldValue?: Record<string, string | boolean>;
-  newValue?: Record<string, string | boolean>;
+  oldValue?: Record<string, unknown>;
+  newValue?: Record<string, unknown>;
   member: string | IUser;
   description: string;
   createdAt: Date;

@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 export interface TiptapNode {
   type: string;
   content?: TiptapNode[];
-  attrs?: Record<string, any>;
+  attrs?: Record<string, string>;
   marks?: Array<{
     type: string;
-    attrs?: Record<string, any>;
+    attrs?: Record<string, string>;
   }>;
   text?: string;
 }

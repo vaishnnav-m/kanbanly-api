@@ -32,9 +32,7 @@ export class NotificationService implements INotificationService {
       ...{ workspaceName: data.workspaceName },
     };
 
-    console.log("new notification creation", newNotification);
     const notification = await this._notificationRepo.create(newNotification);
-    console.log("new notification created success", notification);
 
     appEvents.emit(AppEvent.Notification, notification);
   }

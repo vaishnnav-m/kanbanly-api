@@ -56,12 +56,7 @@ export class VerificationController implements IVerificationController {
       success: true,
       message: SUCCESS_MESSAGES.EMAIL_VERIFIED,
       data: {
-        user: {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          profile: user.profile,
-        },
+        user,
         role: user.isAdmin ? "admin" : "user",
       },
     });

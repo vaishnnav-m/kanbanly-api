@@ -11,10 +11,8 @@ export interface ISubscriptionRepository
   countSubscriptions(query?: FilterQuery<ISubscription>): Promise<number>;
   groupSubscriptionsByCreatedDate(
     fromDate?: Date
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<{ date: any; count: any }[]>;
+  ): Promise<{ date: string; count: number }[]>;
   groupActiveSubscriptionsByPlan(
     fromDate?: Date
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<{ planName: any; count: any }[]>;
+  ): Promise<{ planName: string; count: number }[]>;
 }

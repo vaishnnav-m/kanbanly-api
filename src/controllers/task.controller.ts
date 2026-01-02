@@ -23,19 +23,7 @@ export class TaskController implements ITaskController {
     const workspaceId = req.params.workspaceId;
     const projectId = req.params.projectId;
 
-    const {
-      task,
-      description,
-      priority,
-      assignedTo,
-      dueDate,
-      workItemType,
-      epicId,
-      sprintId,
-      status,
-      parentId,
-      storyPoint,
-    } = req.body as Omit<
+    const taskData = req.body as Omit<
       CreateTaskDto,
       "createdBy" | "workspaceId" | "projectId"
     >;
@@ -48,20 +36,10 @@ export class TaskController implements ITaskController {
     }
 
     await this._taskService.createTask({
-      task,
-      description,
-      assignedTo,
+      ...taskData,
       createdBy,
-      dueDate,
-      priority,
-      status: status,
-      projectId,
       workspaceId,
-      workItemType,
-      epicId,
-      sprintId,
-      parentId,
-      storyPoint,
+      projectId,
     });
 
     res

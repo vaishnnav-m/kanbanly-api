@@ -505,10 +505,9 @@ export class TaskService implements ITaskService {
     await this._workItemRepo.update({ taskId }, newTask);
 
     const changedFields: Partial<Record<keyof IWorkItem, boolean>> = {};
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const oldValues: Record<string, any> = {};
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const newValues: Record<string, any> = {};
+    type ChangeValue = IWorkItem[keyof IWorkItem];
+    const oldValues: Partial<Record<keyof IWorkItem, ChangeValue>> = {};
+    const newValues: Partial<Record<keyof IWorkItem, ChangeValue>> = {};
 
     for (const key in newTask) {
       const objkey = key as keyof IWorkItem;

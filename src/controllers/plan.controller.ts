@@ -12,20 +12,9 @@ export class PlanController implements IPlanController {
   constructor(@inject("IPlanService") private _planService: IPlanService) {}
 
   async createPlan(req: Request, res: Response): Promise<void> {
-    const body = req.body as CreatePlanDto;
-    const newPlan: CreatePlanDto = {
-      name: body.name,
-      description: body.description,
-      monthlyPrice: body.monthlyPrice,
-      yearlyPrice: body.yearlyPrice,
-      workspaceLimit: body.workspaceLimit,
-      memberLimit: body.memberLimit,
-      projectLimit: body.projectLimit,
-      taskLimit: body.taskLimit,
-      features: body.features,
-    };
+    const planData = req.body as CreatePlanDto;
 
-    await this._planService.createPlan(newPlan);
+    await this._planService.createPlan(planData);
 
     res
       .status(HTTP_STATUS.CREATED)

@@ -258,6 +258,7 @@ export class AuthService implements IAuthService {
         email: userData.email,
         firstName: userData.firstName,
         lastName: userData.lastName,
+        profile: userData.profile,
       },
     };
 

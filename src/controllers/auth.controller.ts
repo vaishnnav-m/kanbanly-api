@@ -27,13 +27,7 @@ export class AuthController implements IAuthController {
     const response: ApiResponse<AuthUserResponseDto> = {
       success: true,
       message: SUCCESS_MESSAGES.REGISTRATION_SUCCESSFUL,
-      data: {
-        userId: user.userId,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        profile: user.profile,
-      },
+      data: user,
     };
 
     res.status(HTTP_STATUS.CREATED).json(response);
@@ -59,13 +53,7 @@ export class AuthController implements IAuthController {
     const response: ApiResponse<AuthUserResponseDto> = {
       success: true,
       message: SUCCESS_MESSAGES.LOGIN_SUCCESSFUL,
-      data: {
-        userId: responseData.user.userId,
-        firstName: responseData.user.firstName,
-        lastName: responseData.user.lastName,
-        email: responseData.user.email,
-        profile: responseData.user.profile,
-      },
+      data: responseData.user,
     };
 
     res.status(HTTP_STATUS.OK).json(response);
@@ -141,13 +129,7 @@ export class AuthController implements IAuthController {
     const response: ApiResponse<AuthUserResponseDto> = {
       success: true,
       message: SUCCESS_MESSAGES.LOGIN_SUCCESSFUL,
-      data: {
-        userId: user.userId,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        profile: user.profile,
-      },
+      data: user,
     };
 
     res.status(HTTP_STATUS.OK).json(response);
@@ -223,12 +205,7 @@ export class AuthController implements IAuthController {
     const response: ApiResponse<AuthUserResponseDto> = {
       success: true,
       message: SUCCESS_MESSAGES.LOGIN_SUCCESSFUL,
-      data: {
-        userId: responseData.user.userId,
-        firstName: responseData.user.firstName,
-        lastName: responseData.user.lastName,
-        email: responseData.user.email,
-      },
+      data: responseData.user,
     };
 
     res.status(HTTP_STATUS.OK).json(response);

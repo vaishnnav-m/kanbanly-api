@@ -32,16 +32,12 @@ export class EpicController implements IEpicController {
       );
     }
 
-    const newEpicData = {
-      title: epicData.title,
-      description: epicData.description,
-      color: epicData.color,
-      workspaceId,
+    await this._epicService.createEpic({
+      ...epicData,
       projectId,
+      workspaceId,
       createdBy: userId,
-    };
-
-    await this._epicService.createEpic(newEpicData);
+    });
 
     res.status(HTTP_STATUS.CREATED).json({
       success: true,
@@ -119,7 +115,10 @@ export class EpicController implements IEpicController {
         HTTP_STATUS.UNAUTHORIZED
       );
     }
-    const epicData = req.body as EpicUpdationDto;
+    const epicData = req.body as Omit<
+      EpicUpdationDto,
+      "epicId" | "workspaceId"
+    >;
     const workspaceId = req.params.workspaceId as string;
     const epicId = req.params.epicId as string;
 
@@ -130,22 +129,18 @@ export class EpicController implements IEpicController {
       );
     }
 
-    const newEpicData = {
+    await this._epicService.editEpic(userId, {
+      ...epicData,
       epicId,
       workspaceId,
-      title: epicData.title,
-      description: epicData.description,
-      color: epicData.color,
-      dueDate: epicData.dueDate,
-    };
-
-    await this._epicService.editEpic(userId, newEpicData);
+    });
 
     res.status(HTTP_STATUS.CREATED).json({
       success: true,
       message: SUCCESS_MESSAGES.DATA_EDITED,
     });
   }
+
   async deleteEpic(req: Request, res: Response) {
     const userId = req.user?.userid;
     if (!userId) {
