@@ -8,5 +8,10 @@ export interface IWorkspaceRepository extends IBaseRepository<IWorkspace> {
     userId: string
   ): Promise<IWorkspace[]>;
   isOwner(workspaceId: string, userId: string): Promise<boolean>;
-  findWorkspacesWithOwner(): Promise<IWorkspace[]>;
+  findWorkspacesWithOwner(options: {
+    limit?: number;
+    skip?: number;
+    search?: string;
+  }): Promise<IWorkspace[]>;
+  countWorkspaces(): Promise<number>;
 }

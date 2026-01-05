@@ -13,8 +13,10 @@ export interface IWorkspaceService {
 
   getAllWorkspaces(
     userid: string,
-    role: string
-  ): Promise<WorkspaceListResponseDto[] | null>;
+    role: string,
+    search?: string,
+    page?: number
+  ): Promise<WorkspaceListResponseDto | null>;
 
   getOneWorkspace(
     workspaceData: GetOneWorkspaceDto

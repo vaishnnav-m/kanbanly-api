@@ -39,6 +39,10 @@ export class WorkspaceController implements IWorkspaceController {
 
   async getAllWorkspaces(req: Request, res: Response) {
     const { user } = req;
+    const pageParam = req.query.page;
+    const search = req.query.search as string;
+    const page =
+      parseInt(typeof pageParam === "string" ? pageParam : "1", 10) || 1;
 
     if (!user) {
       throw new AppError(
@@ -49,7 +53,9 @@ export class WorkspaceController implements IWorkspaceController {
 
     const workspaces = await this._workspaceService.getAllWorkspaces(
       user.userid,
-      user.role as string
+      user.role as string,
+      search,
+      page
     );
 
     res.status(HTTP_STATUS.OK).json({

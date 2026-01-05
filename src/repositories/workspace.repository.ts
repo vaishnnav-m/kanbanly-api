@@ -33,10 +33,17 @@ export class WorkspaceRepository
     return userId === onwner?.createdBy;
   }
 
-  async findWorkspacesWithOwner(): Promise<IWorkspace[]> {
-    const result = this.model.aggregate([
+  async findWorkspacesWithOwner(options: {
+    limit?: number;
+    skip?: number;
+    search?: string;
+  }): Promise<IWorkspace[]> {
+    const { limit = 10, skip = 0, search = "" } = options;
+    const query = search ? { name: { $regex: search, $options: "i" } } : {};
+    console.log("search query", query,skip,limit);
+    const result = await this.model.aggregate([
       {
-        $match: {},
+        $match: query,
       },
       {
         $lookup: {
@@ -46,7 +53,12 @@ export class WorkspaceRepository
           as: "createdBy",
         },
       },
-      { $unwind: "$createdBy" },
+      {
+        $unwind: {
+          path: "$createdBy",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       {
         $lookup: {
           from: "workspacemembers",
@@ -72,8 +84,18 @@ export class WorkspaceRepository
           createdBy: 1,
         },
       },
+      {
+        $skip: skip,
+      },
+      {
+        $limit: limit,
+      },
     ]);
 
     return result;
+  }
+
+  async countWorkspaces(): Promise<number> {
+    return await this.model.countDocuments();
   }
 }

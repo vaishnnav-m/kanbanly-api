@@ -1,4 +1,3 @@
-import { IWorkspace } from "../../entities/IWorkspace";
 import { WorkspacePermission } from "../../enums/workspace-permissions.enum";
 
 export type IWorkspacePermissions = {
@@ -12,16 +11,22 @@ export interface CreateWorkspaceDto {
   createdBy: string;
 }
 
-export type WorkspaceListResponseDto = Omit<
-  IWorkspace,
-  "createdAt" | "createdBy" | "permissions"
-> & {
-  createdBy?: {
-    userId: string;
-    email: string;
+export type WorkspaceListResponseDto = {
+  workspaces: {
+    workspaceId: string;
     name: string;
-    profile?: string;
-  };
+    description?: string;
+    createdBy?: {
+      userId: string;
+      email: string;
+      name: string;
+      profile?: string;
+    };
+    memberCount?: number;
+    logo?: string;
+    slug: string;
+  }[];
+  totalPages?: number;
 };
 
 export interface GetOneWorkspaceDto {

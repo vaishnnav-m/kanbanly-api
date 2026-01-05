@@ -26,7 +26,6 @@ import { DEFAULT_WORKSPACE_PERMISSIONS } from "../shared/constants/permissions";
 import { IPermissionService } from "../types/service-interface/IPermissionService";
 import { WorkspacePermission } from "../types/enums/workspace-permissions.enum";
 import { IUser } from "../types/entities/IUser";
-import { IProjectService } from "../types/service-interface/IProjectService";
 
 @injectable()
 export class WorkspaceService implements IWorkspaceService {
@@ -43,8 +42,7 @@ export class WorkspaceService implements IWorkspaceService {
     @inject("ISubscriptionService")
     private _subscriptionService: ISubscriptionService,
     @inject("IPermissionService")
-    private _permissionService: IPermissionService,
-    @inject("IProjectService") private _projectService: IProjectService
+    private _permissionService: IPermissionService
   ) {
     this._slugify = normalizeString;
   }
@@ -103,10 +101,19 @@ export class WorkspaceService implements IWorkspaceService {
 
   async getAllWorkspaces(
     userId: string,
-    role: string
-  ): Promise<WorkspaceListResponseDto[]> {
+    role: string,
+    search?: string,
+    page?: number
+  ): Promise<WorkspaceListResponseDto> {
     if (role === "admin") {
-      const workspaces = await this._workspaceRepo.findWorkspacesWithOwner();
+      const skip = ((page || 1) - 1) * 10;
+      const workspaces = await this._workspaceRepo.findWorkspacesWithOwner({
+        limit: 10,
+        skip,
+        search,
+      });
+      const totalWorkspaces = await this._workspaceRepo.countWorkspaces();
+      const totalPages = Math.round(totalWorkspaces / 10);
 
       const modified = workspaces.map((workspace) => {
         const createdBy = workspace.createdBy as IUser;
@@ -126,7 +133,7 @@ export class WorkspaceService implements IWorkspaceService {
         };
       });
 
-      return modified;
+      return { workspaces: modified, totalPages };
     }
 
     const memberWorkspaces: IWorkspaceMember[] =
@@ -151,7 +158,7 @@ export class WorkspaceService implements IWorkspaceService {
       };
     });
 
-    return modified;
+    return { workspaces: modified };
   }
 
   async getOneWorkspace(
