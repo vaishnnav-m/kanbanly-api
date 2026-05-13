@@ -10,6 +10,7 @@ export const config = {
   cookies: {
     REFRESH_COOKIE_MAXAGE: process.env.REFRESH_COOKIE_MAXAGE || 604800000,
     ACCESS_COOKIE_MAXAGE: process.env.ACCESS_COOKIE_MAXAGE || 300000,
+    SUB_DOMAIN: process.env.SUB_DOMAIN || null
   },
 
   cloudinary: {
@@ -62,7 +63,7 @@ export const config = {
   ai: {
     GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
     model: "gemini-2.5-flash",
-    temperature:0,
+    temperature: 0,
   },
 
   vectorDB: {

@@ -1,6 +1,8 @@
 import { Response } from "express";
+import { config } from "../../config";
 
 const isProduction = process.env.NODE_ENV === "production";
+const subDomain = config.cookies.SUB_DOMAIN;
 
 export const setAuthCookies = (
   res: Response,
@@ -13,7 +15,7 @@ export const setAuthCookies = (
     secure: isProduction,
     sameSite: isProduction ? "none" : "lax",
     maxAge,
-    ...(isProduction && { domain: ".vaishnnav.online" }),
+    ...(isProduction && subDomain && { domain: subDomain }),
   });
 };
 
@@ -23,6 +25,6 @@ export const clearAuthCookies = (res: Response, key: string) => {
     secure: isProduction,
     sameSite: isProduction ? "none" : "lax",
     maxAge: 0,
-    ...(isProduction && { domain: ".vaishnnav.online" }),
+    ...(isProduction && subDomain && { domain: subDomain }),
   });
 };
