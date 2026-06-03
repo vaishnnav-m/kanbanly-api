@@ -5,6 +5,7 @@ import logger from "../../logger/winston.logger";
 import { ProjectTemplateEnum } from "../../types/enums/project-template.enum";
 import { IProjectService } from "../../types/service-interface/IProjectService";
 import { ToolPayloadDto } from "../../types/dtos/ai/ai.dto";
+import { formatToolErrorForUser } from "../utils/tool-error-message";
 
 @injectable()
 export class CreateProjectTool {
@@ -44,7 +45,12 @@ export class CreateProjectTool {
 
           return `✅ Project "${name}" created using ${template} template.`;
         } catch (error) {
-          logger.error(`An error occured in the create project tool`, error);
+          logger.error("create_project tool failed", {
+            error,
+            name,
+            workspaceId,
+          });
+          return formatToolErrorForUser("create_project", error, { name });
         }
       },
       {

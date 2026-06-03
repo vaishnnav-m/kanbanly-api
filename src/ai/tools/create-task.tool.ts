@@ -9,6 +9,10 @@ import {
 } from "../../types/dtos/task/task.dto";
 import { tool } from "langchain";
 import logger from "../../logger/winston.logger";
+import {
+  formatToolErrorForUser,
+  MISSING_PROJECT_CONTEXT_ERROR,
+} from "../utils/tool-error-message";
 
 @injectable()
 export class CreateTaskTool {
@@ -36,9 +40,7 @@ export class CreateTaskTool {
       }) => {
         try {
           if (!projectId) {
-            throw new Error(
-              "Project context is missing. Ask the user to select a project."
-            );
+            throw new Error(MISSING_PROJECT_CONTEXT_ERROR);
           }
 
           await this._taskService.createTask({
@@ -52,8 +54,16 @@ export class CreateTaskTool {
             status,
             createdBy: userId,
           });
+
+          return `✅ Task "${task}" created successfully.`;
         } catch (error) {
-          logger.error(`An error occured in the create task tool`, error);
+          logger.error("create_task tool failed", {
+            error,
+            task,
+            workspaceId,
+            projectId,
+          });
+          return formatToolErrorForUser("create_task", error, { task });
         }
       },
       {

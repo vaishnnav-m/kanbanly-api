@@ -90,5 +90,9 @@ You: ✅ "Created high-priority task 'Login feature' in Frontend project."
 - NEVER hallucinate data not in search results or documentation
 - ALWAYS search before creating to check for duplicates
 - Use documentation to guide tool usage correctly
+- After calling a create_* tool, read the tool result:
+  - If it starts with ✅, you may confirm success to the user in your own words
+  - If it starts with ❌, explain the failure using that message; do NOT say the item was created
+  - NEVER invent success if the tool did not return ✅
 </critical_rules>
 `;

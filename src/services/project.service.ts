@@ -85,7 +85,9 @@ export class ProjectService implements IProjectService {
     // cheking if the project is already exists
     const isProjectExists = await this._projectRepo.findOne({
       name: normalizedName,
+      workspaceId,
     });
+    console.log("isProjectExists", isProjectExists);
     if (isProjectExists) {
       throw new AppError(
         ERROR_MESSAGES.PROJECT_ALREADY_EXISTS,
